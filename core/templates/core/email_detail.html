@@ -1,0 +1,37 @@
+{% extends "core/base.html" %}
+{% block title %}{{ message.subject }} · Emails Manager{% endblock %}
+{% block content %}
+<div class="mb-3">
+  <a href="{% url 'core:inbox' %}?window={{ back_window }}" class="text-secondary small text-decoration-none">← Back to inbox</a>
+</div>
+
+<div class="card card-soft mb-3">
+  <div class="card-body">
+    <h1 class="h5 mb-3">{{ message.subject }}</h1>
+    <dl class="row mb-0 small">
+      <dt class="col-sm-2 text-secondary">Account</dt>
+      <dd class="col-sm-10">{{ account.email_address }}</dd>
+      <dt class="col-sm-2 text-secondary">From</dt>
+      <dd class="col-sm-10">{{ message.from_ }}</dd>
+      {% if message.to %}
+        <dt class="col-sm-2 text-secondary">To</dt>
+        <dd class="col-sm-10">{{ message.to|join:", " }}</dd>
+      {% endif %}
+      <dt class="col-sm-2 text-secondary">Date</dt>
+      <dd class="col-sm-10">{{ message.date|date:"M j, Y H:i" }}</dd>
+    </dl>
+  </div>
+</div>
+
+<div class="card card-soft">
+  <div class="card-body">
+    {% if message.html %}
+      <iframe srcdoc="{{ message.html }}" sandbox style="width:100%; min-height:480px; border:0;"></iframe>
+    {% elif message.text %}
+      <pre class="mb-0" style="white-space:pre-wrap; word-wrap:break-word; font-family:inherit;">{{ message.text }}</pre>
+    {% else %}
+      <p class="text-secondary mb-0">(empty message)</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

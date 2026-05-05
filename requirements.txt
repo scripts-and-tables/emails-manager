@@ -1,0 +1,11 @@
+Django>=5.1,<6.0
+imap-tools>=1.7
+django-otp>=1.5
+qrcode[pil]>=7.4
+cryptography>=42
+dj-database-url>=2.2
+python-decouple>=3.8
+psycopg[binary]>=3.2
+gunicorn>=22
+whitenoise>=6.7
+requests>=2.32

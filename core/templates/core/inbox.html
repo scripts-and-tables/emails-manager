@@ -1,0 +1,67 @@
+{% extends "core/base.html" %}
+{% block title %}Inbox · Emails Manager{% endblock %}
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h1 class="h4 mb-0">Inbox</h1>
+  <form method="get" class="d-flex align-items-center gap-2">
+    <label class="text-secondary small mb-0" for="id_window">Show:</label>
+    <select name="window" id="id_window" class="form-select form-select-sm" onchange="this.form.submit()">
+      {% for value, label in windows %}
+        <option value="{{ value }}" {% if value == window %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </form>
+</div>
+
+{% if not has_accounts %}
+  <div class="card card-soft">
+    <div class="card-body text-center py-5">
+      <p class="text-secondary mb-3">No email accounts yet.</p>
+      <a href="{% url 'core:account_new' %}" class="btn btn-primary">Add an account</a>
+    </div>
+  </div>
+{% else %}
+  {% if errors %}
+    <div class="alert alert-warning">
+      <strong>Some accounts failed to fetch:</strong>
+      <ul class="mb-0">
+        {% for e in errors %}
+          <li><code>{{ e.account.email_address }}</code> — {{ e.message }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <div class="card card-soft">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Account</th>
+            <th>From</th>
+            <th>Subject</th>
+            <th style="width:160px">Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for h in headers %}
+            <tr style="cursor:pointer"
+                onclick="window.location='{% url 'core:email_detail' h.account_id h.uid %}?window={{ window }}'">
+              <td class="text-secondary small">{{ h.account_email }}</td>
+              <td class="truncate-cell" style="max-width:240px">{{ h.from_ }}</td>
+              <td class="truncate-cell" style="max-width:520px">
+                {% if not h.seen %}<strong>{{ h.subject }}</strong>{% else %}{{ h.subject }}{% endif %}
+              </td>
+              <td class="text-secondary small">{{ h.date|date:"M j, H:i" }}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="4" class="text-center text-secondary py-4">No messages in this window.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <p class="text-secondary small mt-3 mb-0">{{ headers|length }} message{{ headers|length|pluralize }}.</p>
+{% endif %}
+{% endblock %}

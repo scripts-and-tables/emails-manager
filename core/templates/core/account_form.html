@@ -1,0 +1,54 @@
+{% extends "core/base.html" %}
+{% block title %}{% if is_new %}Add{% else %}Edit{% endif %} account · Emails Manager{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-7">
+    <div class="card card-soft">
+      <div class="card-body p-4">
+        <h1 class="h4 mb-3">{% if is_new %}Add email account{% else %}Edit {{ account.email_address }}{% endif %}</h1>
+        <form method="post" novalidate>
+          {% csrf_token %}
+          {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+
+          <div class="mb-3">
+            <label class="form-label" for="id_email_address">Email address</label>
+            {{ form.email_address }}
+            {% for err in form.email_address.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" for="id_display_name">Display name <span class="text-secondary small">(optional)</span></label>
+            {{ form.display_name }}
+            {% for err in form.display_name.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+          </div>
+
+          <div class="row">
+            <div class="col-md-8 mb-3">
+              <label class="form-label" for="id_imap_host">IMAP host</label>
+              {{ form.imap_host }}
+              {% for err in form.imap_host.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label" for="id_imap_port">Port</label>
+              {{ form.imap_port }}
+              {% for err in form.imap_port.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label" for="id_password">App password{% if is_new %} <span class="text-danger">*</span>{% endif %}</label>
+            {{ form.password }}
+            {% if form.password.help_text %}<div class="form-text">{{ form.password.help_text }}</div>{% endif %}
+            {% for err in form.password.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">{% if is_new %}Add account{% else %}Save changes{% endif %}</button>
+            <a href="{% url 'core:accounts_list' %}" class="btn btn-outline-secondary">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

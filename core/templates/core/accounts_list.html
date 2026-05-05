@@ -1,0 +1,45 @@
+{% extends "core/base.html" %}
+{% block title %}Accounts · Emails Manager{% endblock %}
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h1 class="h4 mb-0">Email accounts</h1>
+  <a href="{% url 'core:account_new' %}" class="btn btn-primary btn-sm">+ Add account</a>
+</div>
+
+{% if accounts %}
+  <div class="card card-soft">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr><th>Email</th><th>Display name</th><th>IMAP host</th><th>Port</th><th class="text-end">Actions</th></tr>
+        </thead>
+        <tbody>
+          {% for account in accounts %}
+            <tr>
+              <td>{{ account.email_address }}</td>
+              <td class="text-secondary">{{ account.display_name|default:"—" }}</td>
+              <td><code class="small">{{ account.imap_host }}</code></td>
+              <td>{{ account.imap_port }}</td>
+              <td class="text-end">
+                <a href="{% url 'core:account_edit' account.pk %}" class="btn btn-outline-secondary btn-sm">Edit</a>
+                <form method="post" action="{% url 'core:account_delete' account.pk %}" class="d-inline"
+                      onsubmit="return confirm('Remove {{ account.email_address }}?');">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-outline-danger btn-sm">Remove</button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% else %}
+  <div class="card card-soft">
+    <div class="card-body text-center py-5">
+      <p class="text-secondary mb-3">You haven't added any email accounts yet.</p>
+      <a href="{% url 'core:account_new' %}" class="btn btn-primary">Add your first account</a>
+    </div>
+  </div>
+{% endif %}
+{% endblock %}
