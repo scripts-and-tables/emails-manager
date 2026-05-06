@@ -59,10 +59,27 @@
                 <div class="d-flex align-items-center gap-2">
                   <span class="status-dot-css status-idle-bg" data-status-dot aria-hidden="true"></span>
                   <span class="status-message text-secondary small flex-grow-1">Not tested</span>
+                  <button type="button"
+                          class="btn btn-sm btn-outline-warning border-0 d-none update-password-btn"
+                          data-password-url="{% url 'core:account_update_password' account.pk %}"
+                          title="Update app password" aria-label="Update app password">
+                    <i class="bi bi-key"></i>
+                  </button>
                   <button type="button" class="btn btn-sm btn-outline-secondary border-0 test-btn"
                           title="Test connection" aria-label="Test connection">
                     <i class="bi bi-arrow-repeat"></i>
                   </button>
+                </div>
+                <div class="d-none mt-2 update-password-form">
+                  <div class="input-group input-group-sm">
+                    <span class="input-group-text"><i class="bi bi-key"></i></span>
+                    <input type="password" class="form-control update-password-input"
+                           placeholder="New app password" autocomplete="new-password">
+                    <button type="button" class="btn btn-primary update-password-save"
+                            title="Save and re-test"><i class="bi bi-check2"></i></button>
+                    <button type="button" class="btn btn-outline-secondary update-password-cancel"
+                            title="Cancel"><i class="bi bi-x"></i></button>
+                  </div>
                 </div>
               </td>
               <td class="text-end">
@@ -108,13 +125,30 @@
                    {% if account.is_enabled %}checked{% endif %}>
           </div>
         </div>
-        <div class="d-flex align-items-center gap-2 mb-3 px-2 py-2 rounded" style="background: rgba(0,0,0,.025);">
+        <div class="d-flex align-items-center gap-2 mb-2 px-2 py-2 rounded" style="background: rgba(0,0,0,.025);">
           <span class="status-dot-css status-idle-bg" data-status-dot aria-hidden="true"></span>
           <span class="status-message text-secondary small flex-grow-1">Not tested</span>
+          <button type="button"
+                  class="btn btn-sm btn-outline-warning border-0 d-none update-password-btn"
+                  data-password-url="{% url 'core:account_update_password' account.pk %}"
+                  title="Update app password" aria-label="Update app password">
+            <i class="bi bi-key"></i>
+          </button>
           <button type="button" class="btn btn-sm btn-outline-secondary border-0 test-btn"
                   title="Test connection" aria-label="Test connection">
             <i class="bi bi-arrow-repeat"></i>
           </button>
+        </div>
+        <div class="d-none mb-3 update-password-form">
+          <div class="input-group input-group-sm">
+            <span class="input-group-text"><i class="bi bi-key"></i></span>
+            <input type="password" class="form-control update-password-input"
+                   placeholder="New app password" autocomplete="new-password">
+            <button type="button" class="btn btn-primary update-password-save"
+                    title="Save and re-test"><i class="bi bi-check2"></i></button>
+            <button type="button" class="btn btn-outline-secondary update-password-cancel"
+                    title="Cancel"><i class="bi bi-x"></i></button>
+          </div>
         </div>
         <div class="d-flex gap-2">
           <a href="{% url 'core:account_edit' account.pk %}" class="btn btn-outline-secondary btn-sm flex-grow-1">
@@ -149,6 +183,27 @@
       return document.querySelectorAll(`[data-account-id="${accountId}"]`);
     }
 
+    function setUpdatePasswordVisibility(row, mode) {
+      const keyBtn = row.querySelector('.update-password-btn');
+      const form = row.querySelector('.update-password-form');
+      if (mode === 'hidden') {
+        if (keyBtn) keyBtn.classList.add('d-none');
+        if (form) form.classList.add('d-none');
+      } else if (mode === 'available') {
+        if (keyBtn) keyBtn.classList.remove('d-none');
+        if (form) form.classList.add('d-none');
+      } else if (mode === 'open') {
+        if (keyBtn) keyBtn.classList.add('d-none');
+        if (form) form.classList.remove('d-none');
+      }
+    }
+
+    function setUpdatePasswordForAccount(accountId, mode) {
+      document.querySelectorAll(`[data-account-id="${accountId}"]`).forEach((row) => {
+        setUpdatePasswordVisibility(row, mode);
+      });
+    }
+
     function paintRow(row, state, message) {
       const dot = row.querySelector('[data-status-dot]');
       const messageCell = row.querySelector('.status-message');
@@ -158,16 +213,19 @@
         messageCell.className = 'status-message text-secondary small flex-grow-1';
         messageCell.textContent = 'Testing…';
         if (testBtn) { testBtn.disabled = true; testBtn.classList.add('is-testing'); }
+        setUpdatePasswordVisibility(row, 'hidden');
       } else if (state === 'ok') {
         if (dot) dot.className = 'status-dot-css status-ok-bg';
         messageCell.className = 'status-message text-success small flex-grow-1';
         messageCell.textContent = message || 'Connected';
         if (testBtn) { testBtn.disabled = false; testBtn.classList.remove('is-testing'); }
+        setUpdatePasswordVisibility(row, 'hidden');
       } else if (state === 'fail') {
         if (dot) dot.className = 'status-dot-css status-fail-bg';
         messageCell.className = 'status-message text-danger small flex-grow-1';
         messageCell.textContent = message || 'Failed';
         if (testBtn) { testBtn.disabled = false; testBtn.classList.remove('is-testing'); }
+        setUpdatePasswordVisibility(row, 'available');
       }
     }
 
@@ -195,6 +253,72 @@
       btn.addEventListener('click', () => {
         const row = btn.closest('[data-account-row]');
         testAccount(row.dataset.accountId, row.dataset.testUrl);
+      });
+    });
+
+    document.querySelectorAll('.update-password-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const row = btn.closest('[data-account-row]');
+        const accountId = row.dataset.accountId;
+        setUpdatePasswordForAccount(accountId, 'open');
+        const visibleForm = Array.from(
+          document.querySelectorAll(`[data-account-id="${accountId}"] .update-password-form`)
+        ).find((f) => f.offsetParent !== null);
+        if (visibleForm) visibleForm.querySelector('.update-password-input').focus();
+      });
+    });
+
+    document.querySelectorAll('.update-password-cancel').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const row = btn.closest('[data-account-row]');
+        const accountId = row.dataset.accountId;
+        document.querySelectorAll(`[data-account-id="${accountId}"] .update-password-input`)
+          .forEach((i) => { i.value = ''; });
+        setUpdatePasswordForAccount(accountId, 'available');
+      });
+    });
+
+    document.querySelectorAll('.update-password-save').forEach((saveBtn) => {
+      saveBtn.addEventListener('click', async () => {
+        const row = saveBtn.closest('[data-account-row]');
+        const accountId = row.dataset.accountId;
+        const input = row.querySelector('.update-password-input');
+        const password = input.value;
+        if (!password) { input.focus(); return; }
+        const url = row.querySelector('.update-password-btn').dataset.passwordUrl;
+        const allSaveBtns = document.querySelectorAll(`[data-account-id="${accountId}"] .update-password-save`);
+        allSaveBtns.forEach((b) => { b.disabled = true; });
+        try {
+          const body = new URLSearchParams();
+          body.set('password', password);
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrfToken, 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: body.toString(),
+          });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          document.querySelectorAll(`[data-account-id="${accountId}"] .update-password-input`)
+            .forEach((i) => { i.value = ''; });
+          setUpdatePasswordForAccount(accountId, 'hidden');
+          testAccount(accountId, row.dataset.testUrl);
+        } catch (err) {
+          input.classList.add('is-invalid');
+          setTimeout(() => input.classList.remove('is-invalid'), 1500);
+        } finally {
+          allSaveBtns.forEach((b) => { b.disabled = false; });
+        }
+      });
+    });
+
+    document.querySelectorAll('.update-password-input').forEach((input) => {
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          input.closest('[data-account-row]').querySelector('.update-password-save').click();
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          input.closest('[data-account-row]').querySelector('.update-password-cancel').click();
+        }
       });
     });
 

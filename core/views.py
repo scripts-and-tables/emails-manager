@@ -275,6 +275,18 @@ def account_toggle(request: HttpRequest, pk: int) -> JsonResponse:
 
 
 @otp_required
+@require_http_methods(["POST"])
+def account_update_password(request: HttpRequest, pk: int) -> JsonResponse:
+    account = get_object_or_404(EmailAccount, pk=pk, owner=request.user)
+    new_password = (request.POST.get("password") or "").strip()
+    if not new_password:
+        return JsonResponse({"ok": False, "error": "Password is required."}, status=400)
+    account.set_password(new_password)
+    account.save(update_fields=["encrypted_password", "updated_at"])
+    return JsonResponse({"ok": True})
+
+
+@otp_required
 def inbox(request: HttpRequest) -> HttpResponse:
     window = request.GET.get("window", "1d")
     days_map = {"1d": 1, "7d": 7, "30d": 30}
