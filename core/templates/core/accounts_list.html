@@ -26,12 +26,11 @@
       <table class="table table-hover align-middle mb-0">
         <thead>
           <tr>
-            <th style="width:1%"></th>
             <th>Email</th>
             <th>Display name</th>
             <th>IMAP host</th>
             <th>Port</th>
-            <th>Status</th>
+            <th style="min-width: 240px;">Status</th>
             <th class="text-end">Actions</th>
           </tr>
         </thead>
@@ -39,25 +38,30 @@
           {% for account in accounts %}
             <tr data-account-row data-account-id="{{ account.pk }}"
                 data-test-url="{% url 'core:account_test' account.pk %}">
-              <td>
-                <span class="status-dot-css status-idle-bg" data-status-dot aria-hidden="true"></span>
-              </td>
               <td>{{ account.email_address }}</td>
               <td class="text-secondary">{{ account.display_name|default:"—" }}</td>
               <td><code class="small">{{ account.imap_host }}</code></td>
               <td>{{ account.imap_port }}</td>
-              <td class="status-message text-secondary small">Not tested</td>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <span class="status-dot-css status-idle-bg" data-status-dot aria-hidden="true"></span>
+                  <span class="status-message text-secondary small flex-grow-1">Not tested</span>
+                  <button type="button" class="btn btn-sm btn-outline-secondary border-0 test-btn"
+                          title="Test connection" aria-label="Test connection">
+                    <i class="bi bi-arrow-repeat"></i>
+                  </button>
+                </div>
+              </td>
               <td class="text-end">
-                <button type="button" class="btn btn-outline-primary btn-sm test-btn">
-                  <i class="bi bi-lightning-charge me-1"></i>Test
-                </button>
-                <a href="{% url 'core:account_edit' account.pk %}" class="btn btn-outline-secondary btn-sm">
+                <a href="{% url 'core:account_edit' account.pk %}" class="btn btn-outline-secondary btn-sm"
+                   title="Edit" aria-label="Edit">
                   <i class="bi bi-pencil"></i>
                 </a>
                 <form method="post" action="{% url 'core:account_delete' account.pk %}" class="d-inline"
                       onsubmit="return confirm('Remove {{ account.email_address }}?');">
                   {% csrf_token %}
-                  <button type="submit" class="btn btn-outline-danger btn-sm">
+                  <button type="submit" class="btn btn-outline-danger btn-sm"
+                          title="Remove" aria-label="Remove">
                     <i class="bi bi-trash"></i>
                   </button>
                 </form>
@@ -73,31 +77,32 @@
     {% for account in accounts %}
       <div class="item-card p-3" data-account-row data-account-id="{{ account.pk }}"
            data-test-url="{% url 'core:account_test' account.pk %}">
-        <div class="d-flex align-items-start gap-2 mb-2">
-          <span class="status-dot-css status-idle-bg mt-2" data-status-dot aria-hidden="true"></span>
-          <div class="flex-grow-1 min-w-0">
-            <div class="fw-semibold text-truncate">{{ account.email_address }}</div>
-            {% if account.display_name %}
-              <div class="text-secondary small">{{ account.display_name }}</div>
-            {% endif %}
-            <div class="text-secondary small mt-1">
-              <code>{{ account.imap_host }}:{{ account.imap_port }}</code>
-            </div>
+        <div class="mb-2">
+          <div class="fw-semibold text-truncate">{{ account.email_address }}</div>
+          {% if account.display_name %}
+            <div class="text-secondary small">{{ account.display_name }}</div>
+          {% endif %}
+          <div class="text-secondary small mt-1">
+            <code>{{ account.imap_host }}:{{ account.imap_port }}</code>
           </div>
         </div>
-        <div class="status-message text-secondary small mb-3">Not tested</div>
-        <div class="d-flex gap-2">
-          <button type="button" class="btn btn-outline-primary btn-sm flex-grow-1 test-btn">
-            <i class="bi bi-lightning-charge me-1"></i>Test
+        <div class="d-flex align-items-center gap-2 mb-3 px-2 py-2 rounded" style="background: rgba(0,0,0,.025);">
+          <span class="status-dot-css status-idle-bg" data-status-dot aria-hidden="true"></span>
+          <span class="status-message text-secondary small flex-grow-1">Not tested</span>
+          <button type="button" class="btn btn-sm btn-outline-secondary border-0 test-btn"
+                  title="Test connection" aria-label="Test connection">
+            <i class="bi bi-arrow-repeat"></i>
           </button>
-          <a href="{% url 'core:account_edit' account.pk %}" class="btn btn-outline-secondary btn-sm">
+        </div>
+        <div class="d-flex gap-2">
+          <a href="{% url 'core:account_edit' account.pk %}" class="btn btn-outline-secondary btn-sm flex-grow-1">
             <i class="bi bi-pencil me-1"></i>Edit
           </a>
           <form method="post" action="{% url 'core:account_delete' account.pk %}"
                 onsubmit="return confirm('Remove {{ account.email_address }}?');">
             {% csrf_token %}
             <button type="submit" class="btn btn-outline-danger btn-sm">
-              <i class="bi bi-trash"></i>
+              <i class="bi bi-trash me-1"></i>Remove
             </button>
           </form>
         </div>
@@ -106,16 +111,9 @@
   </div>
 
   <style>
-    .status-spin {
-      display: inline-block;
-      width: 12px; height: 12px;
-      border: 2px solid #dee2e6;
-      border-top-color: #0d6efd;
-      border-radius: 50%;
-      animation: status-spin 0.7s linear infinite;
-      vertical-align: middle;
-    }
-    @keyframes status-spin { to { transform: rotate(360deg); } }
+    .test-btn.is-testing i { animation: test-spin 0.7s linear infinite; display: inline-block; }
+    @keyframes test-spin { to { transform: rotate(360deg); } }
+    .test-btn:disabled { opacity: 1; }
   </style>
 
   <script>
@@ -132,32 +130,19 @@
       const testBtn = row.querySelector('.test-btn');
 
       if (state === 'testing') {
-        if (dot) {
-          dot.outerHTML = '<span class="status-spin" data-status-dot aria-hidden="true"></span>';
-        }
-        messageCell.className = 'status-message text-secondary small' + (messageCell.classList.contains('mb-3') ? ' mb-3' : '');
+        messageCell.className = 'status-message text-secondary small flex-grow-1';
         messageCell.textContent = 'Testing…';
-        if (testBtn) testBtn.disabled = true;
+        if (testBtn) { testBtn.disabled = true; testBtn.classList.add('is-testing'); }
       } else if (state === 'ok') {
-        const newDot = document.createElement('span');
-        newDot.className = 'status-dot-css status-ok-bg' + (row.tagName === 'TR' ? '' : ' mt-2');
-        newDot.dataset.statusDot = '';
-        newDot.setAttribute('aria-hidden', 'true');
-        const oldDot = row.querySelector('[data-status-dot]');
-        if (oldDot) oldDot.replaceWith(newDot);
-        messageCell.className = 'status-message text-success small' + (messageCell.classList.contains('mb-3') ? ' mb-3' : '');
+        if (dot) dot.className = 'status-dot-css status-ok-bg';
+        messageCell.className = 'status-message text-success small flex-grow-1';
         messageCell.textContent = message || 'Connected';
-        if (testBtn) testBtn.disabled = false;
+        if (testBtn) { testBtn.disabled = false; testBtn.classList.remove('is-testing'); }
       } else if (state === 'fail') {
-        const newDot = document.createElement('span');
-        newDot.className = 'status-dot-css status-fail-bg' + (row.tagName === 'TR' ? '' : ' mt-2');
-        newDot.dataset.statusDot = '';
-        newDot.setAttribute('aria-hidden', 'true');
-        const oldDot = row.querySelector('[data-status-dot]');
-        if (oldDot) oldDot.replaceWith(newDot);
-        messageCell.className = 'status-message text-danger small' + (messageCell.classList.contains('mb-3') ? ' mb-3' : '');
+        if (dot) dot.className = 'status-dot-css status-fail-bg';
+        messageCell.className = 'status-message text-danger small flex-grow-1';
         messageCell.textContent = message || 'Failed';
-        if (testBtn) testBtn.disabled = false;
+        if (testBtn) { testBtn.disabled = false; testBtn.classList.remove('is-testing'); }
       }
     }
 
@@ -198,8 +183,12 @@
           }
         });
         testAllBtn.disabled = true;
+        testAllBtn.classList.add('is-testing');
         Promise.all(Array.from(seen.entries()).map(([id, url]) => testAccount(id, url)))
-          .finally(() => { testAllBtn.disabled = false; });
+          .finally(() => {
+            testAllBtn.disabled = false;
+            testAllBtn.classList.remove('is-testing');
+          });
       });
     }
   })();

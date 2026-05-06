@@ -6,6 +6,7 @@ app_name = "core"
 
 urlpatterns = [
     path("", views.index, name="index"),
+    path("home/", views.home, name="home"),
     path("login/", views.login_view, name="login"),
     path("logout/", views.logout_view, name="logout"),
     path("verify-otp/", views.verify_otp, name="verify_otp"),

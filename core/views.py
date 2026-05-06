@@ -37,14 +37,20 @@ def _send_otp_or_flash(request: HttpRequest, user) -> bool:
 
 def index(request: HttpRequest) -> HttpResponse:
     if request.user.is_authenticated and is_otp_verified(request):
-        return redirect("core:accounts_list")
+        return redirect("core:home")
     return redirect("core:login")
+
+
+@otp_required
+def home(request: HttpRequest) -> HttpResponse:
+    account_count = EmailAccount.objects.filter(owner=request.user).count()
+    return render(request, "core/home.html", {"account_count": account_count})
 
 
 @require_http_methods(["GET", "POST"])
 def login_view(request: HttpRequest) -> HttpResponse:
     if request.user.is_authenticated and is_otp_verified(request):
-        return redirect("core:accounts_list")
+        return redirect("core:home")
 
     if request.method == "POST":
         form = AuthenticationForm(request, data=request.POST)
@@ -98,7 +104,7 @@ def verify_otp(request: HttpRequest) -> HttpResponse:
                 auth_login(request, user)
                 request.session[OTP_VERIFIED_SESSION_KEY] = True
                 request.session.pop(PRE_OTP_USER_KEY, None)
-                return redirect("core:accounts_list")
+                return redirect("core:home")
             form.add_error("token", error)
     else:
         form = OtpForm()

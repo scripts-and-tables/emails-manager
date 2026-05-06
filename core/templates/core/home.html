@@ -1,0 +1,109 @@
+{% extends "core/base.html" %}
+{% block title %}Home · Emails Manager{% endblock %}
+{% block content %}
+<div class="card card-soft mb-4 overflow-hidden">
+  <div class="card-body p-4 p-md-5 position-relative" style="background: linear-gradient(135deg, #005FF9 0%, #0099FF 100%); color: #fff;">
+    <div class="row align-items-center g-3">
+      <div class="col-12 col-md-auto">
+        <span class="brand-mark brand-mark-lg" aria-hidden="true" style="background: rgba(255,255,255,.18); box-shadow: none;">@</span>
+      </div>
+      <div class="col">
+        <h1 class="h3 mb-1">
+          {% if user.first_name %}
+            Welcome back, {{ user.first_name }}.
+          {% else %}
+            Welcome back, {{ user.username }}.
+          {% endif %}
+        </h1>
+        <p class="mb-0 opacity-75">Manage your mailboxes and read recent mail from one place.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-12 col-sm-6 col-lg-4">
+    <a href="{% url 'core:inbox' %}" class="card card-soft text-decoration-none text-reset h-100 home-tile">
+      <div class="card-body p-4">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <span class="home-tile-icon home-tile-icon-blue"><i class="bi bi-inbox"></i></span>
+          <h2 class="h5 mb-0">Inbox</h2>
+        </div>
+        <p class="text-secondary small mb-0">
+          See recent messages across your accounts. Search by subject or sender.
+        </p>
+        <div class="text-primary small mt-3">
+          Open inbox <i class="bi bi-arrow-right ms-1"></i>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <div class="col-12 col-sm-6 col-lg-4">
+    <a href="{% url 'core:accounts_list' %}" class="card card-soft text-decoration-none text-reset h-100 home-tile">
+      <div class="card-body p-4">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <span class="home-tile-icon home-tile-icon-green"><i class="bi bi-person-rolodex"></i></span>
+          <h2 class="h5 mb-0">Accounts</h2>
+        </div>
+        <p class="text-secondary small mb-0">
+          {% if account_count == 0 %}
+            No mailboxes connected yet. Add your first account.
+          {% elif account_count == 1 %}
+            1 mailbox connected. Test connectivity or add another.
+          {% else %}
+            {{ account_count }} mailboxes connected.
+          {% endif %}
+        </p>
+        <div class="text-primary small mt-3">
+          {% if account_count == 0 %}Add an account{% else %}Manage accounts{% endif %}
+          <i class="bi bi-arrow-right ms-1"></i>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <div class="col-12 col-sm-6 col-lg-4">
+    <a href="{% url 'core:profile' %}" class="card card-soft text-decoration-none text-reset h-100 home-tile">
+      <div class="card-body p-4">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <span class="home-tile-icon home-tile-icon-violet"><i class="bi bi-person-circle"></i></span>
+          <h2 class="h5 mb-0">Profile</h2>
+        </div>
+        <p class="text-secondary small mb-0">
+          Update your name, email, or password. Sign out when you're done.
+        </p>
+        <div class="text-primary small mt-3">
+          View profile <i class="bi bi-arrow-right ms-1"></i>
+        </div>
+      </div>
+    </a>
+  </div>
+</div>
+
+<div class="card card-soft">
+  <div class="card-body p-4">
+    <h2 class="h6 text-secondary text-uppercase mb-3" style="letter-spacing:.05em;">
+      <i class="bi bi-lightbulb me-1"></i>Tips
+    </h2>
+    <ul class="mb-0 small text-secondary">
+      <li class="mb-2">For mail.ru, generate an <strong>app-specific password</strong> in account security settings and make sure IMAP is enabled.</li>
+      <li class="mb-2">Use the <strong>Test</strong> button on the Accounts page to verify connectivity without leaving the app.</li>
+      <li>Forgot your password? Use <a href="{% url 'core:profile' %}">Profile → Change password</a> while signed in, or sign out and use "Forgot your password?" on the login page.</li>
+    </ul>
+  </div>
+</div>
+
+<style>
+  .home-tile { transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease; }
+  .home-tile:hover { border-color: rgba(13, 110, 253, .35); box-shadow: 0 4px 14px rgba(0,0,0,.06); transform: translateY(-1px); }
+  .home-tile-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 44px; height: 44px; border-radius: 10px; font-size: 22px;
+    flex-shrink: 0;
+  }
+  .home-tile-icon-blue   { background: rgba(13, 110, 253, .1);  color: #0d6efd; }
+  .home-tile-icon-green  { background: rgba(25, 135, 84, .1);   color: #198754; }
+  .home-tile-icon-violet { background: rgba(111, 66, 193, .1);  color: #6f42c1; }
+</style>
+{% endblock %}
