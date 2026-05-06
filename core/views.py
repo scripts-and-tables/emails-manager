@@ -144,6 +144,12 @@ def account_new(request: HttpRequest) -> HttpResponse:
 
 
 @otp_required
+def account_detail(request: HttpRequest, pk: int) -> HttpResponse:
+    account = get_object_or_404(EmailAccount, pk=pk, owner=request.user)
+    return render(request, "core/account_detail.html", {"account": account})
+
+
+@otp_required
 @require_http_methods(["GET", "POST"])
 def account_edit(request: HttpRequest, pk: int) -> HttpResponse:
     account = get_object_or_404(EmailAccount, pk=pk, owner=request.user)

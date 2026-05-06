@@ -35,7 +35,6 @@
             <th>IMAP host</th>
             <th>Port</th>
             <th style="min-width: 240px;">Status</th>
-            <th class="text-end">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -51,7 +50,10 @@
                          {% if account.is_enabled %}checked{% endif %}>
                 </div>
               </td>
-              <td>{{ account.email_address }}</td>
+              <td>
+                <a href="{% url 'core:account_detail' account.pk %}"
+                   class="text-decoration-none text-reset account-link">{{ account.email_address }}</a>
+              </td>
               <td class="text-secondary">{{ account.display_name|default:"—" }}</td>
               <td><code class="small">{{ account.imap_host }}</code></td>
               <td>{{ account.imap_port }}</td>
@@ -82,20 +84,6 @@
                   </div>
                 </div>
               </td>
-              <td class="text-end">
-                <a href="{% url 'core:account_edit' account.pk %}" class="btn btn-outline-secondary btn-sm"
-                   title="Edit" aria-label="Edit">
-                  <i class="bi bi-pencil"></i>
-                </a>
-                <form method="post" action="{% url 'core:account_delete' account.pk %}" class="d-inline"
-                      onsubmit="return confirm('Remove {{ account.email_address }}?');">
-                  {% csrf_token %}
-                  <button type="submit" class="btn btn-outline-danger btn-sm"
-                          title="Remove" aria-label="Remove">
-                    <i class="bi bi-trash"></i>
-                  </button>
-                </form>
-              </td>
             </tr>
           {% endfor %}
         </tbody>
@@ -109,7 +97,8 @@
            data-account-row data-account-id="{{ account.pk }}"
            data-test-url="{% url 'core:account_test' account.pk %}">
         <div class="d-flex align-items-start gap-2 mb-2">
-          <div class="flex-grow-1 min-w-0">
+          <a href="{% url 'core:account_detail' account.pk %}"
+             class="flex-grow-1 min-w-0 text-decoration-none text-reset account-link">
             <div class="fw-semibold text-truncate">{{ account.email_address }}</div>
             {% if account.display_name %}
               <div class="text-secondary small">{{ account.display_name }}</div>
@@ -117,7 +106,7 @@
             <div class="text-secondary small mt-1">
               <code>{{ account.imap_host }}:{{ account.imap_port }}</code>
             </div>
-          </div>
+          </a>
           <div class="form-check form-switch m-0 ps-0">
             <input class="form-check-input toggle-switch m-0" type="checkbox" role="switch"
                    data-toggle-url="{% url 'core:account_toggle' account.pk %}"
@@ -139,7 +128,7 @@
             <i class="bi bi-arrow-repeat"></i>
           </button>
         </div>
-        <div class="d-none mb-3 update-password-form">
+        <div class="d-none mb-1 update-password-form">
           <div class="input-group input-group-sm">
             <span class="input-group-text"><i class="bi bi-key"></i></span>
             <input type="password" class="form-control update-password-input"
@@ -149,18 +138,6 @@
             <button type="button" class="btn btn-outline-secondary update-password-cancel"
                     title="Cancel"><i class="bi bi-x"></i></button>
           </div>
-        </div>
-        <div class="d-flex gap-2">
-          <a href="{% url 'core:account_edit' account.pk %}" class="btn btn-outline-secondary btn-sm flex-grow-1">
-            <i class="bi bi-pencil me-1"></i>Edit
-          </a>
-          <form method="post" action="{% url 'core:account_delete' account.pk %}"
-                onsubmit="return confirm('Remove {{ account.email_address }}?');">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-outline-danger btn-sm">
-              <i class="bi bi-trash me-1"></i>Remove
-            </button>
-          </form>
         </div>
       </div>
     {% endfor %}
@@ -173,6 +150,7 @@
     [data-account-row].is-disabled { opacity: 0.55; }
     [data-account-row].is-disabled .toggle-switch { opacity: 1; }
     .form-switch .toggle-switch:checked { background-color: #198754; border-color: #198754; }
+    .account-link:hover { color: #0d6efd; }
   </style>
 
   <script>
