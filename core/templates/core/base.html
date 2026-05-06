@@ -146,6 +146,9 @@
       }
       .main-nav-drawer .navbar-nav .nav-link.is-logout { color: #dc3545; }
       .main-nav-drawer .navbar-nav .nav-link.is-logout i { color: #dc3545; }
+      .main-nav-drawer .navbar-nav .nav-link-button {
+        background: transparent; border: 0; width: 100%; text-align: left;
+      }
     }
 
     @media (max-width: 575.98px) {
@@ -161,13 +164,13 @@
       <span>Emails Manager</span>
     </a>
     <div class="d-flex align-items-center gap-2 ms-auto order-lg-last">
-      <button id="theme-toggle" class="theme-toggle-btn" type="button"
-              aria-label="Toggle light or dark theme" title="Toggle theme">
+      <button class="theme-toggle-btn{% if user.is_authenticated and request.session.otp_verified %} d-none d-lg-flex{% endif %}" type="button"
+              data-theme-toggle aria-label="Toggle light or dark theme" title="Toggle theme">
         <i class="bi bi-moon-stars theme-icon-dark" aria-hidden="true"></i>
         <i class="bi bi-sun-fill theme-icon-light" aria-hidden="true"></i>
       </button>
       {% if user.is_authenticated and request.session.otp_verified %}
-        <div class="dropdown">
+        <div class="dropdown d-none d-lg-block">
           <button class="user-avatar-btn dropdown-toggle" type="button"
                   data-bs-toggle="dropdown" aria-expanded="false" aria-label="Open user menu">
             <span class="user-avatar">{% if user.first_name and user.last_name %}{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}{% elif user.first_name %}{{ user.first_name|first|upper }}{% else %}{{ user.username|first|upper }}{% endif %}</span>
@@ -228,6 +231,14 @@
               </a>
             </li>
             <li class="nav-item d-lg-none">
+              <button type="button" class="nav-link nav-link-button" data-theme-toggle>
+                <i class="bi bi-moon-stars theme-icon-dark"></i>
+                <i class="bi bi-sun-fill theme-icon-light"></i>
+                <span class="theme-icon-dark">Switch to dark theme</span>
+                <span class="theme-icon-light">Switch to light theme</span>
+              </button>
+            </li>
+            <li class="nav-item d-lg-none">
               <a class="nav-link is-logout" href="{% url 'core:logout' %}">
                 <i class="bi bi-box-arrow-right"></i><span>Logout</span>
               </a>
@@ -268,15 +279,14 @@
       });
     }
 
-    const themeBtn = document.getElementById('theme-toggle');
-    if (themeBtn) {
-      themeBtn.addEventListener('click', () => {
+    document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+      btn.addEventListener('click', () => {
         const root = document.documentElement;
         const next = root.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
         root.setAttribute('data-bs-theme', next);
         try { localStorage.setItem('theme', next); } catch (e) { /* ignore */ }
       });
-    }
+    });
   })();
 </script>
 </body>
