@@ -1,6 +1,11 @@
 from __future__ import annotations
 
+import csv
+from io import StringIO
+
 from django.contrib import messages
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 from django.contrib.auth import authenticate, get_user_model, update_session_auth_hash
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
@@ -16,7 +21,7 @@ from django.views.decorators.http import require_http_methods
 
 from .decorators import OTP_VERIFIED_SESSION_KEY, is_otp_verified, otp_required
 from .email_otp import OtpDeliveryError, issue_and_send, verify
-from .forms import EmailAccountForm, OtpForm, PasswordResetRequestForm, ProfileInfoForm
+from .forms import BulkAccountForm, EmailAccountForm, OtpForm, PasswordResetRequestForm, ProfileInfoForm
 from .imap_client import check_status, check_status_bulk, fetch_body, fetch_recent_bulk
 from .models import EmailAccount
 from .password_reset import ResetDeliveryError, send_reset_email
@@ -161,6 +166,95 @@ def account_delete(request: HttpRequest, pk: int) -> HttpResponse:
     account.delete()
     messages.success(request, f"Removed {email}.")
     return redirect("core:accounts_list")
+
+
+def _parse_bulk_csv(text: str) -> tuple[list[dict], list[tuple[int, str]]]:
+    """Parse pasted CSV. Returns (rows, errors). Each row: line, email, password, host, port."""
+    rows: list[dict] = []
+    errors: list[tuple[int, str]] = []
+    reader = csv.reader(StringIO(text))
+    for line_num, raw in enumerate(reader, start=1):
+        if not raw or all(not (c or "").strip() for c in raw):
+            continue
+        first = (raw[0] or "").strip()
+        if first.startswith("#"):
+            continue
+        if line_num == 1 and first.lower() in ("email", "email_address"):
+            continue
+        try:
+            email = first
+            password = (raw[1].strip() if len(raw) > 1 else "")
+            host = (raw[2].strip() if len(raw) > 2 and raw[2].strip() else "imap.mail.ru")
+            port_text = (raw[3].strip() if len(raw) > 3 and raw[3].strip() else "993")
+            port = int(port_text)
+        except (IndexError, ValueError) as exc:
+            errors.append((line_num, f"Bad row: {exc}"))
+            continue
+        if not email:
+            errors.append((line_num, "Missing email"))
+            continue
+        if not password:
+            errors.append((line_num, "Missing password"))
+            continue
+        rows.append({"line": line_num, "email": email, "password": password, "host": host, "port": port})
+    return rows, errors
+
+
+@otp_required
+@require_http_methods(["GET", "POST"])
+def account_bulk_add(request: HttpRequest) -> HttpResponse:
+    if request.method == "POST":
+        form = BulkAccountForm(request.POST)
+        if form.is_valid():
+            rows, parse_errors = _parse_bulk_csv(form.cleaned_data["csv_text"])
+            existing = {
+                e.lower()
+                for e in EmailAccount.objects.filter(owner=request.user)
+                .values_list("email_address", flat=True)
+            }
+            added = 0
+            skipped: list[tuple[int, str]] = []
+            row_errors: list[tuple[int, str]] = list(parse_errors)
+            for row in rows:
+                email = row["email"]
+                if email.lower() in existing:
+                    skipped.append((row["line"], email))
+                    continue
+                try:
+                    validate_email(email)
+                except ValidationError:
+                    row_errors.append((row["line"], f"Invalid email: {email}"))
+                    continue
+                try:
+                    account = EmailAccount(
+                        owner=request.user,
+                        email_address=email,
+                        imap_host=row["host"],
+                        imap_port=row["port"],
+                    )
+                    account.set_password(row["password"])
+                    account.save()
+                    existing.add(email.lower())
+                    added += 1
+                except Exception as exc:  # noqa: BLE001
+                    row_errors.append((row["line"], str(exc)))
+
+            return render(
+                request,
+                "core/account_bulk.html",
+                {
+                    "form": BulkAccountForm(),
+                    "result": {
+                        "total": len(rows),
+                        "added": added,
+                        "skipped": skipped,
+                        "errors": row_errors,
+                    },
+                },
+            )
+    else:
+        form = BulkAccountForm()
+    return render(request, "core/account_bulk.html", {"form": form})
 
 
 @otp_required

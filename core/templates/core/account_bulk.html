@@ -1,0 +1,91 @@
+{% extends "core/base.html" %}
+{% block title %}Bulk add accounts · Mail.Ru Manager{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-md-10 col-lg-8">
+    <div class="mb-3">
+      <a href="{% url 'core:accounts_list' %}" class="text-secondary small text-decoration-none">
+        <i class="bi bi-arrow-left me-1"></i>Back to accounts
+      </a>
+    </div>
+
+    <div class="card card-soft mb-4">
+      <div class="card-body p-3 p-md-4">
+        <h1 class="h4 mb-3">
+          <i class="bi bi-cloud-upload me-2 text-primary"></i>Bulk add accounts
+        </h1>
+        <p class="text-secondary small mb-4">
+          Paste one account per line as comma-separated values: <code>email,password,host,port</code>.
+          The host and port columns are optional and default to <code>imap.mail.ru:993</code>.
+          A header row is auto-skipped. Blank lines and lines starting with <code>#</code> are ignored.
+        </p>
+
+        {% if result %}
+          <div class="alert alert-{% if result.added > 0 and not result.errors %}success{% elif result.added > 0 %}warning{% else %}danger{% endif %} mb-4">
+            <h2 class="h6 mb-2">
+              <i class="bi bi-check-circle-fill me-1"></i>
+              {{ result.added }} of {{ result.total }} added
+            </h2>
+            {% if result.skipped %}
+              <div class="small mt-2">
+                <strong>Skipped {{ result.skipped|length }} duplicate{{ result.skipped|length|pluralize }}:</strong>
+                <ul class="mb-0 small ps-3">
+                  {% for line, email in result.skipped %}
+                    <li>Line {{ line }}: <code>{{ email }}</code> already exists</li>
+                  {% endfor %}
+                </ul>
+              </div>
+            {% endif %}
+            {% if result.errors %}
+              <div class="small mt-2">
+                <strong>{{ result.errors|length }} error{{ result.errors|length|pluralize }}:</strong>
+                <ul class="mb-0 small ps-3">
+                  {% for line, msg in result.errors %}
+                    <li>Line {{ line }}: {{ msg }}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+            {% endif %}
+            {% if result.added > 0 %}
+              <div class="mt-3">
+                <a href="{% url 'core:accounts_list' %}" class="btn btn-sm btn-primary">
+                  View accounts <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+              </div>
+            {% endif %}
+          </div>
+        {% endif %}
+
+        <form method="post" novalidate>
+          {% csrf_token %}
+          {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+          <div class="mb-3">
+            <label class="form-label" for="id_csv_text">CSV</label>
+            {{ form.csv_text }}
+            {% if form.csv_text.help_text %}<div class="form-text">{{ form.csv_text.help_text }}</div>{% endif %}
+            {% for err in form.csv_text.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+          </div>
+
+          <details class="mb-4">
+            <summary class="text-secondary small">Common IMAP hosts</summary>
+            <ul class="small text-secondary mt-2 mb-0 ps-3">
+              <li>mail.ru — <code>imap.mail.ru:993</code></li>
+              <li>Gmail — <code>imap.gmail.com:993</code></li>
+              <li>Yandex — <code>imap.yandex.com:993</code></li>
+              <li>Outlook / Office 365 — <code>outlook.office365.com:993</code></li>
+              <li>iCloud — <code>imap.mail.me.com:993</code></li>
+            </ul>
+          </details>
+
+          <div class="d-flex flex-column flex-sm-row gap-2">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-cloud-upload me-1"></i>Import accounts
+            </button>
+            <a href="{% url 'core:accounts_list' %}" class="btn btn-outline-secondary">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

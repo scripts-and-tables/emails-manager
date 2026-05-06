@@ -34,6 +34,29 @@ class PasswordResetRequestForm(forms.Form):
     )
 
 
+class BulkAccountForm(forms.Form):
+    csv_text = forms.CharField(
+        label="CSV",
+        widget=forms.Textarea(
+            attrs={
+                "class": "form-control font-monospace",
+                "rows": 12,
+                "spellcheck": "false",
+                "placeholder": (
+                    "email,password,host,port\n"
+                    "me@mail.ru,abcdef123456,imap.mail.ru,993\n"
+                    "work@gmail.com,xxxxxxxxxxxx,imap.gmail.com,993"
+                ),
+            }
+        ),
+        help_text=(
+            "One account per line. Comma-separated. "
+            "Host and port columns are optional and default to imap.mail.ru:993. "
+            "Use app-specific passwords only — never your main account password."
+        ),
+    )
+
+
 class ProfileInfoForm(forms.ModelForm):
     class Meta:
         model = get_user_model()
