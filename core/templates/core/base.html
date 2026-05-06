@@ -12,6 +12,7 @@
       background:#f7f8fa;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
+    .navbar { --top-nav-height: 56px; min-height: var(--top-nav-height); }
     .navbar-brand { font-weight: 600; letter-spacing: .2px; display: inline-flex; align-items: center; gap: .55rem; }
     .brand-mark {
       display: inline-flex; align-items: center; justify-content: center;
@@ -46,9 +47,6 @@
 
     .empty-state-icon { font-size: 3rem; color: #ced4da; line-height: 1; }
 
-    .navbar-toggler { border: 0; padding: .25rem .5rem; }
-    .navbar-toggler:focus { box-shadow: none; }
-
     .user-avatar {
       display: inline-flex; align-items: center; justify-content: center;
       width: 36px; height: 36px; border-radius: 50%;
@@ -62,9 +60,37 @@
     .user-avatar-btn:hover, .user-avatar-btn:focus { border-color: rgba(13, 110, 253, .35); box-shadow: 0 0 0 3px rgba(13, 110, 253, .1); }
     .user-avatar-btn.dropdown-toggle::after { display: none; }
 
+    .menu-toggle {
+      background: transparent; border: 0; padding: 0;
+      width: 40px; height: 40px;
+      display: inline-flex; align-items: center; justify-content: center;
+      cursor: pointer;
+    }
+    .menu-toggle:focus { outline: none; box-shadow: 0 0 0 3px rgba(13, 110, 253, .15); border-radius: 8px; }
+    .hamburger-bars { position: relative; width: 22px; height: 18px; display: block; }
+    .hamburger-bars .bar {
+      position: absolute; left: 0;
+      width: 100%; height: 2px;
+      background: #495057; border-radius: 2px;
+      transition: transform .25s ease, top .25s ease, opacity .15s ease;
+    }
+    .hamburger-bars .bar:nth-child(1) { top: 0; }
+    .hamburger-bars .bar:nth-child(2) { top: 8px; }
+    .hamburger-bars .bar:nth-child(3) { top: 16px; }
+    .menu-toggle.is-open .hamburger-bars .bar:nth-child(1) { top: 8px; transform: rotate(45deg); }
+    .menu-toggle.is-open .hamburger-bars .bar:nth-child(2) { opacity: 0; }
+    .menu-toggle.is-open .hamburger-bars .bar:nth-child(3) { top: 8px; transform: rotate(-45deg); }
+
     @media (max-width: 991.98px) {
-      .offcanvas { width: 100vw !important; max-width: 100vw !important; }
-      .offcanvas .navbar-nav .nav-link {
+      .main-nav-drawer.offcanvas-top {
+        --bs-offcanvas-height: calc(100vh - var(--top-nav-height));
+        top: var(--top-nav-height) !important;
+        border-top: 1px solid rgba(0,0,0,.06);
+      }
+      .offcanvas-backdrop {
+        top: var(--top-nav-height) !important;
+      }
+      .main-nav-drawer .navbar-nav .nav-link {
         padding: 1rem 1.25rem;
         font-size: 1.05rem;
         color: var(--bs-body-color);
@@ -73,16 +99,14 @@
         align-items: center;
         gap: .75rem;
       }
-      .offcanvas .navbar-nav .nav-link i { font-size: 1.25rem; color: #6c757d; width: 1.5rem; text-align: center; }
-      .offcanvas .navbar-nav .nav-link:hover,
-      .offcanvas .navbar-nav .nav-link:focus,
-      .offcanvas .navbar-nav .nav-link:active {
+      .main-nav-drawer .navbar-nav .nav-link i { font-size: 1.25rem; color: #6c757d; width: 1.5rem; text-align: center; }
+      .main-nav-drawer .navbar-nav .nav-link:hover,
+      .main-nav-drawer .navbar-nav .nav-link:focus,
+      .main-nav-drawer .navbar-nav .nav-link:active {
         background: rgba(13, 110, 253, .06);
       }
-      .offcanvas .navbar-nav .nav-link.is-logout {
-        color: #dc3545;
-      }
-      .offcanvas .navbar-nav .nav-link.is-logout i { color: #dc3545; }
+      .main-nav-drawer .navbar-nav .nav-link.is-logout { color: #dc3545; }
+      .main-nav-drawer .navbar-nav .nav-link.is-logout i { color: #dc3545; }
     }
 
     @media (max-width: 575.98px) {
@@ -91,7 +115,7 @@
   </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom">
+<nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom" style="position: relative; z-index: 1046;">
   <div class="container">
     <a class="navbar-brand" href="{% url 'core:index' %}">
       <span class="brand-mark" aria-hidden="true">@</span>
@@ -99,7 +123,7 @@
     </a>
     {% if user.is_authenticated and request.session.otp_verified %}
       <div class="d-flex align-items-center gap-2 ms-auto order-lg-last">
-        <div class="dropdown d-none d-lg-block">
+        <div class="dropdown">
           <button class="user-avatar-btn dropdown-toggle" type="button"
                   data-bs-toggle="dropdown" aria-expanded="false" aria-label="Open user menu">
             <span class="user-avatar">{% if user.first_name and user.last_name %}{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}{% elif user.first_name %}{{ user.first_name|first|upper }}{% else %}{{ user.username|first|upper }}{% endif %}</span>
@@ -124,29 +148,19 @@
             </li>
           </ul>
         </div>
-        <button class="navbar-toggler border-0 d-lg-none" type="button"
+        <button class="menu-toggle d-lg-none" type="button"
                 data-bs-toggle="offcanvas" data-bs-target="#mainNav"
-                aria-controls="mainNav" aria-label="Open menu">
-          <span class="user-avatar" aria-hidden="true">{% if user.first_name and user.last_name %}{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}{% elif user.first_name %}{{ user.first_name|first|upper }}{% else %}{{ user.username|first|upper }}{% endif %}</span>
+                aria-controls="mainNav" aria-label="Toggle navigation menu">
+          <span class="hamburger-bars" aria-hidden="true">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+          </span>
         </button>
       </div>
-      <div class="offcanvas offcanvas-lg offcanvas-end" tabindex="-1" id="mainNav" aria-labelledby="mainNavLabel">
-        <div class="offcanvas-header border-bottom p-3 d-lg-none">
-          <div class="d-flex align-items-center gap-3 flex-grow-1 min-w-0">
-            <span class="user-avatar" style="width: 44px; height: 44px; font-size: 16px;" aria-hidden="true">{% if user.first_name and user.last_name %}{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}{% elif user.first_name %}{{ user.first_name|first|upper }}{% else %}{{ user.username|first|upper }}{% endif %}</span>
-            <div class="flex-grow-1 min-w-0">
-              {% if user.first_name or user.last_name %}
-                <div class="fw-semibold text-truncate" id="mainNavLabel">{{ user.first_name }} {{ user.last_name }}</div>
-              {% else %}
-                <div class="fw-semibold text-truncate" id="mainNavLabel">{{ user.username }}</div>
-              {% endif %}
-              <div class="small text-secondary text-truncate">{{ user.email|default:user.username }}</div>
-            </div>
-          </div>
-          <button type="button" class="btn-close ms-2" data-bs-dismiss="offcanvas" data-bs-target="#mainNav" aria-label="Close"></button>
-        </div>
-        <div class="offcanvas-body p-0 p-lg-0 align-items-lg-center">
-          <ul class="navbar-nav flex-grow-1 ms-lg-3">
+      <div class="offcanvas offcanvas-top offcanvas-lg main-nav-drawer" id="mainNav" tabindex="-1" aria-labelledby="mainNavLabel">
+        <div class="offcanvas-body p-0 align-items-lg-center">
+          <ul class="navbar-nav flex-grow-1 ms-lg-3" id="mainNavLabel">
             <li class="nav-item">
               <a class="nav-link" href="{% url 'core:home' %}">
                 <i class="bi bi-house"></i><span>Home</span>
@@ -195,5 +209,18 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
+<script>
+  (function () {
+    const drawer = document.getElementById('mainNav');
+    if (!drawer) return;
+    const toggles = document.querySelectorAll('.menu-toggle');
+    drawer.addEventListener('show.bs.offcanvas', () => {
+      toggles.forEach((t) => t.classList.add('is-open'));
+    });
+    drawer.addEventListener('hide.bs.offcanvas', () => {
+      toggles.forEach((t) => t.classList.remove('is-open'));
+    });
+  })();
+</script>
 </body>
 </html>
