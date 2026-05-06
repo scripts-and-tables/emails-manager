@@ -8,8 +8,15 @@
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   <style>
     body { background:#f7f8fa; }
-    .navbar-brand { font-weight: 600; letter-spacing: .2px; display: inline-flex; align-items: center; gap: .5rem; }
-    .navbar-brand svg { color: #005FF9; }
+    .navbar-brand { font-weight: 600; letter-spacing: .2px; display: inline-flex; align-items: center; gap: .55rem; }
+    .brand-mark {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 28px; height: 28px; border-radius: 7px;
+      background: linear-gradient(135deg, #005FF9 0%, #0099FF 100%);
+      color: #fff; font-weight: 700; font-size: 17px;
+      line-height: 1; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      box-shadow: 0 1px 3px rgba(0, 95, 249, .25);
+    }
     .card-soft { box-shadow: 0 1px 3px rgba(0,0,0,.04); border: 1px solid rgba(0,0,0,.06); }
     .truncate-cell { max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .table thead th { font-size: .82rem; text-transform: uppercase; letter-spacing: .04em; color: #6c757d; }
@@ -19,11 +26,7 @@
 <nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom">
   <div class="container">
     <a class="navbar-brand" href="{% url 'core:index' %}">
-      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
-           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <rect x="2" y="4" width="20" height="16" rx="2"/>
-        <path d="m22 7-10 6L2 7"/>
-      </svg>
+      <span class="brand-mark" aria-hidden="true">@</span>
       <span>Emails Manager</span>
     </a>
     {% if user.is_authenticated and request.session.otp_verified %}
