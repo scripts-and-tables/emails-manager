@@ -21,7 +21,6 @@ urlpatterns = [
     path("accounts/<int:pk>/edit/", views.account_edit, name="account_edit"),
     path("accounts/<int:pk>/delete/", views.account_delete, name="account_delete"),
     path("accounts/<int:pk>/test/", views.account_test, name="account_test"),
-    path("status/", views.status, name="status"),
     path("inbox/", views.inbox, name="inbox"),
     path("inbox/<int:account_id>/<str:uid>/", views.email_detail, name="email_detail"),
 ]

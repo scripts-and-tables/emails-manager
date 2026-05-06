@@ -21,9 +21,8 @@
     {% if user.is_authenticated and request.session.otp_verified %}
       <div class="collapse navbar-collapse">
         <ul class="navbar-nav me-auto">
-          <li class="nav-item"><a class="nav-link" href="{% url 'core:status' %}">Status</a></li>
-          <li class="nav-item"><a class="nav-link" href="{% url 'core:inbox' %}">Inbox</a></li>
           <li class="nav-item"><a class="nav-link" href="{% url 'core:accounts_list' %}">Accounts</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'core:inbox' %}">Inbox</a></li>
         </ul>
         <div class="d-flex align-items-center gap-2">
           <span class="text-secondary small">{{ user.username }}</span>

@@ -37,14 +37,14 @@ def _send_otp_or_flash(request: HttpRequest, user) -> bool:
 
 def index(request: HttpRequest) -> HttpResponse:
     if request.user.is_authenticated and is_otp_verified(request):
-        return redirect("core:status")
+        return redirect("core:accounts_list")
     return redirect("core:login")
 
 
 @require_http_methods(["GET", "POST"])
 def login_view(request: HttpRequest) -> HttpResponse:
     if request.user.is_authenticated and is_otp_verified(request):
-        return redirect("core:status")
+        return redirect("core:accounts_list")
 
     if request.method == "POST":
         form = AuthenticationForm(request, data=request.POST)
@@ -98,7 +98,7 @@ def verify_otp(request: HttpRequest) -> HttpResponse:
                 auth_login(request, user)
                 request.session[OTP_VERIFIED_SESSION_KEY] = True
                 request.session.pop(PRE_OTP_USER_KEY, None)
-                return redirect("core:status")
+                return redirect("core:accounts_list")
             form.add_error("token", error)
     else:
         form = OtpForm()
@@ -112,8 +112,11 @@ def verify_otp(request: HttpRequest) -> HttpResponse:
 
 @otp_required
 def accounts_list(request: HttpRequest) -> HttpResponse:
-    accounts = EmailAccount.objects.filter(owner=request.user)
-    return render(request, "core/accounts_list.html", {"accounts": accounts})
+    accounts = list(EmailAccount.objects.filter(owner=request.user))
+    results = check_status_bulk(accounts)
+    status_by_id = {r.account_id: r for r in results}
+    rows = [{"account": acc, "status": status_by_id.get(acc.id)} for acc in accounts]
+    return render(request, "core/accounts_list.html", {"rows": rows})
 
 
 @otp_required
@@ -167,18 +170,6 @@ def account_test(request: HttpRequest, pk: int) -> HttpResponse:
     else:
         messages.error(request, f"{account.email_address}: {result.message}")
     return redirect("core:accounts_list")
-
-
-@otp_required
-def status(request: HttpRequest) -> HttpResponse:
-    accounts = list(EmailAccount.objects.filter(owner=request.user))
-    results = check_status_bulk(accounts)
-    all_ok = bool(results) and all(r.ok for r in results)
-    return render(
-        request,
-        "core/status.html",
-        {"results": results, "has_accounts": bool(accounts), "all_ok": all_ok},
-    )
 
 
 @otp_required

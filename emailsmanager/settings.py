@@ -144,7 +144,7 @@ LOGGING = {
 
 # Auth redirects
 LOGIN_URL = "/login/"
-LOGIN_REDIRECT_URL = "/status/"
+LOGIN_REDIRECT_URL = "/accounts/"
 LOGOUT_REDIRECT_URL = "/login/"
 
 # Session security
