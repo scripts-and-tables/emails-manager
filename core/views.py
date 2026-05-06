@@ -172,6 +172,15 @@ def account_test(request: HttpRequest, pk: int) -> JsonResponse:
 
 
 @otp_required
+@require_http_methods(["POST"])
+def account_toggle(request: HttpRequest, pk: int) -> JsonResponse:
+    account = get_object_or_404(EmailAccount, pk=pk, owner=request.user)
+    account.is_enabled = request.POST.get("enabled") == "1"
+    account.save(update_fields=["is_enabled", "updated_at"])
+    return JsonResponse({"is_enabled": account.is_enabled})
+
+
+@otp_required
 def inbox(request: HttpRequest) -> HttpResponse:
     window = request.GET.get("window", "1d")
     days_map = {"1d": 1, "7d": 7, "30d": 30}
@@ -179,7 +188,8 @@ def inbox(request: HttpRequest) -> HttpResponse:
     if window not in days_map:
         window = "1d"
 
-    accounts = list(EmailAccount.objects.filter(owner=request.user))
+    all_accounts = list(EmailAccount.objects.filter(owner=request.user))
+    accounts = [a for a in all_accounts if a.is_enabled]
     headers, errors = fetch_recent_bulk(accounts, days=days)
 
     error_rows = [
@@ -196,7 +206,8 @@ def inbox(request: HttpRequest) -> HttpResponse:
             "errors": error_rows,
             "window": window,
             "windows": [("1d", "Last 24 hours"), ("7d", "Last 7 days"), ("30d", "Last 30 days")],
-            "has_accounts": bool(accounts),
+            "has_accounts": bool(all_accounts),
+            "all_disabled": bool(all_accounts) and not accounts,
         },
     )
 

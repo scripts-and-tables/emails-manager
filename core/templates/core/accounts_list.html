@@ -26,6 +26,7 @@
       <table class="table table-hover align-middle mb-0">
         <thead>
           <tr>
+            <th style="width:1%" class="text-center" title="Enabled">On</th>
             <th>Email</th>
             <th>Display name</th>
             <th>IMAP host</th>
@@ -37,7 +38,16 @@
         <tbody>
           {% for account in accounts %}
             <tr data-account-row data-account-id="{{ account.pk }}"
-                data-test-url="{% url 'core:account_test' account.pk %}">
+                data-test-url="{% url 'core:account_test' account.pk %}"
+                class="{% if not account.is_enabled %}is-disabled{% endif %}">
+              <td>
+                <div class="form-check form-switch m-0 ps-0 d-flex justify-content-center">
+                  <input class="form-check-input toggle-switch m-0" type="checkbox" role="switch"
+                         data-toggle-url="{% url 'core:account_toggle' account.pk %}"
+                         aria-label="Enable {{ account.email_address }}"
+                         {% if account.is_enabled %}checked{% endif %}>
+                </div>
+              </td>
               <td>{{ account.email_address }}</td>
               <td class="text-secondary">{{ account.display_name|default:"—" }}</td>
               <td><code class="small">{{ account.imap_host }}</code></td>
@@ -75,15 +85,24 @@
 
   <div class="d-lg-none">
     {% for account in accounts %}
-      <div class="item-card p-3" data-account-row data-account-id="{{ account.pk }}"
+      <div class="item-card p-3 {% if not account.is_enabled %}is-disabled{% endif %}"
+           data-account-row data-account-id="{{ account.pk }}"
            data-test-url="{% url 'core:account_test' account.pk %}">
-        <div class="mb-2">
-          <div class="fw-semibold text-truncate">{{ account.email_address }}</div>
-          {% if account.display_name %}
-            <div class="text-secondary small">{{ account.display_name }}</div>
-          {% endif %}
-          <div class="text-secondary small mt-1">
-            <code>{{ account.imap_host }}:{{ account.imap_port }}</code>
+        <div class="d-flex align-items-start gap-2 mb-2">
+          <div class="flex-grow-1 min-w-0">
+            <div class="fw-semibold text-truncate">{{ account.email_address }}</div>
+            {% if account.display_name %}
+              <div class="text-secondary small">{{ account.display_name }}</div>
+            {% endif %}
+            <div class="text-secondary small mt-1">
+              <code>{{ account.imap_host }}:{{ account.imap_port }}</code>
+            </div>
+          </div>
+          <div class="form-check form-switch m-0 ps-0">
+            <input class="form-check-input toggle-switch m-0" type="checkbox" role="switch"
+                   data-toggle-url="{% url 'core:account_toggle' account.pk %}"
+                   aria-label="Enable {{ account.email_address }}"
+                   {% if account.is_enabled %}checked{% endif %}>
           </div>
         </div>
         <div class="d-flex align-items-center gap-2 mb-3 px-2 py-2 rounded" style="background: rgba(0,0,0,.025);">
@@ -114,6 +133,9 @@
     .test-btn.is-testing i { animation: test-spin 0.7s linear infinite; display: inline-block; }
     @keyframes test-spin { to { transform: rotate(360deg); } }
     .test-btn:disabled { opacity: 1; }
+    [data-account-row].is-disabled { opacity: 0.55; }
+    [data-account-row].is-disabled .toggle-switch { opacity: 1; }
+    .form-switch .toggle-switch:checked { background-color: #198754; border-color: #198754; }
   </style>
 
   <script>
@@ -191,6 +213,41 @@
           });
       });
     }
+
+    function syncToggles(accountId, enabled) {
+      document.querySelectorAll(`[data-account-id="${accountId}"]`).forEach((row) => {
+        row.classList.toggle('is-disabled', !enabled);
+        row.querySelectorAll('.toggle-switch').forEach((sw) => { sw.checked = enabled; });
+      });
+    }
+
+    document.querySelectorAll('.toggle-switch').forEach((sw) => {
+      sw.addEventListener('change', async (e) => {
+        const target = e.target;
+        const row = target.closest('[data-account-row]');
+        const accountId = row.dataset.accountId;
+        const url = target.dataset.toggleUrl;
+        const wantEnabled = target.checked;
+        const allSwitches = document.querySelectorAll(`[data-account-id="${accountId}"] .toggle-switch`);
+        allSwitches.forEach((s) => { s.disabled = true; });
+        try {
+          const body = new URLSearchParams();
+          body.set('enabled', wantEnabled ? '1' : '0');
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrfToken, 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: body.toString(),
+          });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const data = await response.json();
+          syncToggles(accountId, !!data.is_enabled);
+        } catch (err) {
+          syncToggles(accountId, !wantEnabled);
+        } finally {
+          allSwitches.forEach((s) => { s.disabled = false; });
+        }
+      });
+    });
   })();
   </script>
 {% else %}
