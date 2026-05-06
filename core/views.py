@@ -17,7 +17,7 @@ from django.views.decorators.http import require_http_methods
 from .decorators import OTP_VERIFIED_SESSION_KEY, is_otp_verified, otp_required
 from .email_otp import OtpDeliveryError, issue_and_send, verify
 from .forms import EmailAccountForm, OtpForm, PasswordResetRequestForm
-from .imap_client import check_status_bulk, fetch_body, fetch_recent_bulk
+from .imap_client import check_status, check_status_bulk, fetch_body, fetch_recent_bulk
 from .models import EmailAccount
 from .password_reset import ResetDeliveryError, send_reset_email
 
@@ -154,6 +154,18 @@ def account_delete(request: HttpRequest, pk: int) -> HttpResponse:
     email = account.email_address
     account.delete()
     messages.success(request, f"Removed {email}.")
+    return redirect("core:accounts_list")
+
+
+@otp_required
+@require_http_methods(["POST"])
+def account_test(request: HttpRequest, pk: int) -> HttpResponse:
+    account = get_object_or_404(EmailAccount, pk=pk, owner=request.user)
+    result = check_status(account)
+    if result.ok:
+        messages.success(request, f"{account.email_address}: connection OK.")
+    else:
+        messages.error(request, f"{account.email_address}: {result.message}")
     return redirect("core:accounts_list")
 
 

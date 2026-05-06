@@ -6,6 +6,7 @@ from pathlib import Path
 
 import dj_database_url
 from decouple import Csv, config
+from django.contrib.messages import constants as message_constants
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -124,6 +125,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 PASSWORD_RESET_TIMEOUT = 3600  # 1 hour
+
+MESSAGE_TAGS = {message_constants.ERROR: "danger"}  # map to Bootstrap's alert-danger
 
 
 # Auth redirects

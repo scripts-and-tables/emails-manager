@@ -21,6 +21,10 @@
               <td><code class="small">{{ account.imap_host }}</code></td>
               <td>{{ account.imap_port }}</td>
               <td class="text-end">
+                <form method="post" action="{% url 'core:account_test' account.pk %}" class="d-inline">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-outline-primary btn-sm">Test</button>
+                </form>
                 <a href="{% url 'core:account_edit' account.pk %}" class="btn btn-outline-secondary btn-sm">Edit</a>
                 <form method="post" action="{% url 'core:account_delete' account.pk %}" class="d-inline"
                       onsubmit="return confirm('Remove {{ account.email_address }}?');">
