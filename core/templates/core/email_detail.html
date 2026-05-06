@@ -9,19 +9,34 @@
 
 <div class="card card-soft mb-3">
   <div class="card-body p-3 p-md-4">
-    <h1 class="h5 mb-3">{{ message.subject|default:"(no subject)" }}</h1>
-    <dl class="row mb-0 small">
-      <dt class="col-sm-3 col-md-2 text-secondary fw-normal">Account</dt>
-      <dd class="col-sm-9 col-md-10 mb-2 mb-sm-1 text-truncate">{{ account.email_address }}</dd>
-      <dt class="col-sm-3 col-md-2 text-secondary fw-normal">From</dt>
-      <dd class="col-sm-9 col-md-10 mb-2 mb-sm-1 text-truncate">{{ message.from_ }}</dd>
-      {% if message.to %}
-        <dt class="col-sm-3 col-md-2 text-secondary fw-normal">To</dt>
-        <dd class="col-sm-9 col-md-10 mb-2 mb-sm-1">{{ message.to|join:", " }}</dd>
-      {% endif %}
-      <dt class="col-sm-3 col-md-2 text-secondary fw-normal">Date</dt>
-      <dd class="col-sm-9 col-md-10 mb-0">{{ message.date|date:"M j, Y H:i" }}</dd>
-    </dl>
+    <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+      <h1 class="h5 mb-0 flex-grow-1">{{ message.subject|default:"(no subject)" }}</h1>
+      <button class="btn btn-sm btn-outline-secondary border-0 p-1 details-toggle"
+              type="button" data-bs-toggle="collapse" data-bs-target="#email-meta"
+              aria-expanded="true" aria-controls="email-meta"
+              aria-label="Toggle details">
+        <i class="bi bi-chevron-up details-chevron"></i>
+      </button>
+    </div>
+    <div class="text-secondary small mb-0 details-summary">
+      <i class="bi bi-person-circle me-1"></i>{{ message.from_ }}
+      <span class="mx-1">·</span>
+      <span class="text-nowrap">{{ message.date|date:"M j, H:i" }}</span>
+    </div>
+    <div id="email-meta" class="collapse show">
+      <dl class="row mb-0 small mt-3">
+        <dt class="col-sm-3 col-md-2 text-secondary fw-normal">Account</dt>
+        <dd class="col-sm-9 col-md-10 mb-2 mb-sm-1 text-truncate">{{ account.email_address }}</dd>
+        <dt class="col-sm-3 col-md-2 text-secondary fw-normal">From</dt>
+        <dd class="col-sm-9 col-md-10 mb-2 mb-sm-1 text-truncate">{{ message.from_ }}</dd>
+        {% if message.to %}
+          <dt class="col-sm-3 col-md-2 text-secondary fw-normal">To</dt>
+          <dd class="col-sm-9 col-md-10 mb-2 mb-sm-1">{{ message.to|join:", " }}</dd>
+        {% endif %}
+        <dt class="col-sm-3 col-md-2 text-secondary fw-normal">Date</dt>
+        <dd class="col-sm-9 col-md-10 mb-0">{{ message.date|date:"M j, Y H:i" }}</dd>
+      </dl>
+    </div>
   </div>
 </div>
 
@@ -39,8 +54,23 @@
 </div>
 
 <style>
+  .details-chevron { transition: transform .2s ease; }
+  .details-toggle[aria-expanded="false"] .details-chevron { transform: rotate(180deg); }
+  .details-toggle[aria-expanded="true"] ~ .details-summary { display: none; }
   @media (min-width: 992px) {
     .email-body-frame { min-height: 480px !important; }
   }
 </style>
+
+<script>
+  (function () {
+    const meta = document.getElementById('email-meta');
+    const toggle = document.querySelector('[data-bs-target="#email-meta"]');
+    if (!meta || !toggle) return;
+    if (window.matchMedia('(max-width: 991.98px)').matches) {
+      meta.classList.remove('show');
+      toggle.setAttribute('aria-expanded', 'false');
+    }
+  })();
+</script>
 {% endblock %}
