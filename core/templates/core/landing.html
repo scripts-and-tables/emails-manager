@@ -1,5 +1,5 @@
 {% extends "core/base.html" %}
-{% block title %}Emails Manager — All your mailboxes in one place{% endblock %}
+{% block title %}Mail.Ru Manager — All your mailboxes in one place{% endblock %}
 {% block content %}
 
 <style>
@@ -97,10 +97,30 @@
       0 0 0 1px rgba(0,0,0,.5);
     margin: 0 auto;
   }
+  .phone-frame {
+    transform: perspective(1400px) rotateY(-10deg) rotateX(4deg);
+    transform-style: preserve-3d;
+  }
   .phone-frame.is-floating { animation: phone-float 6s ease-in-out infinite; }
   @keyframes phone-float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
+    0%, 100% { transform: perspective(1400px) rotateY(-10deg) rotateX(4deg) translateY(0); }
+    50%      { transform: perspective(1400px) rotateY(-10deg) rotateX(4deg) translateY(-10px); }
+  }
+  .phone-frame.phone-tilt-left {
+    transform: perspective(1400px) rotateY(15deg) rotateX(4deg);
+  }
+  .phone-frame.phone-tilt-right {
+    transform: perspective(1400px) rotateY(-15deg) rotateX(4deg);
+  }
+  .phone-frame.phone-tilt-flat {
+    transform: perspective(1400px) rotateX(2deg);
+  }
+  .phone-frame.phone-tilt-flat.is-floating {
+    animation: phone-float-flat 6s ease-in-out infinite;
+  }
+  @keyframes phone-float-flat {
+    0%, 100% { transform: perspective(1400px) rotateX(2deg) translateY(0); }
+    50%      { transform: perspective(1400px) rotateX(2deg) translateY(-10px); }
   }
   .phone-screen {
     width: 100%; height: 100%;
@@ -399,7 +419,7 @@
           <div class="phone-navbar">
             <span class="phone-brand">
               <span class="phone-brand-mark">@</span>
-              <span>Emails Manager</span>
+              <span>Manager</span>
             </span>
             <span class="phone-burger"><span></span><span></span><span></span></span>
           </div>
@@ -565,7 +585,7 @@
   </div>
   <div class="lp-gallery">
     <!-- Phone 1: Accounts list, light -->
-    <div class="phone-frame">
+    <div class="phone-frame phone-tilt-left">
       <div class="phone-notch"></div>
       <div class="phone-screen">
         <div class="phone-status">
@@ -576,7 +596,7 @@
         </div>
         <div class="phone-navbar">
           <span class="phone-brand">
-            <span class="phone-brand-mark">@</span><span>Emails Manager</span>
+            <span class="phone-brand-mark">@</span><span>Manager</span>
           </span>
           <span class="phone-burger"><span></span><span></span><span></span></span>
         </div>
@@ -611,7 +631,7 @@
     </div>
 
     <!-- Phone 2 (centered): Inbox, dark -->
-    <div class="phone-frame lp-gallery-mid is-floating">
+    <div class="phone-frame lp-gallery-mid phone-tilt-flat is-floating">
       <div class="phone-notch"></div>
       <div class="phone-screen is-dark">
         <div class="phone-status">
@@ -622,7 +642,7 @@
         </div>
         <div class="phone-navbar">
           <span class="phone-brand">
-            <span class="phone-brand-mark">@</span><span>Emails Manager</span>
+            <span class="phone-brand-mark">@</span><span>Manager</span>
           </span>
           <span class="phone-burger"><span></span><span></span><span></span></span>
         </div>
@@ -669,7 +689,7 @@
     </div>
 
     <!-- Phone 3: Drawer menu, light -->
-    <div class="phone-frame">
+    <div class="phone-frame phone-tilt-right">
       <div class="phone-notch"></div>
       <div class="phone-screen">
         <div class="phone-status">
@@ -680,7 +700,7 @@
         </div>
         <div class="phone-navbar">
           <span class="phone-brand">
-            <span class="phone-brand-mark">@</span><span>Emails Manager</span>
+            <span class="phone-brand-mark">@</span><span>Manager</span>
           </span>
           <span class="phone-burger" style="position: relative; width: 18px; height: 14px;">
             <span style="position: absolute; top: 6px; transform: rotate(45deg); width: 100%;"></span>
@@ -798,7 +818,7 @@
     <div class="col-md-6">
       <div class="d-flex align-items-center gap-2 mb-2">
         <span class="brand-mark" style="width: 24px; height: 24px; font-size: 14px;">@</span>
-        <strong class="text-body">Emails Manager</strong>
+        <strong class="text-body">Mail.Ru Manager</strong>
       </div>
       <div>One inbox to rule them all. Built with Django and a great deal of squinting at IMAP.</div>
     </div>

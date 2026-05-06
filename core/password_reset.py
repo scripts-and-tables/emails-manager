@@ -22,7 +22,7 @@ def send_reset_email(to_email: str, reset_url: str) -> None:
     if not api_key:
         raise ResetDeliveryError("RESEND_API_KEY is not configured.")
 
-    subject = "Reset your Emails Manager password"
+    subject = "Reset your Mail.Ru Manager password"
     text = (
         "We received a request to reset your password.\n\n"
         f"Open this link to choose a new password:\n{reset_url}\n\n"

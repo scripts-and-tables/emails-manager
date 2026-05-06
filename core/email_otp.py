@@ -30,7 +30,7 @@ def _send_via_resend(to_email: str, code: str) -> None:
     if not api_key:
         raise OtpDeliveryError("RESEND_API_KEY is not configured.")
 
-    subject = "Your Emails Manager sign-in code"
+    subject = "Your Mail.Ru Manager sign-in code"
     text = (
         f"Your sign-in code is {code}.\n"
         f"It expires in {OTP_TTL_SECONDS // 60} minutes.\n\n"

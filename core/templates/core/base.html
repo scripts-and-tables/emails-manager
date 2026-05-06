@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}Emails Manager{% endblock %}</title>
+  <title>{% block title %}Mail.Ru Manager{% endblock %}</title>
   <script>
     (function () {
       try {
@@ -161,7 +161,7 @@
   <div class="container">
     <a class="navbar-brand" href="{% url 'core:index' %}">
       <span class="brand-mark" aria-hidden="true">@</span>
-      <span>Emails Manager</span>
+      <span>{% if user.is_authenticated and request.session.otp_verified %}Manager{% else %}Mail.Ru Manager{% endif %}</span>
     </a>
     <div class="d-flex align-items-center gap-2 ms-auto order-lg-last">
       <button class="theme-toggle-btn{% if user.is_authenticated and request.session.otp_verified %} d-none d-lg-flex{% endif %}" type="button"
