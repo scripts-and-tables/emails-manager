@@ -9,6 +9,8 @@ urlpatterns = [
     path("login/", views.login_view, name="login"),
     path("logout/", views.logout_view, name="logout"),
     path("verify-otp/", views.verify_otp, name="verify_otp"),
+    path("profile/", views.profile, name="profile"),
+    path("profile/password/", views.profile_password_change, name="profile_password_change"),
     path("password-reset/", views.password_reset_request, name="password_reset_request"),
     path("password-reset/done/", views.password_reset_complete, name="password_reset_complete"),
     path(

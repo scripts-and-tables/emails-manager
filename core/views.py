@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 from django.contrib import messages
-from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth import authenticate, get_user_model, update_session_auth_hash
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import AuthenticationForm, SetPasswordForm
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm, SetPasswordForm
 from django.contrib.auth.tokens import default_token_generator
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -16,7 +16,7 @@ from django.views.decorators.http import require_http_methods
 
 from .decorators import OTP_VERIFIED_SESSION_KEY, is_otp_verified, otp_required
 from .email_otp import OtpDeliveryError, issue_and_send, verify
-from .forms import EmailAccountForm, OtpForm, PasswordResetRequestForm
+from .forms import EmailAccountForm, OtpForm, PasswordResetRequestForm, ProfileInfoForm
 from .imap_client import check_status, check_status_bulk, fetch_body, fetch_recent_bulk
 from .models import EmailAccount
 from .password_reset import ResetDeliveryError, send_reset_email
@@ -167,11 +167,11 @@ def account_test(request: HttpRequest, pk: int) -> JsonResponse:
 
 @otp_required
 def inbox(request: HttpRequest) -> HttpResponse:
-    window = request.GET.get("window", "7d")
+    window = request.GET.get("window", "1d")
     days_map = {"1d": 1, "7d": 7, "30d": 30}
-    days = days_map.get(window, 7)
+    days = days_map.get(window, 1)
     if window not in days_map:
-        window = "7d"
+        window = "1d"
 
     accounts = list(EmailAccount.objects.filter(owner=request.user))
     headers, errors = fetch_recent_bulk(accounts, days=days)
@@ -202,7 +202,7 @@ def email_detail(request: HttpRequest, account_id: int, uid: str) -> HttpRespons
         message = fetch_body(account, uid)
     except Exception as exc:  # noqa: BLE001
         messages.error(request, f"Could not load email: {exc}")
-        return redirect(reverse("core:inbox") + f"?window={request.GET.get('window', '7d')}")
+        return redirect(reverse("core:inbox") + f"?window={request.GET.get('window', '1d')}")
 
     if message is None:
         messages.error(request, "Email not found.")
@@ -211,7 +211,7 @@ def email_detail(request: HttpRequest, account_id: int, uid: str) -> HttpRespons
     return render(
         request,
         "core/email_detail.html",
-        {"message": message, "account": account, "back_window": request.GET.get("window", "7d")},
+        {"message": message, "account": account, "back_window": request.GET.get("window", "1d")},
     )
 
 
@@ -268,3 +268,40 @@ def password_reset_confirm(request: HttpRequest, uidb64: str, token: str) -> Htt
 
 def password_reset_complete(request: HttpRequest) -> HttpResponse:
     return render(request, "core/password_reset_complete.html")
+
+
+def _add_bootstrap_class(form, css_class: str = "form-control") -> None:
+    for field in form.fields.values():
+        field.widget.attrs.setdefault("class", css_class)
+
+
+@otp_required
+@require_http_methods(["GET", "POST"])
+def profile(request: HttpRequest) -> HttpResponse:
+    info_form = ProfileInfoForm(instance=request.user)
+    password_form = PasswordChangeForm(request.user)
+    _add_bootstrap_class(password_form)
+
+    if request.method == "POST":
+        info_form = ProfileInfoForm(request.POST, instance=request.user)
+        if info_form.is_valid():
+            info_form.save()
+            messages.success(request, "Profile updated.")
+            return redirect("core:profile")
+
+    return render(request, "core/profile.html", {"info_form": info_form, "password_form": password_form})
+
+
+@otp_required
+@require_http_methods(["POST"])
+def profile_password_change(request: HttpRequest) -> HttpResponse:
+    password_form = PasswordChangeForm(request.user, request.POST)
+    _add_bootstrap_class(password_form)
+    if password_form.is_valid():
+        user = password_form.save()
+        update_session_auth_hash(request, user)
+        messages.success(request, "Password changed.")
+        return redirect("core:profile")
+
+    info_form = ProfileInfoForm(instance=request.user)
+    return render(request, "core/profile.html", {"info_form": info_form, "password_form": password_form})

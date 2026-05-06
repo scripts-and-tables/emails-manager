@@ -8,7 +8,8 @@
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   <style>
     body { background:#f7f8fa; }
-    .navbar-brand { font-weight: 600; letter-spacing: .2px; }
+    .navbar-brand { font-weight: 600; letter-spacing: .2px; display: inline-flex; align-items: center; gap: .5rem; }
+    .navbar-brand svg { color: #005FF9; }
     .card-soft { box-shadow: 0 1px 3px rgba(0,0,0,.04); border: 1px solid rgba(0,0,0,.06); }
     .truncate-cell { max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .table thead th { font-size: .82rem; text-transform: uppercase; letter-spacing: .04em; color: #6c757d; }
@@ -17,16 +18,30 @@
 <body>
 <nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="{% url 'core:index' %}">Emails Manager</a>
+    <a class="navbar-brand" href="{% url 'core:index' %}">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="2" y="4" width="20" height="16" rx="2"/>
+        <path d="m22 7-10 6L2 7"/>
+      </svg>
+      <span>Emails Manager</span>
+    </a>
     {% if user.is_authenticated and request.session.otp_verified %}
       <div class="collapse navbar-collapse">
         <ul class="navbar-nav me-auto">
           <li class="nav-item"><a class="nav-link" href="{% url 'core:accounts_list' %}">Accounts</a></li>
           <li class="nav-item"><a class="nav-link" href="{% url 'core:inbox' %}">Inbox</a></li>
         </ul>
-        <div class="d-flex align-items-center gap-2">
-          <span class="text-secondary small">{{ user.username }}</span>
-          <a class="btn btn-outline-secondary btn-sm" href="{% url 'core:logout' %}">Logout</a>
+        <div class="dropdown">
+          <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button"
+                  data-bs-toggle="dropdown" aria-expanded="false">
+            {{ user.username }}
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="{% url 'core:profile' %}">Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{% url 'core:logout' %}">Logout</a></li>
+          </ul>
         </div>
       </div>
     {% endif %}
