@@ -123,6 +123,9 @@ STORAGES = {
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
+PASSWORD_RESET_TIMEOUT = 3600  # 1 hour
+
+
 # Auth redirects
 LOGIN_URL = "/login/"
 LOGIN_REDIRECT_URL = "/status/"

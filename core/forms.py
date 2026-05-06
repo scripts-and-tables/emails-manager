@@ -20,6 +20,19 @@ class OtpForm(forms.Form):
     )
 
 
+class PasswordResetRequestForm(forms.Form):
+    email = forms.EmailField(
+        label="Email address",
+        widget=forms.EmailInput(
+            attrs={
+                "class": "form-control",
+                "autocomplete": "email",
+                "autofocus": "autofocus",
+            }
+        ),
+    )
+
+
 class EmailAccountForm(forms.ModelForm):
     password = forms.CharField(
         label="App password",

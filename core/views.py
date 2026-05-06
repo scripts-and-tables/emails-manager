@@ -5,17 +5,21 @@ from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, SetPasswordForm
+from django.contrib.auth.tokens import default_token_generator
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.views.decorators.http import require_http_methods
 
 from .decorators import OTP_VERIFIED_SESSION_KEY, is_otp_verified, otp_required
 from .email_otp import OtpDeliveryError, issue_and_send, verify
-from .forms import EmailAccountForm, OtpForm
+from .forms import EmailAccountForm, OtpForm, PasswordResetRequestForm
 from .imap_client import check_status_bulk, fetch_body, fetch_recent_bulk
 from .models import EmailAccount
+from .password_reset import ResetDeliveryError, send_reset_email
 
 User = get_user_model()
 
@@ -213,3 +217,58 @@ def email_detail(request: HttpRequest, account_id: int, uid: str) -> HttpRespons
         "core/email_detail.html",
         {"message": message, "account": account, "back_window": request.GET.get("window", "7d")},
     )
+
+
+@require_http_methods(["GET", "POST"])
+def password_reset_request(request: HttpRequest) -> HttpResponse:
+    if request.method == "POST":
+        form = PasswordResetRequestForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data["email"].strip()
+            user = User.objects.filter(email__iexact=email).first()
+            if user is not None and user.email:
+                uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
+                token = default_token_generator.make_token(user)
+                reset_url = request.build_absolute_uri(
+                    reverse("core:password_reset_confirm", args=[uidb64, token])
+                )
+                try:
+                    send_reset_email(user.email, reset_url)
+                except ResetDeliveryError:
+                    pass  # logged in helper; show generic success either way
+            return render(request, "core/password_reset_request.html", {"form": form, "sent": True})
+    else:
+        form = PasswordResetRequestForm()
+
+    return render(request, "core/password_reset_request.html", {"form": form, "sent": False})
+
+
+@require_http_methods(["GET", "POST"])
+def password_reset_confirm(request: HttpRequest, uidb64: str, token: str) -> HttpResponse:
+    user = None
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.filter(pk=uid).first()
+    except (TypeError, ValueError, OverflowError):
+        user = None
+
+    if user is None or not default_token_generator.check_token(user, token):
+        return render(request, "core/password_reset_confirm.html", {"valid_link": False})
+
+    if request.method == "POST":
+        form = SetPasswordForm(user, request.POST)
+        for field in form.fields.values():
+            field.widget.attrs.setdefault("class", "form-control")
+        if form.is_valid():
+            form.save()
+            return redirect("core:password_reset_complete")
+    else:
+        form = SetPasswordForm(user)
+        for field in form.fields.values():
+            field.widget.attrs.setdefault("class", "form-control")
+
+    return render(request, "core/password_reset_confirm.html", {"form": form, "valid_link": True})
+
+
+def password_reset_complete(request: HttpRequest) -> HttpResponse:
+    return render(request, "core/password_reset_complete.html")
