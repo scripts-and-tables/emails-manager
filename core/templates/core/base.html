@@ -56,10 +56,34 @@
       color: #fff; font-weight: 600; font-size: 14px;
       text-transform: uppercase; line-height: 1;
       box-shadow: 0 1px 3px rgba(0, 95, 249, .25);
+      flex-shrink: 0;
     }
     .user-avatar-btn { padding: 2px; border: 2px solid transparent; border-radius: 50%; transition: border-color .15s ease, box-shadow .15s ease; background: transparent; }
     .user-avatar-btn:hover, .user-avatar-btn:focus { border-color: rgba(13, 110, 253, .35); box-shadow: 0 0 0 3px rgba(13, 110, 253, .1); }
     .user-avatar-btn.dropdown-toggle::after { display: none; }
+
+    @media (max-width: 991.98px) {
+      .offcanvas { width: 100vw !important; max-width: 100vw !important; }
+      .offcanvas .navbar-nav .nav-link {
+        padding: 1rem 1.25rem;
+        font-size: 1.05rem;
+        color: var(--bs-body-color);
+        border-bottom: 1px solid rgba(0,0,0,.05);
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+      }
+      .offcanvas .navbar-nav .nav-link i { font-size: 1.25rem; color: #6c757d; width: 1.5rem; text-align: center; }
+      .offcanvas .navbar-nav .nav-link:hover,
+      .offcanvas .navbar-nav .nav-link:focus,
+      .offcanvas .navbar-nav .nav-link:active {
+        background: rgba(13, 110, 253, .06);
+      }
+      .offcanvas .navbar-nav .nav-link.is-logout {
+        color: #dc3545;
+      }
+      .offcanvas .navbar-nav .nav-link.is-logout i { color: #dc3545; }
+    }
 
     @media (max-width: 575.98px) {
       .auth-card-wrap { padding: 1.25rem 0; }
@@ -75,7 +99,7 @@
     </a>
     {% if user.is_authenticated and request.session.otp_verified %}
       <div class="d-flex align-items-center gap-2 ms-auto order-lg-last">
-        <div class="dropdown">
+        <div class="dropdown d-none d-lg-block">
           <button class="user-avatar-btn dropdown-toggle" type="button"
                   data-bs-toggle="dropdown" aria-expanded="false" aria-label="Open user menu">
             <span class="user-avatar">{% if user.first_name and user.last_name %}{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}{% elif user.first_name %}{{ user.first_name|first|upper }}{% else %}{{ user.username|first|upper }}{% endif %}</span>
@@ -101,29 +125,55 @@
           </ul>
         </div>
         <button class="navbar-toggler border-0 d-lg-none" type="button"
-                data-bs-toggle="collapse" data-bs-target="#mainNav"
-                aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
-          <i class="bi bi-list" style="font-size: 1.6rem;"></i>
+                data-bs-toggle="offcanvas" data-bs-target="#mainNav"
+                aria-controls="mainNav" aria-label="Open menu">
+          <span class="user-avatar" aria-hidden="true">{% if user.first_name and user.last_name %}{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}{% elif user.first_name %}{{ user.first_name|first|upper }}{% else %}{{ user.username|first|upper }}{% endif %}</span>
         </button>
       </div>
-      <div class="collapse navbar-collapse" id="mainNav">
-        <ul class="navbar-nav me-auto mt-2 mt-lg-0">
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'core:home' %}">
-              <i class="bi bi-house me-1"></i>Home
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'core:inbox' %}">
-              <i class="bi bi-inbox me-1"></i>Inbox
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'core:accounts_list' %}">
-              <i class="bi bi-person-rolodex me-1"></i>Accounts
-            </a>
-          </li>
-        </ul>
+      <div class="offcanvas offcanvas-lg offcanvas-end" tabindex="-1" id="mainNav" aria-labelledby="mainNavLabel">
+        <div class="offcanvas-header border-bottom p-3 d-lg-none">
+          <div class="d-flex align-items-center gap-3 flex-grow-1 min-w-0">
+            <span class="user-avatar" style="width: 44px; height: 44px; font-size: 16px;" aria-hidden="true">{% if user.first_name and user.last_name %}{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}{% elif user.first_name %}{{ user.first_name|first|upper }}{% else %}{{ user.username|first|upper }}{% endif %}</span>
+            <div class="flex-grow-1 min-w-0">
+              {% if user.first_name or user.last_name %}
+                <div class="fw-semibold text-truncate" id="mainNavLabel">{{ user.first_name }} {{ user.last_name }}</div>
+              {% else %}
+                <div class="fw-semibold text-truncate" id="mainNavLabel">{{ user.username }}</div>
+              {% endif %}
+              <div class="small text-secondary text-truncate">{{ user.email|default:user.username }}</div>
+            </div>
+          </div>
+          <button type="button" class="btn-close ms-2" data-bs-dismiss="offcanvas" data-bs-target="#mainNav" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body p-0 p-lg-0 align-items-lg-center">
+          <ul class="navbar-nav flex-grow-1 ms-lg-3">
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'core:home' %}">
+                <i class="bi bi-house"></i><span>Home</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'core:inbox' %}">
+                <i class="bi bi-inbox"></i><span>Inbox</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'core:accounts_list' %}">
+                <i class="bi bi-person-rolodex"></i><span>Accounts</span>
+              </a>
+            </li>
+            <li class="nav-item d-lg-none mt-3" style="border-top: 1px solid rgba(0,0,0,.08); padding-top: .25rem;">
+              <a class="nav-link" href="{% url 'core:profile' %}">
+                <i class="bi bi-person"></i><span>Profile</span>
+              </a>
+            </li>
+            <li class="nav-item d-lg-none">
+              <a class="nav-link is-logout" href="{% url 'core:logout' %}">
+                <i class="bi bi-box-arrow-right"></i><span>Logout</span>
+              </a>
+            </li>
+          </ul>
+        </div>
       </div>
     {% endif %}
   </div>
