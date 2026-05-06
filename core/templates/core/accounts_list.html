@@ -3,10 +3,16 @@
 {% block content %}
 <div class="d-flex align-items-center justify-content-between mb-3">
   <h1 class="h4 mb-0">Email accounts</h1>
-  <a href="{% url 'core:account_new' %}" class="btn btn-primary btn-sm">+ Add account</a>
+  <div class="d-flex gap-2">
+    {% if accounts %}
+      <button type="button" id="test-all-btn" class="btn btn-outline-primary btn-sm">Test all</button>
+    {% endif %}
+    <a href="{% url 'core:account_new' %}" class="btn btn-primary btn-sm">+ Add account</a>
+  </div>
 </div>
 
-{% if rows %}
+{% if accounts %}
+  {% csrf_token %}
   <div class="card card-soft">
     <div class="table-responsive">
       <table class="table table-hover align-middle mb-0">
@@ -22,30 +28,22 @@
           </tr>
         </thead>
         <tbody>
-          {% for row in rows %}
-            <tr>
+          {% for account in accounts %}
+            <tr data-account-row data-account-id="{{ account.pk }}"
+                data-test-url="{% url 'core:account_test' account.pk %}">
               <td>
-                {% if row.status and row.status.ok %}
-                  <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle">●</span>
-                {% else %}
-                  <span class="badge bg-danger-subtle text-danger-emphasis border border-danger-subtle">●</span>
-                {% endif %}
+                <span class="status-dot status-idle" aria-hidden="true">●</span>
               </td>
-              <td>{{ row.account.email_address }}</td>
-              <td class="text-secondary">{{ row.account.display_name|default:"—" }}</td>
-              <td><code class="small">{{ row.account.imap_host }}</code></td>
-              <td>{{ row.account.imap_port }}</td>
-              <td class="{% if row.status and not row.status.ok %}text-danger small{% else %}text-secondary small{% endif %}">
-                {{ row.status.message|default:"—" }}
-              </td>
+              <td>{{ account.email_address }}</td>
+              <td class="text-secondary">{{ account.display_name|default:"—" }}</td>
+              <td><code class="small">{{ account.imap_host }}</code></td>
+              <td>{{ account.imap_port }}</td>
+              <td class="status-message text-secondary small">Not tested</td>
               <td class="text-end">
-                <form method="post" action="{% url 'core:account_test' row.account.pk %}" class="d-inline">
-                  {% csrf_token %}
-                  <button type="submit" class="btn btn-outline-primary btn-sm">Test</button>
-                </form>
-                <a href="{% url 'core:account_edit' row.account.pk %}" class="btn btn-outline-secondary btn-sm">Edit</a>
-                <form method="post" action="{% url 'core:account_delete' row.account.pk %}" class="d-inline"
-                      onsubmit="return confirm('Remove {{ row.account.email_address }}?');">
+                <button type="button" class="btn btn-outline-primary btn-sm test-btn">Test</button>
+                <a href="{% url 'core:account_edit' account.pk %}" class="btn btn-outline-secondary btn-sm">Edit</a>
+                <form method="post" action="{% url 'core:account_delete' account.pk %}" class="d-inline"
+                      onsubmit="return confirm('Remove {{ account.email_address }}?');">
                   {% csrf_token %}
                   <button type="submit" class="btn btn-outline-danger btn-sm">Remove</button>
                 </form>
@@ -56,6 +54,86 @@
       </table>
     </div>
   </div>
+
+  <style>
+    .status-dot { font-size: 1.2rem; line-height: 1; }
+    .status-idle { color: #adb5bd; }
+    .status-ok { color: #198754; }
+    .status-fail { color: #dc3545; }
+    .status-spin {
+      display: inline-block;
+      width: 1rem; height: 1rem;
+      border: 2px solid #dee2e6;
+      border-top-color: #0d6efd;
+      border-radius: 50%;
+      animation: status-spin 0.7s linear infinite;
+      vertical-align: -2px;
+    }
+    @keyframes status-spin { to { transform: rotate(360deg); } }
+  </style>
+
+  <script>
+  (function () {
+    const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+
+    function setRowState(row, state, message) {
+      const dotCell = row.querySelector('td:first-child');
+      const messageCell = row.querySelector('.status-message');
+      const testBtn = row.querySelector('.test-btn');
+
+      if (state === 'testing') {
+        dotCell.innerHTML = '<span class="status-spin" aria-hidden="true"></span>';
+        messageCell.className = 'status-message text-secondary small';
+        messageCell.textContent = 'Testing…';
+        testBtn.disabled = true;
+      } else if (state === 'ok') {
+        dotCell.innerHTML = '<span class="status-dot status-ok" aria-hidden="true">●</span>';
+        messageCell.className = 'status-message text-success small';
+        messageCell.textContent = message || 'Connected';
+        testBtn.disabled = false;
+      } else if (state === 'fail') {
+        dotCell.innerHTML = '<span class="status-dot status-fail" aria-hidden="true">●</span>';
+        messageCell.className = 'status-message text-danger small';
+        messageCell.textContent = message || 'Failed';
+        testBtn.disabled = false;
+      }
+    }
+
+    async function testRow(row) {
+      const url = row.dataset.testUrl;
+      setRowState(row, 'testing');
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'X-CSRFToken': csrfToken, 'Accept': 'application/json' },
+        });
+        if (!response.ok) {
+          setRowState(row, 'fail', `HTTP ${response.status}`);
+          return;
+        }
+        const data = await response.json();
+        setRowState(row, data.ok ? 'ok' : 'fail', data.message);
+      } catch (err) {
+        setRowState(row, 'fail', err.message || 'Network error');
+      }
+    }
+
+    document.querySelectorAll('[data-account-row] .test-btn').forEach((btn) => {
+      btn.addEventListener('click', () => testRow(btn.closest('[data-account-row]')));
+    });
+
+    const testAllBtn = document.getElementById('test-all-btn');
+    if (testAllBtn) {
+      testAllBtn.addEventListener('click', () => {
+        const rows = document.querySelectorAll('[data-account-row]');
+        testAllBtn.disabled = true;
+        Promise.all(Array.from(rows).map(testRow)).finally(() => {
+          testAllBtn.disabled = false;
+        });
+      });
+    }
+  })();
+  </script>
 {% else %}
   <div class="card card-soft">
     <div class="card-body text-center py-5">

@@ -7,7 +7,7 @@ from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm, SetPasswordForm
 from django.contrib.auth.tokens import default_token_generator
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.encoding import force_bytes, force_str
@@ -112,11 +112,8 @@ def verify_otp(request: HttpRequest) -> HttpResponse:
 
 @otp_required
 def accounts_list(request: HttpRequest) -> HttpResponse:
-    accounts = list(EmailAccount.objects.filter(owner=request.user))
-    results = check_status_bulk(accounts)
-    status_by_id = {r.account_id: r for r in results}
-    rows = [{"account": acc, "status": status_by_id.get(acc.id)} for acc in accounts]
-    return render(request, "core/accounts_list.html", {"rows": rows})
+    accounts = EmailAccount.objects.filter(owner=request.user)
+    return render(request, "core/accounts_list.html", {"accounts": accounts})
 
 
 @otp_required
@@ -162,14 +159,10 @@ def account_delete(request: HttpRequest, pk: int) -> HttpResponse:
 
 @otp_required
 @require_http_methods(["POST"])
-def account_test(request: HttpRequest, pk: int) -> HttpResponse:
+def account_test(request: HttpRequest, pk: int) -> JsonResponse:
     account = get_object_or_404(EmailAccount, pk=pk, owner=request.user)
     result = check_status(account)
-    if result.ok:
-        messages.success(request, f"{account.email_address}: connection OK.")
-    else:
-        messages.error(request, f"{account.email_address}: {result.message}")
-    return redirect("core:accounts_list")
+    return JsonResponse({"ok": result.ok, "message": result.message})
 
 
 @otp_required
