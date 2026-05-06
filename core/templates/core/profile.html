@@ -2,15 +2,25 @@
 {% block title %}Profile · Emails Manager{% endblock %}
 {% block content %}
 <div class="row justify-content-center">
-  <div class="col-md-7">
-    <h1 class="h4 mb-4">Profile</h1>
+  <div class="col-12 col-md-9 col-lg-7">
+    <div class="d-flex align-items-center gap-3 mb-4">
+      <span class="brand-mark brand-mark-lg" aria-hidden="true">
+        <i class="bi bi-person" style="font-size: 30px;"></i>
+      </span>
+      <div>
+        <h1 class="h4 mb-0">Profile</h1>
+        <p class="text-secondary small mb-0">Manage your account info and password.</p>
+      </div>
+    </div>
 
     <div class="card card-soft mb-4">
-      <div class="card-body p-4">
-        <h2 class="h6 text-secondary text-uppercase mb-3" style="letter-spacing:.05em;">Account info</h2>
-        <dl class="row mb-3">
-          <dt class="col-sm-4 text-secondary fw-normal">Username</dt>
-          <dd class="col-sm-8"><code>{{ user.username }}</code></dd>
+      <div class="card-body p-3 p-md-4">
+        <h2 class="h6 text-secondary text-uppercase mb-3" style="letter-spacing:.05em;">
+          <i class="bi bi-person-circle me-1"></i>Account info
+        </h2>
+        <dl class="row mb-3 small">
+          <dt class="col-sm-4 col-md-3 text-secondary fw-normal">Username</dt>
+          <dd class="col-sm-8 col-md-9"><code>{{ user.username }}</code></dd>
         </dl>
         <form method="post" novalidate>
           {% csrf_token %}
@@ -28,18 +38,25 @@
           </div>
           <div class="mb-3">
             <label class="form-label" for="id_email">Email address</label>
-            {{ info_form.email }}
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+              {{ info_form.email }}
+            </div>
             <div class="form-text">Used for sign-in OTP codes and password-reset links.</div>
             {% for err in info_form.email.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
           </div>
-          <button type="submit" class="btn btn-primary">Save changes</button>
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check2 me-1"></i>Save changes
+          </button>
         </form>
       </div>
     </div>
 
     <div class="card card-soft mb-4">
-      <div class="card-body p-4">
-        <h2 class="h6 text-secondary text-uppercase mb-3" style="letter-spacing:.05em;">Change password</h2>
+      <div class="card-body p-3 p-md-4">
+        <h2 class="h6 text-secondary text-uppercase mb-3" style="letter-spacing:.05em;">
+          <i class="bi bi-key me-1"></i>Change password
+        </h2>
         <form method="post" action="{% url 'core:profile_password_change' %}" novalidate>
           {% csrf_token %}
           {% if password_form.non_field_errors %}
@@ -47,12 +64,18 @@
           {% endif %}
           <div class="mb-3">
             <label class="form-label" for="id_old_password">Current password</label>
-            {{ password_form.old_password }}
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-lock"></i></span>
+              {{ password_form.old_password }}
+            </div>
             {% for err in password_form.old_password.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
           </div>
           <div class="mb-3">
             <label class="form-label" for="id_new_password1">New password</label>
-            {{ password_form.new_password1 }}
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+              {{ password_form.new_password1 }}
+            </div>
             {% if password_form.new_password1.help_text %}
               <div class="form-text">{{ password_form.new_password1.help_text|safe }}</div>
             {% endif %}
@@ -60,16 +83,23 @@
           </div>
           <div class="mb-3">
             <label class="form-label" for="id_new_password2">Confirm new password</label>
-            {{ password_form.new_password2 }}
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+              {{ password_form.new_password2 }}
+            </div>
             {% for err in password_form.new_password2.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
           </div>
-          <button type="submit" class="btn btn-primary">Change password</button>
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-shield-check me-1"></i>Change password
+          </button>
         </form>
       </div>
     </div>
 
     <div class="text-center">
-      <a class="btn btn-outline-secondary" href="{% url 'core:logout' %}">Sign out</a>
+      <a class="btn btn-outline-secondary" href="{% url 'core:logout' %}">
+        <i class="bi bi-box-arrow-right me-1"></i>Sign out
+      </a>
     </div>
   </div>
 </div>
