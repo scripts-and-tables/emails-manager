@@ -129,6 +129,19 @@ PASSWORD_RESET_TIMEOUT = 3600  # 1 hour
 MESSAGE_TAGS = {message_constants.ERROR: "danger"}  # map to Bootstrap's alert-danger
 
 
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {"class": "logging.StreamHandler"},
+    },
+    "root": {"handlers": ["console"], "level": "INFO"},
+    "loggers": {
+        "django.request": {"handlers": ["console"], "level": "ERROR", "propagate": False},
+    },
+}
+
+
 # Auth redirects
 LOGIN_URL = "/login/"
 LOGIN_REDIRECT_URL = "/status/"

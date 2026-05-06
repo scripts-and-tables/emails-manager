@@ -75,6 +75,14 @@ def check_status_bulk(accounts: Iterable[EmailAccount]) -> list[StatusResult]:
     return [by_id[a.id] for a in accounts]
 
 
+def _coerce_aware(value: datetime | None) -> datetime | None:
+    if value is None:
+        return None
+    if value.tzinfo is None:
+        return value.replace(tzinfo=timezone.utc)
+    return value
+
+
 def fetch_recent(account: EmailAccount, since: datetime) -> tuple[list[EmailHeader], str | None]:
     """Returns (headers, error_message_or_none)."""
     headers: list[EmailHeader] = []
@@ -95,7 +103,7 @@ def fetch_recent(account: EmailAccount, since: datetime) -> tuple[list[EmailHead
                         uid=msg.uid or "",
                         subject=msg.subject or "(no subject)",
                         from_=msg.from_ or "",
-                        date=msg.date,
+                        date=_coerce_aware(msg.date),
                         seen="\\Seen" in (msg.flags or ()),
                     )
                 )
