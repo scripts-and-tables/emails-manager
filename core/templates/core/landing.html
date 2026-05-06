@@ -1,0 +1,813 @@
+{% extends "core/base.html" %}
+{% block title %}Emails Manager — All your mailboxes in one place{% endblock %}
+{% block content %}
+
+<style>
+  /* === Landing-only styles === */
+  .lp-hero {
+    padding: 3rem 0 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  @media (min-width: 992px) { .lp-hero { padding: 5rem 0 4rem; } }
+
+  .lp-hero-bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(70% 50% at 80% 0%, rgba(0, 153, 255, .18), transparent 60%),
+      radial-gradient(60% 40% at 0% 30%, rgba(0, 95, 249, .14), transparent 60%);
+    z-index: -1;
+    pointer-events: none;
+  }
+  [data-bs-theme="dark"] .lp-hero-bg {
+    background:
+      radial-gradient(70% 50% at 80% 0%, rgba(0, 153, 255, .22), transparent 60%),
+      radial-gradient(60% 40% at 0% 30%, rgba(0, 95, 249, .18), transparent 60%);
+  }
+
+  .lp-eyebrow {
+    display: inline-flex; align-items: center; gap: .5rem;
+    padding: .35rem .75rem;
+    background: rgba(13, 110, 253, .08);
+    color: #0d6efd;
+    border-radius: 999px;
+    font-size: .85rem;
+    font-weight: 500;
+    margin-bottom: 1.25rem;
+  }
+  [data-bs-theme="dark"] .lp-eyebrow { background: rgba(13, 110, 253, .15); color: #6ea8fe; }
+
+  .lp-headline {
+    font-size: clamp(2.25rem, 5vw, 3.75rem);
+    font-weight: 700;
+    letter-spacing: -.02em;
+    line-height: 1.05;
+    margin-bottom: 1rem;
+  }
+  .lp-text-gradient {
+    background: linear-gradient(135deg, #005FF9 0%, #0099FF 60%, #00D9FF 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .lp-lead {
+    font-size: 1.15rem;
+    color: var(--bs-secondary-color);
+    margin-bottom: 2rem;
+    max-width: 38ch;
+  }
+
+  .lp-cta-row { display: flex; gap: .75rem; flex-wrap: wrap; }
+  .lp-btn-primary {
+    background: linear-gradient(135deg, #005FF9 0%, #0099FF 100%);
+    border: 0;
+    color: #fff;
+    padding: .8rem 1.5rem;
+    font-weight: 500;
+    border-radius: 10px;
+    box-shadow: 0 4px 14px rgba(0, 95, 249, .25);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .lp-btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(0, 95, 249, .35);
+    color: #fff;
+  }
+
+  .lp-stats {
+    display: flex; flex-wrap: wrap; gap: 1.5rem 2.5rem;
+    margin-top: 2.5rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--bs-border-color);
+    color: var(--bs-secondary-color);
+    font-size: .9rem;
+  }
+  .lp-stat strong { color: var(--bs-body-color); display: block; font-size: 1.2rem; font-weight: 700; }
+
+  /* Phone mockups */
+  .phone-frame {
+    position: relative;
+    width: 290px;
+    height: 590px;
+    background: linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%);
+    border-radius: 38px;
+    padding: 12px;
+    box-shadow:
+      0 30px 60px -15px rgba(0,0,0,.35),
+      0 0 0 1px rgba(255,255,255,.04) inset,
+      0 0 0 1px rgba(0,0,0,.5);
+    margin: 0 auto;
+  }
+  .phone-frame.is-floating { animation: phone-float 6s ease-in-out infinite; }
+  @keyframes phone-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  .phone-screen {
+    width: 100%; height: 100%;
+    border-radius: 26px;
+    overflow: hidden;
+    background: #f7f8fa;
+    color: #212529;
+    position: relative;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+  .phone-screen.is-dark { background: #16181b; color: #dee2e6; }
+  .phone-notch {
+    position: absolute;
+    top: 7px; left: 50%; transform: translateX(-50%);
+    width: 96px; height: 22px;
+    background: #0a0a0a;
+    border-radius: 12px;
+    z-index: 10;
+  }
+  .phone-status {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 22px 0;
+    font-size: 11px; font-weight: 600;
+    height: 36px;
+  }
+  .phone-status .signals { display: inline-flex; gap: 4px; align-items: center; }
+  .phone-navbar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(0,0,0,.06);
+  }
+  .phone-screen.is-dark .phone-navbar { border-bottom-color: rgba(255,255,255,.06); }
+  .phone-brand {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-weight: 600; font-size: 13px;
+  }
+  .phone-brand-mark {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px;
+    background: linear-gradient(135deg, #005FF9 0%, #0099FF 100%);
+    color: #fff; border-radius: 6px;
+    font-size: 13px; font-weight: 700;
+  }
+  .phone-burger { display: inline-flex; flex-direction: column; gap: 3px; }
+  .phone-burger span {
+    display: block; width: 18px; height: 2px;
+    background: #495057; border-radius: 2px;
+  }
+  .phone-screen.is-dark .phone-burger span { background: #adb5bd; }
+
+  .phone-content { padding: 12px; height: calc(100% - 88px); overflow: hidden; }
+  .phone-h1 { font-size: 16px; font-weight: 700; margin: 4px 0 8px; }
+  .phone-search {
+    display: flex; align-items: center; gap: 6px;
+    background: #fff; border: 1px solid rgba(0,0,0,.08); border-radius: 8px;
+    padding: 7px 10px;
+    color: #6c757d;
+    font-size: 11px;
+    margin-bottom: 10px;
+  }
+  .phone-screen.is-dark .phone-search { background: #1f2225; border-color: rgba(255,255,255,.08); color: #adb5bd; }
+
+  .phone-card {
+    background: #fff;
+    border: 1px solid rgba(0,0,0,.07);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+  }
+  .phone-screen.is-dark .phone-card { background: #1f2225; border-color: rgba(255,255,255,.08); }
+  .phone-card-row { display: flex; justify-content: space-between; gap: 6px; align-items: center; }
+  .phone-card-from { font-weight: 600; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .phone-card-date { font-size: 10px; color: #6c757d; flex-shrink: 0; }
+  .phone-screen.is-dark .phone-card-date { color: #adb5bd; }
+  .phone-card-subj { font-size: 12px; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .phone-card-subj.is-unread { font-weight: 600; }
+  .phone-card-acc { font-size: 10px; color: #6c757d; margin-top: 4px; }
+  .phone-screen.is-dark .phone-card-acc { color: #adb5bd; }
+
+  /* Accounts variant inside phone */
+  .phone-acct-card {
+    background: #fff;
+    border: 1px solid rgba(0,0,0,.07);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+  }
+  .phone-screen.is-dark .phone-acct-card { background: #1f2225; border-color: rgba(255,255,255,.08); }
+  .phone-acct-email { font-weight: 600; font-size: 12px; }
+  .phone-acct-host { font-size: 10px; color: #6c757d; margin-top: 2px; }
+  .phone-screen.is-dark .phone-acct-host { color: #adb5bd; }
+  .phone-acct-status {
+    display: flex; align-items: center; gap: 6px;
+    margin-top: 8px; padding: 6px 8px;
+    background: rgba(0,0,0,.03);
+    border-radius: 6px;
+    font-size: 11px;
+  }
+  .phone-screen.is-dark .phone-acct-status { background: rgba(255,255,255,.04); }
+  .phone-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .phone-dot.ok { background: #198754; box-shadow: 0 0 0 2px rgba(25, 135, 84, .15); }
+  .phone-dot.fail { background: #dc3545; box-shadow: 0 0 0 2px rgba(220, 53, 69, .15); }
+
+  .phone-fab {
+    position: absolute; right: 14px; bottom: 14px;
+    width: 44px; height: 44px;
+    background: linear-gradient(135deg, #005FF9 0%, #0099FF 100%);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 22px;
+    box-shadow: 0 6px 14px rgba(0, 95, 249, .35);
+  }
+
+  /* === Sections === */
+  .lp-section { padding: 4rem 0; }
+  @media (min-width: 992px) { .lp-section { padding: 6rem 0; } }
+
+  .lp-section-bg-soft {
+    background: linear-gradient(180deg, transparent, var(--bs-tertiary-bg) 50%, transparent);
+  }
+
+  .lp-section-eyebrow {
+    color: #0d6efd;
+    text-transform: uppercase;
+    font-size: .8rem;
+    letter-spacing: .1em;
+    font-weight: 600;
+    margin-bottom: .75rem;
+  }
+  [data-bs-theme="dark"] .lp-section-eyebrow { color: #6ea8fe; }
+
+  .lp-section-title {
+    font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+    font-weight: 700;
+    letter-spacing: -.015em;
+    margin-bottom: .75rem;
+  }
+  .lp-section-lead {
+    color: var(--bs-secondary-color);
+    font-size: 1.1rem;
+    max-width: 60ch;
+  }
+
+  /* Feature cards */
+  .lp-feature {
+    height: 100%;
+    border: 1px solid var(--bs-border-color);
+    border-radius: 14px;
+    background: var(--bs-body-bg);
+    padding: 1.75rem;
+    transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+  }
+  .lp-feature:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(0,0,0,.06);
+    border-color: rgba(13, 110, 253, .35);
+  }
+  .lp-feature-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    font-size: 22px;
+    margin-bottom: 1.1rem;
+  }
+  .lp-feature-icon.ic-blue   { background: rgba(13, 110, 253, .12);  color: #0d6efd; }
+  .lp-feature-icon.ic-green  { background: rgba(25, 135, 84, .12);   color: #198754; }
+  .lp-feature-icon.ic-violet { background: rgba(111, 66, 193, .12);  color: #6f42c1; }
+  .lp-feature-icon.ic-amber  { background: rgba(255, 159, 0, .14);   color: #cc7a00; }
+  .lp-feature-icon.ic-pink   { background: rgba(214, 51, 132, .12);  color: #d63384; }
+  .lp-feature-icon.ic-teal   { background: rgba(32, 201, 151, .14);  color: #149374; }
+  .lp-feature-title { font-size: 1.1rem; font-weight: 600; margin-bottom: .5rem; }
+  .lp-feature-text { color: var(--bs-secondary-color); margin-bottom: 0; font-size: .95rem; }
+
+  /* How-it-works steps */
+  .lp-step {
+    text-align: left;
+    height: 100%;
+    padding: 1.5rem;
+  }
+  .lp-step-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, #005FF9 0%, #0099FF 100%);
+    color: #fff; font-weight: 700;
+    margin-bottom: 1rem;
+  }
+  .lp-step-title { font-weight: 600; margin-bottom: .35rem; }
+  .lp-step-text { color: var(--bs-secondary-color); font-size: .95rem; margin-bottom: 0; }
+
+  /* Mobile gallery */
+  .lp-gallery {
+    display: flex; flex-wrap: wrap; gap: 2.5rem;
+    justify-content: center; align-items: end;
+  }
+  .lp-gallery .phone-frame { transform: scale(.92); }
+  .lp-gallery .phone-frame.lp-gallery-mid { transform: scale(1); margin: 0 -1rem; z-index: 2; }
+
+  /* Security card */
+  .lp-security-card {
+    background: linear-gradient(135deg, #0a1f4f 0%, #0d2c6e 100%);
+    color: #fff;
+    border-radius: 18px;
+    padding: 3rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .lp-security-card::after {
+    content: ''; position: absolute; right: -50px; top: -50px;
+    width: 240px; height: 240px;
+    background: radial-gradient(circle, rgba(0, 153, 255, .35), transparent 70%);
+    pointer-events: none;
+  }
+  .lp-security-bullet {
+    display: flex; align-items: start; gap: .75rem;
+    margin-bottom: 1rem;
+  }
+  .lp-security-bullet i {
+    color: #00D9FF; font-size: 1.2rem; line-height: 1.5;
+    flex-shrink: 0;
+  }
+
+  /* Footer CTA */
+  .lp-final-cta {
+    text-align: center;
+    background: linear-gradient(135deg, rgba(0, 95, 249, .08) 0%, rgba(0, 153, 255, .08) 100%);
+    border: 1px solid rgba(0, 95, 249, .15);
+    border-radius: 18px;
+    padding: 3.5rem 1.5rem;
+  }
+  [data-bs-theme="dark"] .lp-final-cta {
+    background: linear-gradient(135deg, rgba(0, 95, 249, .15) 0%, rgba(0, 153, 255, .12) 100%);
+  }
+
+  .lp-footer {
+    border-top: 1px solid var(--bs-border-color);
+    padding: 2rem 0;
+    color: var(--bs-secondary-color);
+    font-size: .9rem;
+  }
+</style>
+
+<!-- ====== HERO ====== -->
+<section class="lp-hero">
+  <div class="lp-hero-bg" aria-hidden="true"></div>
+  <div class="row align-items-center g-5">
+    <div class="col-lg-6">
+      <span class="lp-eyebrow">
+        <i class="bi bi-stars"></i> Personal email aggregator
+      </span>
+      <h1 class="lp-headline">
+        All your mailboxes.<br>
+        <span class="lp-text-gradient">One place.</span>
+      </h1>
+      <p class="lp-lead">
+        Connect every mail.ru, Gmail, Yandex, or Outlook account you own and read recent
+        mail from all of them in one fast, secure dashboard. Built for people who collect
+        inboxes the way other people collect tabs.
+      </p>
+      <div class="lp-cta-row">
+        <a href="{% url 'core:login' %}" class="lp-btn-primary">
+          Sign in <i class="bi bi-arrow-right ms-1"></i>
+        </a>
+        <a href="#features" class="btn btn-outline-secondary btn-lg" style="border-radius: 10px;">
+          See features
+        </a>
+      </div>
+      <div class="lp-stats">
+        <div class="lp-stat">
+          <strong>∞</strong>
+          accounts in one inbox
+        </div>
+        <div class="lp-stat">
+          <strong>AES + HMAC</strong>
+          password encryption
+        </div>
+        <div class="lp-stat">
+          <strong>2FA</strong>
+          on every sign-in
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6 d-flex justify-content-center">
+      <!-- Hero phone: light, inbox view -->
+      <div class="phone-frame is-floating">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="phone-status">
+            <span>9:41</span>
+            <span class="signals">
+              <i class="bi bi-reception-4"></i>
+              <i class="bi bi-wifi"></i>
+              <i class="bi bi-battery-full"></i>
+            </span>
+          </div>
+          <div class="phone-navbar">
+            <span class="phone-brand">
+              <span class="phone-brand-mark">@</span>
+              <span>Emails Manager</span>
+            </span>
+            <span class="phone-burger"><span></span><span></span><span></span></span>
+          </div>
+          <div class="phone-content">
+            <div class="phone-h1">Inbox</div>
+            <div class="phone-search">
+              <i class="bi bi-search"></i>
+              <span>Search subject or sender</span>
+            </div>
+            <div class="phone-card">
+              <div class="phone-card-row">
+                <div class="phone-card-from">Anna Karpova</div>
+                <div class="phone-card-date">10:42</div>
+              </div>
+              <div class="phone-card-subj is-unread">Re: Project review notes</div>
+              <div class="phone-card-acc">@ work@mail.ru</div>
+            </div>
+            <div class="phone-card">
+              <div class="phone-card-row">
+                <div class="phone-card-from">Tech Weekly</div>
+                <div class="phone-card-date">09:15</div>
+              </div>
+              <div class="phone-card-subj is-unread">Issue #214: edge functions, finally</div>
+              <div class="phone-card-acc">@ news@yandex.com</div>
+            </div>
+            <div class="phone-card">
+              <div class="phone-card-row">
+                <div class="phone-card-from">GitHub</div>
+                <div class="phone-card-date">08:02</div>
+              </div>
+              <div class="phone-card-subj">[Repo] New PR ready for review</div>
+              <div class="phone-card-acc">@ dev@gmail.com</div>
+            </div>
+            <div class="phone-card">
+              <div class="phone-card-row">
+                <div class="phone-card-from">Booking.com</div>
+                <div class="phone-card-date">Yesterday</div>
+              </div>
+              <div class="phone-card-subj">Your trip to Lisbon · check in tips</div>
+              <div class="phone-card-acc">@ travel@mail.ru</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== FEATURES ====== -->
+<section class="lp-section lp-section-bg-soft" id="features">
+  <div class="text-center mb-5">
+    <div class="lp-section-eyebrow">Features</div>
+    <h2 class="lp-section-title">Everything multi-mailbox should be.</h2>
+    <p class="lp-section-lead mx-auto">
+      Designed for people juggling personal, work, and side-project addresses across providers.
+      No clutter, no compromises on privacy.
+    </p>
+  </div>
+  <div class="row g-4">
+    <div class="col-md-6 col-lg-4">
+      <div class="lp-feature">
+        <div class="lp-feature-icon ic-blue"><i class="bi bi-inbox-fill"></i></div>
+        <h3 class="lp-feature-title">Unified inbox</h3>
+        <p class="lp-feature-text">
+          Read mail from every connected account in one chronological feed. Filter by 24 hours, 7 days, or 30 days.
+        </p>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+      <div class="lp-feature">
+        <div class="lp-feature-icon ic-green"><i class="bi bi-globe2"></i></div>
+        <h3 class="lp-feature-title">Any IMAP provider</h3>
+        <p class="lp-feature-text">
+          mail.ru, Gmail, Yandex, Outlook, ProtonMail Bridge — anything that speaks IMAP works out of the box.
+        </p>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+      <div class="lp-feature">
+        <div class="lp-feature-icon ic-violet"><i class="bi bi-shield-lock-fill"></i></div>
+        <h3 class="lp-feature-title">Two-factor sign-in</h3>
+        <p class="lp-feature-text">
+          Email-based one-time codes protect every login. No SMS pivots, no SIM-swap risk.
+        </p>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+      <div class="lp-feature">
+        <div class="lp-feature-icon ic-amber"><i class="bi bi-lock-fill"></i></div>
+        <h3 class="lp-feature-title">Encrypted at rest</h3>
+        <p class="lp-feature-text">
+          App passwords are stored with Fernet (AES-128 + HMAC-SHA256) and only decrypted in memory when fetching mail.
+        </p>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+      <div class="lp-feature">
+        <div class="lp-feature-icon ic-teal"><i class="bi bi-arrow-repeat"></i></div>
+        <h3 class="lp-feature-title">One-tap connectivity tests</h3>
+        <p class="lp-feature-text">
+          Power BI-style refresh per account or all at once, run in parallel so you know in seconds what's healthy.
+        </p>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+      <div class="lp-feature">
+        <div class="lp-feature-icon ic-pink"><i class="bi bi-moon-stars-fill"></i></div>
+        <h3 class="lp-feature-title">Light & dark, on every device</h3>
+        <p class="lp-feature-text">
+          Pixel-tuned for desktop and mobile. Respects your system preference, swap themes from any screen.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== HOW IT WORKS ====== -->
+<section class="lp-section">
+  <div class="text-center mb-5">
+    <div class="lp-section-eyebrow">How it works</div>
+    <h2 class="lp-section-title">Three steps to a quieter inbox.</h2>
+  </div>
+  <div class="row g-4">
+    <div class="col-md-4">
+      <div class="lp-step">
+        <div class="lp-step-num">1</div>
+        <h3 class="lp-step-title">Sign in</h3>
+        <p class="lp-step-text">
+          Use your username and password. We email a 6-digit code to confirm the device.
+        </p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="lp-step">
+        <div class="lp-step-num">2</div>
+        <h3 class="lp-step-title">Add your accounts</h3>
+        <p class="lp-step-text">
+          Generate an app-specific password from each provider, paste it once, encrypted and forgotten.
+        </p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="lp-step">
+        <div class="lp-step-num">3</div>
+        <h3 class="lp-step-title">Read everything in one place</h3>
+        <p class="lp-step-text">
+          Recent messages from every mailbox, side by side. Search, filter by window, open and read.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== MOBILE GALLERY ====== -->
+<section class="lp-section lp-section-bg-soft">
+  <div class="text-center mb-5">
+    <div class="lp-section-eyebrow">Designed for the small screen</div>
+    <h2 class="lp-section-title">Looks great on every device.</h2>
+    <p class="lp-section-lead mx-auto">
+      Card-based layouts, full-screen drawer menu, hand-tuned typography. Built mobile-first,
+      polished for desktop.
+    </p>
+  </div>
+  <div class="lp-gallery">
+    <!-- Phone 1: Accounts list, light -->
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+        <div class="phone-status">
+          <span>9:41</span>
+          <span class="signals">
+            <i class="bi bi-reception-4"></i><i class="bi bi-wifi"></i><i class="bi bi-battery-full"></i>
+          </span>
+        </div>
+        <div class="phone-navbar">
+          <span class="phone-brand">
+            <span class="phone-brand-mark">@</span><span>Emails Manager</span>
+          </span>
+          <span class="phone-burger"><span></span><span></span><span></span></span>
+        </div>
+        <div class="phone-content">
+          <div class="phone-h1">Accounts</div>
+          <div class="phone-acct-card">
+            <div class="phone-acct-email">work@mail.ru</div>
+            <div class="phone-acct-host">imap.mail.ru:993</div>
+            <div class="phone-acct-status">
+              <span class="phone-dot ok"></span>
+              <span style="color:#198754;">Connected</span>
+            </div>
+          </div>
+          <div class="phone-acct-card">
+            <div class="phone-acct-email">news@yandex.com</div>
+            <div class="phone-acct-host">imap.yandex.com:993</div>
+            <div class="phone-acct-status">
+              <span class="phone-dot ok"></span>
+              <span style="color:#198754;">Connected</span>
+            </div>
+          </div>
+          <div class="phone-acct-card">
+            <div class="phone-acct-email">old@mail.ru</div>
+            <div class="phone-acct-host">imap.mail.ru:993</div>
+            <div class="phone-acct-status">
+              <span class="phone-dot fail"></span>
+              <span style="color:#dc3545;">Auth failed</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phone 2 (centered): Inbox, dark -->
+    <div class="phone-frame lp-gallery-mid is-floating">
+      <div class="phone-notch"></div>
+      <div class="phone-screen is-dark">
+        <div class="phone-status">
+          <span>9:41</span>
+          <span class="signals">
+            <i class="bi bi-reception-4"></i><i class="bi bi-wifi"></i><i class="bi bi-battery-full"></i>
+          </span>
+        </div>
+        <div class="phone-navbar">
+          <span class="phone-brand">
+            <span class="phone-brand-mark">@</span><span>Emails Manager</span>
+          </span>
+          <span class="phone-burger"><span></span><span></span><span></span></span>
+        </div>
+        <div class="phone-content">
+          <div class="phone-h1">Inbox</div>
+          <div class="phone-search">
+            <i class="bi bi-search"></i>
+            <span>Search subject or sender</span>
+          </div>
+          <div class="phone-card">
+            <div class="phone-card-row">
+              <div class="phone-card-from">Linear</div>
+              <div class="phone-card-date">11:22</div>
+            </div>
+            <div class="phone-card-subj is-unread">3 issues moved to In Progress</div>
+            <div class="phone-card-acc">@ work@mail.ru</div>
+          </div>
+          <div class="phone-card">
+            <div class="phone-card-row">
+              <div class="phone-card-from">Stripe</div>
+              <div class="phone-card-date">10:01</div>
+            </div>
+            <div class="phone-card-subj is-unread">Payout completed</div>
+            <div class="phone-card-acc">@ side@gmail.com</div>
+          </div>
+          <div class="phone-card">
+            <div class="phone-card-row">
+              <div class="phone-card-from">Notion</div>
+              <div class="phone-card-date">09:48</div>
+            </div>
+            <div class="phone-card-subj">Your team digest is ready</div>
+            <div class="phone-card-acc">@ work@mail.ru</div>
+          </div>
+          <div class="phone-card">
+            <div class="phone-card-row">
+              <div class="phone-card-from">Apple</div>
+              <div class="phone-card-date">Yesterday</div>
+            </div>
+            <div class="phone-card-subj">Your receipt from Apple</div>
+            <div class="phone-card-acc">@ personal@mail.ru</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phone 3: Drawer menu, light -->
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+        <div class="phone-status">
+          <span>9:41</span>
+          <span class="signals">
+            <i class="bi bi-reception-4"></i><i class="bi bi-wifi"></i><i class="bi bi-battery-full"></i>
+          </span>
+        </div>
+        <div class="phone-navbar">
+          <span class="phone-brand">
+            <span class="phone-brand-mark">@</span><span>Emails Manager</span>
+          </span>
+          <span class="phone-burger" style="position: relative; width: 18px; height: 14px;">
+            <span style="position: absolute; top: 6px; transform: rotate(45deg); width: 100%;"></span>
+            <span style="position: absolute; top: 6px; transform: rotate(-45deg); width: 100%;"></span>
+          </span>
+        </div>
+        <div class="phone-content" style="padding: 0;">
+          <div style="padding: 14px; border-bottom: 1px solid rgba(0,0,0,.05); display: flex; align-items: center; gap: 10px;">
+            <span style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#005FF9,#0099FF);color:#fff;font-weight:700;font-size:13px;">AT</span>
+            <div>
+              <div style="font-weight:600;font-size:12px;">Alex Tverdohleb</div>
+              <div style="font-size:10px;color:#6c757d;">alex@example.com</div>
+            </div>
+          </div>
+          <div style="padding: 12px 14px; border-bottom: 1px solid rgba(0,0,0,.05); display:flex; align-items:center; gap:10px;">
+            <i class="bi bi-house" style="color:#6c757d;"></i><span>Home</span>
+          </div>
+          <div style="padding: 12px 14px; border-bottom: 1px solid rgba(0,0,0,.05); display:flex; align-items:center; gap:10px; background: rgba(13, 110, 253, .06);">
+            <i class="bi bi-inbox" style="color:#0d6efd;"></i><span style="font-weight:600;">Inbox</span>
+          </div>
+          <div style="padding: 12px 14px; border-bottom: 1px solid rgba(0,0,0,.05); display:flex; align-items:center; gap:10px;">
+            <i class="bi bi-person-rolodex" style="color:#6c757d;"></i><span>Accounts</span>
+          </div>
+          <div style="padding: 12px 14px; border-bottom: 1px solid rgba(0,0,0,.05); display:flex; align-items:center; gap:10px; margin-top: 8px;">
+            <i class="bi bi-person" style="color:#6c757d;"></i><span>Profile</span>
+          </div>
+          <div style="padding: 12px 14px; border-bottom: 1px solid rgba(0,0,0,.05); display:flex; align-items:center; gap:10px;">
+            <i class="bi bi-moon-stars" style="color:#6c757d;"></i><span>Switch to dark theme</span>
+          </div>
+          <div style="padding: 12px 14px; display:flex; align-items:center; gap:10px; color:#dc3545;">
+            <i class="bi bi-box-arrow-right"></i><span>Logout</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== SECURITY ====== -->
+<section class="lp-section">
+  <div class="row align-items-center g-5">
+    <div class="col-lg-6">
+      <div class="lp-section-eyebrow">Security</div>
+      <h2 class="lp-section-title">Your inboxes are yours.</h2>
+      <p class="lp-section-lead mb-4">
+        Privacy isn't a feature here, it's the default. Mail content is fetched on demand,
+        nothing is cached server-side, and your IMAP credentials never leave your encrypted record.
+      </p>
+      <div class="lp-security-bullet">
+        <i class="bi bi-check-circle-fill text-primary"></i>
+        <div>
+          <strong class="d-block">Fernet-encrypted credentials.</strong>
+          <span class="text-secondary">App passwords stored with AES-128-CBC + HMAC-SHA256.</span>
+        </div>
+      </div>
+      <div class="lp-security-bullet">
+        <i class="bi bi-check-circle-fill text-primary"></i>
+        <div>
+          <strong class="d-block">Two-factor on every sign-in.</strong>
+          <span class="text-secondary">Email OTP, expires in 10 minutes, locks after 5 wrong attempts.</span>
+        </div>
+      </div>
+      <div class="lp-security-bullet">
+        <i class="bi bi-check-circle-fill text-primary"></i>
+        <div>
+          <strong class="d-block">No tracking, no analytics.</strong>
+          <span class="text-secondary">No third-party scripts, no data sold or shared.</span>
+        </div>
+      </div>
+      <div class="lp-security-bullet">
+        <i class="bi bi-check-circle-fill text-primary"></i>
+        <div>
+          <strong class="d-block">HTTPS everywhere.</strong>
+          <span class="text-secondary">Secure cookies, HSTS, CSRF protection by default.</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="lp-security-card">
+        <div class="position-relative" style="z-index: 2;">
+          <i class="bi bi-shield-lock-fill" style="font-size: 3rem; color: #00D9FF;"></i>
+          <h3 class="mt-3 mb-3" style="font-weight: 700;">Built to be quietly secure.</h3>
+          <p class="mb-0 opacity-75">
+            Every connection to your provider uses TLS. Every credential is encrypted before it
+            touches the database. Every sign-in needs the code we just emailed you. No surprises,
+            no compromises.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== FINAL CTA ====== -->
+<section class="lp-section">
+  <div class="lp-final-cta">
+    <h2 class="lp-section-title mb-3">Ready to streamline your inbox?</h2>
+    <p class="lp-section-lead mx-auto mb-4">
+      One place for every mailbox. Sign in to start, or reach out for an invite if you don't have an account yet.
+    </p>
+    <div class="d-flex justify-content-center gap-3 flex-wrap">
+      <a href="{% url 'core:login' %}" class="lp-btn-primary">
+        Sign in <i class="bi bi-arrow-right ms-1"></i>
+      </a>
+      <a href="#features" class="btn btn-outline-secondary btn-lg" style="border-radius: 10px;">
+        Explore features
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ====== FOOTER ====== -->
+<footer class="lp-footer">
+  <div class="row g-3 align-items-center">
+    <div class="col-md-6">
+      <div class="d-flex align-items-center gap-2 mb-2">
+        <span class="brand-mark" style="width: 24px; height: 24px; font-size: 14px;">@</span>
+        <strong class="text-body">Emails Manager</strong>
+      </div>
+      <div>One inbox to rule them all. Built with Django and a great deal of squinting at IMAP.</div>
+    </div>
+    <div class="col-md-6 text-md-end">
+      <a href="{% url 'core:login' %}" class="text-decoration-none me-3">Sign in</a>
+      <a href="#features" class="text-decoration-none me-3">Features</a>
+      <a href="#" class="text-decoration-none">Top ↑</a>
+    </div>
+  </div>
+</footer>
+
+{% endblock %}

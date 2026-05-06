@@ -38,7 +38,7 @@ def _send_otp_or_flash(request: HttpRequest, user) -> bool:
 def index(request: HttpRequest) -> HttpResponse:
     if request.user.is_authenticated and is_otp_verified(request):
         return redirect("core:home")
-    return redirect("core:login")
+    return render(request, "core/landing.html")
 
 
 @otp_required
