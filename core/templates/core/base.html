@@ -81,17 +81,24 @@
 </nav>
 
 <main id="main-content" class="container py-4">
-  {% if messages %}
-    {% for message in messages %}
-      <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
-        {{ message }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-    {% endfor %}
-  {% endif %}
-
   {% block content %}{% endblock %}
 </main>
+
+{% if messages %}
+  <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1090;" id="message-toasts">
+    {% for message in messages %}
+      <div class="toast text-bg-{{ message.tags|default:'info' }} border-0 mb-2 {% if message.tags == 'danger' or message.tags == 'warning' %}toast-persistent{% endif %}"
+           role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+          <div class="toast-body flex-grow-1">{{ message }}</div>
+          <button type="button"
+                  class="btn-close {% if message.tags == 'success' or message.tags == 'danger' or message.tags == 'dark' or message.tags == 'secondary' %}btn-close-white{% endif %} me-2 m-auto"
+                  data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
 
 {% if user.is_authenticated and request.session.otp_verified %}
   {% with cur=request.resolver_match.url_name %}
@@ -169,6 +176,19 @@
     if (target && typeof target.focus === 'function') {
       target.focus({ preventScroll: false });
     }
+
+    // Initialise message toasts. Bootstrap ships defer'd, so the global is
+    // only available once DOMContentLoaded fires.
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof bootstrap === 'undefined' || !bootstrap.Toast) return;
+      document.querySelectorAll('#message-toasts .toast').forEach((el) => {
+        const persistent = el.classList.contains('toast-persistent');
+        bootstrap.Toast.getOrCreateInstance(el, {
+          autohide: !persistent,
+          delay: 4500,
+        }).show();
+      });
+    });
   })();
 </script>
 </body>
