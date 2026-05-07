@@ -16,16 +16,24 @@
          data-test-url="{% url 'core:account_test' account.pk %}">
       <div class="card-body p-3 p-md-4">
         <div class="d-flex align-items-start gap-3 mb-3">
-          <span class="brand-mark" aria-hidden="true" style="width: 44px; height: 44px; font-size: 22px;">
+          <span class="brand-mark d-none d-md-inline-flex" aria-hidden="true"
+                style="width: 44px; height: 44px; font-size: 22px;">
             <i class="bi bi-envelope"></i>
           </span>
           <div class="flex-grow-1 min-w-0">
-            <h1 class="h5 mb-0 text-truncate">{{ account.email_address }}</h1>
+            <h1 class="h5 mb-0 text-break">{{ account.email_address }}</h1>
             {% if account.display_name %}
-              <div class="text-secondary small text-truncate">{{ account.display_name }}</div>
+              <div class="text-secondary small">{{ account.display_name }}</div>
             {% endif %}
           </div>
-          <div class="form-check form-switch m-0 ps-0" title="Enable / disable">
+        </div>
+
+        <div class="d-flex align-items-center justify-content-between gap-2 mb-2 px-3 py-2 rounded"
+             style="background: rgba(0,0,0,.025);">
+          <span class="small">
+            <i class="bi bi-power me-2 text-secondary"></i>Enabled
+          </span>
+          <div class="form-check form-switch m-0 ps-0">
             <input class="form-check-input toggle-switch m-0" type="checkbox" role="switch"
                    data-toggle-url="{% url 'core:account_toggle' account.pk %}"
                    aria-label="Enable {{ account.email_address }}"
@@ -33,7 +41,7 @@
           </div>
         </div>
 
-        <div class="d-flex align-items-center gap-2 mb-3 px-2 py-2 rounded" style="background: rgba(0,0,0,.025);">
+        <div class="d-flex align-items-center gap-2 mb-3 px-3 py-2 rounded" style="background: rgba(0,0,0,.025);">
           <span class="status-dot-css status-idle-bg" data-status-dot aria-hidden="true"></span>
           <span class="status-message text-secondary small flex-grow-1">Not tested</span>
           <button type="button"
