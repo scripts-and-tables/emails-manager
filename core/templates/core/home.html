@@ -45,6 +45,10 @@
         <div class="d-flex align-items-center gap-3 mb-3">
           <span class="home-tile-icon home-tile-icon-green"><i class="bi bi-person-rolodex"></i></span>
           <h2 class="h5 mb-0">Accounts</h2>
+          <span class="badge text-bg-secondary ms-auto"
+                aria-label="{{ account_count }} of {{ account_limit }} accounts used">
+            {{ account_count }} / {{ account_limit }}
+          </span>
         </div>
         <p class="text-secondary small mb-0">
           {% if account_count == 0 %}

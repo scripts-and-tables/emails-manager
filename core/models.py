@@ -61,6 +61,9 @@ class UserPreferences(models.Model):
         related_name="preferences",
     )
     two_factor_enabled = models.BooleanField(default=True)
+    # null = use the free-tier default from core.limits.FREE_TIER_ACCOUNT_LIMIT.
+    # A set value overrides the default upward (paid-tier grants).
+    account_limit_override = models.PositiveIntegerField(null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
 
 

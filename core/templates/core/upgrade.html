@@ -1,0 +1,42 @@
+{% extends "core/base.html" %}
+{% block title %}Upgrade · Mail.Ru Manager{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-md-8 col-lg-6">
+    <div class="mb-3">
+      <a href="{% url 'core:accounts_list' %}" class="text-secondary small text-decoration-none">
+        <i class="bi bi-arrow-left me-1"></i>Back to accounts
+      </a>
+    </div>
+
+    <div class="card card-soft text-center">
+      <div class="card-body p-4 p-md-5">
+        <div class="empty-state-icon mb-3"><i class="bi bi-stars text-warning"></i></div>
+        <h1 class="h4 mb-2">
+          {% if is_premium %}You're on Premium{% else %}Premium plan coming soon{% endif %}
+        </h1>
+        <p class="text-secondary mb-4">
+          You're using <strong>{{ account_count }} / {{ account_limit }}</strong> accounts.
+        </p>
+        {% if is_premium %}
+          <p class="text-secondary small mb-4">
+            Premium gives you up to 100 accounts and bulk import. If you need a higher ceiling, get in touch.
+          </p>
+        {% else %}
+          <ul class="list-unstyled small text-start mx-auto mb-4" style="max-width: 320px;">
+            <li class="mb-2"><i class="bi bi-check-lg text-success me-2"></i>Up to 100 connected mailboxes</li>
+            <li class="mb-2"><i class="bi bi-check-lg text-success me-2"></i>Bulk import via CSV</li>
+            <li class="mb-2"><i class="bi bi-check-lg text-success me-2"></i>Priority support</li>
+          </ul>
+          <p class="text-secondary small mb-4">
+            We're putting the finishing touches on payment and billing. In the meantime, drop us a line if you need a higher cap.
+          </p>
+        {% endif %}
+        <a href="{% url 'core:accounts_list' %}" class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-left me-1"></i>Back to accounts
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

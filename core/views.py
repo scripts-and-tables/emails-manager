@@ -40,6 +40,7 @@ from .imap_client import (
     fetch_recent_bulk,
     mark_unseen,
 )
+from .limits import can_bulk_add, get_account_usage, is_at_account_limit, is_premium
 from .models import EmailAccount, UserPreferences
 from .password_reset import ResetDeliveryError, send_reset_email
 from .rate_limit import is_rate_limited
@@ -66,8 +67,16 @@ def index(request: HttpRequest) -> HttpResponse:
 
 @otp_required
 def home(request: HttpRequest) -> HttpResponse:
-    account_count = EmailAccount.objects.filter(owner=request.user).count()
-    return render(request, "core/home.html", {"account_count": account_count})
+    used, limit = get_account_usage(request.user)
+    return render(
+        request,
+        "core/home.html",
+        {
+            "account_count": used,
+            "account_limit": limit,
+            "is_premium": is_premium(request.user),
+        },
+    )
 
 
 @require_http_methods(["GET", "POST"])
@@ -157,12 +166,33 @@ def verify_otp(request: HttpRequest) -> HttpResponse:
 @otp_required
 def accounts_list(request: HttpRequest) -> HttpResponse:
     accounts = EmailAccount.objects.filter(owner=request.user)
-    return render(request, "core/accounts_list.html", {"accounts": accounts})
+    used, limit = get_account_usage(request.user)
+    at_limit = used >= limit
+    return render(
+        request,
+        "core/accounts_list.html",
+        {
+            "accounts": accounts,
+            "account_count": used,
+            "account_limit": limit,
+            "at_limit": at_limit,
+            "can_bulk_add": can_bulk_add(request.user),
+        },
+    )
 
 
 @otp_required
 @require_http_methods(["GET", "POST"])
 def account_new(request: HttpRequest) -> HttpResponse:
+    # Cap check on both GET and POST so a stale form can't bypass via direct submit.
+    # Race note: two simultaneous POSTs from the same user at limit-1 can both pass
+    # this check and end up over the cap. Accepted for cap=3.
+    if is_at_account_limit(request.user):
+        messages.error(
+            request,
+            "You've reached your account limit. Upgrade to add more.",
+        )
+        return redirect("core:accounts_list")
     if request.method == "POST":
         form = EmailAccountForm(request.POST)
         if form.is_valid():
@@ -242,6 +272,12 @@ def _parse_bulk_csv(text: str) -> tuple[list[dict], list[tuple[int, str]]]:
 @otp_required
 @require_http_methods(["GET", "POST"])
 def account_bulk_add(request: HttpRequest) -> HttpResponse:
+    if not can_bulk_add(request.user):
+        messages.error(request, "Bulk add is a Premium feature. Upgrade to import multiple accounts at once.")
+        return redirect("core:upgrade")
+    used, limit = get_account_usage(request.user)
+    at_limit = used >= limit
+    ctx = {"account_count": used, "account_limit": limit, "at_limit": at_limit}
     if request.method == "POST":
         form = BulkAccountForm(request.POST)
         if form.is_valid():
@@ -251,13 +287,22 @@ def account_bulk_add(request: HttpRequest) -> HttpResponse:
                 for e in EmailAccount.objects.filter(owner=request.user)
                 .values_list("email_address", flat=True)
             }
+            # remaining=None means unlimited; otherwise count down per accepted row.
+            remaining = None if limit is None else max(0, limit - len(existing))
             added = 0
             skipped: list[tuple[int, str]] = []
+            skipped_limit: list[tuple[int, str]] = []
             row_errors: list[tuple[int, str]] = list(parse_errors)
             for row in rows:
                 email = row["email"]
+                # Duplicate check first: a duplicate doesn't consume a slot, so
+                # users at-cap with duplicate rows still get clean "already exists"
+                # labels rather than misleading "limit reached" labels.
                 if email.lower() in existing:
                     skipped.append((row["line"], email))
+                    continue
+                if remaining is not None and remaining <= 0:
+                    skipped_limit.append((row["line"], email))
                     continue
                 try:
                     validate_email(email)
@@ -275,9 +320,14 @@ def account_bulk_add(request: HttpRequest) -> HttpResponse:
                     account.save()
                     existing.add(email.lower())
                     added += 1
+                    if remaining is not None:
+                        remaining -= 1
                 except Exception as exc:  # noqa: BLE001
                     row_errors.append((row["line"], str(exc)))
 
+            # Recompute usage after the bulk run for accurate context.
+            used_after, _ = get_account_usage(request.user)
+            at_limit_after = used_after >= limit
             return render(
                 request,
                 "core/account_bulk.html",
@@ -287,13 +337,17 @@ def account_bulk_add(request: HttpRequest) -> HttpResponse:
                         "total": len(rows),
                         "added": added,
                         "skipped": skipped,
+                        "skipped_limit": skipped_limit,
                         "errors": row_errors,
                     },
+                    "account_count": used_after,
+                    "account_limit": limit,
+                    "at_limit": at_limit_after,
                 },
             )
     else:
         form = BulkAccountForm()
-    return render(request, "core/account_bulk.html", {"form": form})
+    return render(request, "core/account_bulk.html", {"form": form, **ctx})
 
 
 @otp_required
@@ -676,6 +730,20 @@ def profile_password_change(request: HttpRequest) -> HttpResponse:
             "password_form": password_form,
             "password_modal_open": True,
             "two_factor_enabled": prefs.two_factor_enabled,
+        },
+    )
+
+
+@otp_required
+def upgrade(request: HttpRequest) -> HttpResponse:
+    used, limit = get_account_usage(request.user)
+    return render(
+        request,
+        "core/upgrade.html",
+        {
+            "account_count": used,
+            "account_limit": limit,
+            "is_premium": is_premium(request.user),
         },
     )
 

@@ -20,8 +20,19 @@
           A header row is auto-skipped. Blank lines and lines starting with <code>#</code> are ignored.
         </p>
 
+        {% if at_limit and not result %}
+          <div class="alert alert-warning d-flex align-items-start gap-2 mb-4">
+            <i class="bi bi-lock-fill flex-shrink-0 mt-1"></i>
+            <div class="flex-grow-1">
+              <strong>You're at your {{ account_limit }}-account limit ({{ account_count }} / {{ account_limit }}).</strong>
+              <div class="small">Importing now won't add new accounts unless you upgrade.</div>
+            </div>
+            <a href="{% url 'core:upgrade' %}" class="btn btn-sm btn-warning">Upgrade</a>
+          </div>
+        {% endif %}
+
         {% if result %}
-          <div class="alert alert-{% if result.added > 0 and not result.errors %}success{% elif result.added > 0 %}warning{% else %}danger{% endif %} mb-4">
+          <div class="alert alert-{% if result.added == 0 and not result.skipped_limit %}danger{% elif result.errors or result.skipped_limit %}warning{% elif result.added > 0 %}success{% else %}warning{% endif %} mb-4">
             <h2 class="h6 mb-2">
               <i class="bi bi-check-circle-fill me-1"></i>
               {{ result.added }} of {{ result.total }} added
@@ -34,6 +45,21 @@
                     <li>Line {{ line }}: <code>{{ email }}</code> already exists</li>
                   {% endfor %}
                 </ul>
+              </div>
+            {% endif %}
+            {% if result.skipped_limit %}
+              <div class="small mt-2">
+                <strong>Skipped {{ result.skipped_limit|length }} due to account limit:</strong>
+                <ul class="mb-0 small ps-3">
+                  {% for line, email in result.skipped_limit %}
+                    <li>Line {{ line }}: <code>{{ email }}</code> &mdash; upgrade to add more</li>
+                  {% endfor %}
+                </ul>
+                <div class="mt-2">
+                  <a href="{% url 'core:upgrade' %}" class="btn btn-sm btn-warning">
+                    <i class="bi bi-lock-fill me-1"></i>Upgrade
+                  </a>
+                </div>
               </div>
             {% endif %}
             {% if result.errors %}
