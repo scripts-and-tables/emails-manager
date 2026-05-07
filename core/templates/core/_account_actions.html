@@ -1,0 +1,236 @@
+{% comment %}
+Shared CSS + JS for the per-account toggle / test / update-password
+controls. Included from both accounts_list.html and account_detail.html.
+
+Pages must render the CSRF token and the per-account container with:
+  - data-account-row
+  - data-account-id="<pk>"
+  - data-test-url="<url for account_test>"
+And the controls inside must have these classes / data attrs as needed:
+  - .toggle-switch with data-toggle-url
+  - .test-btn
+  - [data-status-dot]
+  - .status-message
+  - .update-password-btn (hidden by default with d-none) with data-password-url
+  - .update-password-form (hidden by default with d-none) containing
+      .update-password-input, .update-password-save, .update-password-cancel
+{% endcomment %}
+
+<style>
+  .test-btn.is-testing i { animation: test-spin 0.7s linear infinite; display: inline-block; }
+  @keyframes test-spin { to { transform: rotate(360deg); } }
+  .test-btn:disabled { opacity: 1; }
+  [data-account-row].is-disabled { opacity: 0.55; }
+  [data-account-row].is-disabled .toggle-switch { opacity: 1; }
+  .form-switch .toggle-switch:checked { background-color: #198754; border-color: #198754; }
+</style>
+
+<script>
+(function () {
+  const csrfInput = document.querySelector('input[name="csrfmiddlewaretoken"]');
+  if (!csrfInput) return;
+  const csrfToken = csrfInput.value;
+
+  function findRowsByAccount(accountId) {
+    return document.querySelectorAll(`[data-account-id="${accountId}"]`);
+  }
+
+  function setUpdatePasswordVisibility(row, mode) {
+    const keyBtn = row.querySelector('.update-password-btn');
+    const form = row.querySelector('.update-password-form');
+    if (mode === 'hidden') {
+      if (keyBtn) keyBtn.classList.add('d-none');
+      if (form) form.classList.add('d-none');
+    } else if (mode === 'available') {
+      if (keyBtn) keyBtn.classList.remove('d-none');
+      if (form) form.classList.add('d-none');
+    } else if (mode === 'open') {
+      if (keyBtn) keyBtn.classList.add('d-none');
+      if (form) form.classList.remove('d-none');
+    }
+  }
+
+  function setUpdatePasswordForAccount(accountId, mode) {
+    findRowsByAccount(accountId).forEach((row) => setUpdatePasswordVisibility(row, mode));
+  }
+
+  function paintRow(row, state, message) {
+    const dot = row.querySelector('[data-status-dot]');
+    const messageCell = row.querySelector('.status-message');
+    const testBtn = row.querySelector('.test-btn');
+
+    if (state === 'testing') {
+      if (messageCell) {
+        messageCell.className = 'status-message text-secondary small flex-grow-1';
+        messageCell.textContent = 'Testing…';
+      }
+      if (testBtn) { testBtn.disabled = true; testBtn.classList.add('is-testing'); }
+      setUpdatePasswordVisibility(row, 'hidden');
+    } else if (state === 'ok') {
+      if (dot) dot.className = 'status-dot-css status-ok-bg';
+      if (messageCell) {
+        messageCell.className = 'status-message text-success small flex-grow-1';
+        messageCell.textContent = message || 'Connected';
+      }
+      if (testBtn) { testBtn.disabled = false; testBtn.classList.remove('is-testing'); }
+      setUpdatePasswordVisibility(row, 'hidden');
+    } else if (state === 'fail') {
+      if (dot) dot.className = 'status-dot-css status-fail-bg';
+      if (messageCell) {
+        messageCell.className = 'status-message text-danger small flex-grow-1';
+        messageCell.textContent = message || 'Failed';
+      }
+      if (testBtn) { testBtn.disabled = false; testBtn.classList.remove('is-testing'); }
+      setUpdatePasswordVisibility(row, 'available');
+    }
+  }
+
+  async function testAccount(accountId, url) {
+    const rows = findRowsByAccount(accountId);
+    rows.forEach((r) => paintRow(r, 'testing'));
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': csrfToken, 'Accept': 'application/json' },
+      });
+      if (!response.ok) {
+        rows.forEach((r) => paintRow(r, 'fail', `HTTP ${response.status}`));
+        return;
+      }
+      const data = await response.json();
+      const state = data.ok ? 'ok' : 'fail';
+      rows.forEach((r) => paintRow(r, state, data.message));
+    } catch (err) {
+      rows.forEach((r) => paintRow(r, 'fail', err.message || 'Network error'));
+    }
+  }
+
+  document.querySelectorAll('.test-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const row = btn.closest('[data-account-row]');
+      if (!row) return;
+      testAccount(row.dataset.accountId, row.dataset.testUrl);
+    });
+  });
+
+  const testAllBtn = document.getElementById('test-all-btn');
+  if (testAllBtn) {
+    testAllBtn.addEventListener('click', () => {
+      const seen = new Map();
+      document.querySelectorAll('[data-account-row]').forEach((row) => {
+        if (!seen.has(row.dataset.accountId)) {
+          seen.set(row.dataset.accountId, row.dataset.testUrl);
+        }
+      });
+      testAllBtn.disabled = true;
+      testAllBtn.classList.add('is-testing');
+      Promise.all(Array.from(seen.entries()).map(([id, url]) => testAccount(id, url)))
+        .finally(() => {
+          testAllBtn.disabled = false;
+          testAllBtn.classList.remove('is-testing');
+        });
+    });
+  }
+
+  document.querySelectorAll('.update-password-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const row = btn.closest('[data-account-row]');
+      const accountId = row.dataset.accountId;
+      setUpdatePasswordForAccount(accountId, 'open');
+      const visibleForm = Array.from(
+        document.querySelectorAll(`[data-account-id="${accountId}"] .update-password-form`)
+      ).find((f) => f.offsetParent !== null);
+      if (visibleForm) visibleForm.querySelector('.update-password-input').focus();
+    });
+  });
+
+  document.querySelectorAll('.update-password-cancel').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const row = btn.closest('[data-account-row]');
+      const accountId = row.dataset.accountId;
+      document.querySelectorAll(`[data-account-id="${accountId}"] .update-password-input`)
+        .forEach((i) => { i.value = ''; });
+      setUpdatePasswordForAccount(accountId, 'available');
+    });
+  });
+
+  document.querySelectorAll('.update-password-save').forEach((saveBtn) => {
+    saveBtn.addEventListener('click', async () => {
+      const row = saveBtn.closest('[data-account-row]');
+      const accountId = row.dataset.accountId;
+      const input = row.querySelector('.update-password-input');
+      const password = input.value;
+      if (!password) { input.focus(); return; }
+      const url = row.querySelector('.update-password-btn').dataset.passwordUrl;
+      const allSaveBtns = document.querySelectorAll(`[data-account-id="${accountId}"] .update-password-save`);
+      allSaveBtns.forEach((b) => { b.disabled = true; });
+      try {
+        const body = new URLSearchParams();
+        body.set('password', password);
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'X-CSRFToken': csrfToken, 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: body.toString(),
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        document.querySelectorAll(`[data-account-id="${accountId}"] .update-password-input`)
+          .forEach((i) => { i.value = ''; });
+        setUpdatePasswordForAccount(accountId, 'hidden');
+        testAccount(accountId, row.dataset.testUrl);
+      } catch (err) {
+        input.classList.add('is-invalid');
+        setTimeout(() => input.classList.remove('is-invalid'), 1500);
+      } finally {
+        allSaveBtns.forEach((b) => { b.disabled = false; });
+      }
+    });
+  });
+
+  document.querySelectorAll('.update-password-input').forEach((input) => {
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        input.closest('[data-account-row]').querySelector('.update-password-save').click();
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        input.closest('[data-account-row]').querySelector('.update-password-cancel').click();
+      }
+    });
+  });
+
+  function syncToggles(accountId, enabled) {
+    findRowsByAccount(accountId).forEach((row) => {
+      row.classList.toggle('is-disabled', !enabled);
+      row.querySelectorAll('.toggle-switch').forEach((sw) => { sw.checked = enabled; });
+    });
+  }
+
+  document.querySelectorAll('.toggle-switch').forEach((sw) => {
+    sw.addEventListener('change', async (e) => {
+      const target = e.target;
+      const row = target.closest('[data-account-row]');
+      const accountId = row.dataset.accountId;
+      const url = target.dataset.toggleUrl;
+      const wantEnabled = target.checked;
+      const allSwitches = document.querySelectorAll(`[data-account-id="${accountId}"] .toggle-switch`);
+      allSwitches.forEach((s) => { s.disabled = true; });
+      try {
+        const body = new URLSearchParams();
+        body.set('enabled', wantEnabled ? '1' : '0');
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'X-CSRFToken': csrfToken, 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: body.toString(),
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        syncToggles(accountId, !!data.is_enabled);
+      } catch (err) {
+        syncToggles(accountId, !wantEnabled);
+      } finally {
+        allSwitches.forEach((s) => { s.disabled = false; });
+      }
+    });
+  });
+})();
+</script>
