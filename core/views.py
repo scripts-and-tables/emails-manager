@@ -432,7 +432,7 @@ def _add_bootstrap_class(form, css_class: str = "form-control") -> None:
 @require_http_methods(["GET", "POST"])
 def profile(request: HttpRequest) -> HttpResponse:
     info_form = ProfileInfoForm(instance=request.user)
-    password_form = PasswordChangeForm(request.user)
+    password_form = SetPasswordForm(request.user)
     _add_bootstrap_class(password_form)
 
     if request.method == "POST":
@@ -442,13 +442,17 @@ def profile(request: HttpRequest) -> HttpResponse:
             messages.success(request, "Profile updated.")
             return redirect("core:profile")
 
-    return render(request, "core/profile.html", {"info_form": info_form, "password_form": password_form})
+    return render(
+        request,
+        "core/profile.html",
+        {"info_form": info_form, "password_form": password_form, "password_modal_open": False},
+    )
 
 
 @otp_required
 @require_http_methods(["POST"])
 def profile_password_change(request: HttpRequest) -> HttpResponse:
-    password_form = PasswordChangeForm(request.user, request.POST)
+    password_form = SetPasswordForm(request.user, request.POST)
     _add_bootstrap_class(password_form)
     if password_form.is_valid():
         user = password_form.save()
@@ -457,4 +461,8 @@ def profile_password_change(request: HttpRequest) -> HttpResponse:
         return redirect("core:profile")
 
     info_form = ProfileInfoForm(instance=request.user)
-    return render(request, "core/profile.html", {"info_form": info_form, "password_form": password_form})
+    return render(
+        request,
+        "core/profile.html",
+        {"info_form": info_form, "password_form": password_form, "password_modal_open": True},
+    )
