@@ -1,11 +1,30 @@
 {% extends "core/base.html" %}
 {% block title %}{{ message.subject }} · Mail.Ru Manager{% endblock %}
 {% block content %}
-<div class="mb-3">
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
   <a href="{% url 'core:inbox' %}?window={{ back_window }}{% if back_account %}&amp;account={{ back_account }}{% endif %}"
      class="text-secondary small text-decoration-none">
     <i class="bi bi-arrow-left me-1"></i>Back to inbox
   </a>
+  <div class="d-flex gap-2">
+    <form method="post" action="{% url 'core:email_mark_unread' account.pk uid %}" class="m-0">
+      {% csrf_token %}
+      <input type="hidden" name="back_window" value="{{ back_window }}">
+      <input type="hidden" name="back_account" value="{{ back_account }}">
+      <button type="submit" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-envelope-paper me-1"></i>Mark as unread
+      </button>
+    </form>
+    <form method="post" action="{% url 'core:email_delete' account.pk uid %}" class="m-0"
+          onsubmit="return confirm('Move this email to Trash? This will remove it from the inbox.');">
+      {% csrf_token %}
+      <input type="hidden" name="back_window" value="{{ back_window }}">
+      <input type="hidden" name="back_account" value="{{ back_account }}">
+      <button type="submit" class="btn btn-outline-danger btn-sm">
+        <i class="bi bi-trash me-1"></i>Delete
+      </button>
+    </form>
+  </div>
 </div>
 
 <div class="card card-soft mb-3">

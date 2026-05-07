@@ -36,4 +36,6 @@ urlpatterns = [
     path("inbox/", views.inbox, name="inbox"),
     path("inbox/data/", views.inbox_data, name="inbox_data"),
     path("inbox/<int:account_id>/<str:uid>/", views.email_detail, name="email_detail"),
+    path("inbox/<int:account_id>/<str:uid>/unread/", views.email_mark_unread, name="email_mark_unread"),
+    path("inbox/<int:account_id>/<str:uid>/delete/", views.email_delete, name="email_delete"),
 ]

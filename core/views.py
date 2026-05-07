@@ -33,7 +33,14 @@ from .forms import (
     ProfileInfoForm,
     SignupForm,
 )
-from .imap_client import check_status, check_status_bulk, fetch_body, fetch_recent_bulk
+from .imap_client import (
+    check_status,
+    check_status_bulk,
+    delete_message,
+    fetch_body,
+    fetch_recent_bulk,
+    mark_unseen,
+)
 from .models import EmailAccount, UserPreferences
 from .rate_limit import is_rate_limited
 from .password_reset import ResetDeliveryError, send_reset_email
@@ -422,10 +429,43 @@ def email_detail(request: HttpRequest, account_id: int, uid: str) -> HttpRespons
         {
             "message": message,
             "account": account,
+            "uid": uid,
             "back_window": request.GET.get("window", "1d"),
             "back_account": request.GET.get("account") or "",
         },
     )
+
+
+def _back_to_inbox_url(request: HttpRequest) -> str:
+    qs = f"?window={request.POST.get('back_window') or request.GET.get('window') or '1d'}"
+    back_account = request.POST.get("back_account") or request.GET.get("account") or ""
+    if back_account:
+        qs += f"&account={back_account}"
+    return reverse("core:inbox") + qs
+
+
+@otp_required
+@require_http_methods(["POST"])
+def email_mark_unread(request: HttpRequest, account_id: int, uid: str) -> HttpResponse:
+    account = get_object_or_404(EmailAccount, pk=account_id, owner=request.user)
+    try:
+        mark_unseen(account, uid)
+        messages.success(request, "Marked as unread.")
+    except Exception as exc:  # noqa: BLE001
+        messages.error(request, f"Couldn't mark as unread: {exc}")
+    return redirect(_back_to_inbox_url(request))
+
+
+@otp_required
+@require_http_methods(["POST"])
+def email_delete(request: HttpRequest, account_id: int, uid: str) -> HttpResponse:
+    account = get_object_or_404(EmailAccount, pk=account_id, owner=request.user)
+    try:
+        delete_message(account, uid)
+        messages.success(request, "Email deleted.")
+    except Exception as exc:  # noqa: BLE001
+        messages.error(request, f"Couldn't delete: {exc}")
+    return redirect(_back_to_inbox_url(request))
 
 
 @require_http_methods(["GET", "POST"])

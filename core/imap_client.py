@@ -137,7 +137,7 @@ def fetch_recent_bulk(
 
 def fetch_body(account: EmailAccount, uid: str) -> EmailFull | None:
     with _open_mailbox(account) as mailbox:
-        for msg in mailbox.fetch(AND(uid=uid), mark_seen=False, limit=1):
+        for msg in mailbox.fetch(AND(uid=uid), mark_seen=True, limit=1):
             return EmailFull(
                 subject=msg.subject or "(no subject)",
                 from_=msg.from_ or "",
@@ -147,3 +147,40 @@ def fetch_body(account: EmailAccount, uid: str) -> EmailFull | None:
                 text=msg.text or "",
             )
     return None
+
+
+_TRASH_NAMES = ("Trash", "trash", "Корзина", "INBOX/Trash", "[Gmail]/Trash", "[Gmail]/Корзина")
+
+
+def _find_trash_folder(mailbox) -> str | None:
+    """Look up the destination folder for "deleted" messages.
+    Prefer SPECIAL-USE \\Trash flag; fall back to common names."""
+    try:
+        folders = list(mailbox.folder.list())
+    except Exception:  # noqa: BLE001
+        return None
+    for f in folders:
+        flags = getattr(f, "flags", ()) or ()
+        if "\\Trash" in flags or r"\Trash" in flags:
+            return f.name
+    folder_names = {f.name: f for f in folders}
+    for candidate in _TRASH_NAMES:
+        if candidate in folder_names:
+            return candidate
+    return None
+
+
+def mark_unseen(account: EmailAccount, uid: str) -> None:
+    with _open_mailbox(account) as mailbox:
+        mailbox.flag([uid], ["\\Seen"], False)
+
+
+def delete_message(account: EmailAccount, uid: str) -> None:
+    """Move the message to the account's Trash folder if available;
+    otherwise mark it \\Deleted and expunge."""
+    with _open_mailbox(account) as mailbox:
+        trash = _find_trash_folder(mailbox)
+        if trash and trash != "INBOX":
+            mailbox.move([uid], trash)
+        else:
+            mailbox.delete([uid])
