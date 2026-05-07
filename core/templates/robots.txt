@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /$
+Disallow: /home/
+Disallow: /inbox/
+Disallow: /accounts/
+Disallow: /profile/
+Disallow: /login/
+Disallow: /logout/
+Disallow: /verify-otp/
+Disallow: /password-reset/
+Disallow: /admin/

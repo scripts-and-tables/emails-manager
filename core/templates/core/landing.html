@@ -1,5 +1,15 @@
 {% extends "core/base.html" %}
 {% block title %}Mail.Ru Manager — All your mailboxes in one place{% endblock %}
+{% block extra_head %}
+  <meta name="description" content="Connect every mail.ru, Gmail, Yandex, or Outlook account and read recent mail from all of them in one fast, secure dashboard.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Mail.Ru Manager — All your mailboxes in one place">
+  <meta property="og:description" content="Connect every mail.ru, Gmail, Yandex, or Outlook account and read recent mail from all of them in one fast, secure dashboard.">
+  <meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Mail.Ru Manager — All your mailboxes in one place">
+  <meta name="twitter:description" content="Connect every mail.ru, Gmail, Yandex, or Outlook account and read recent mail from all of them in one fast, secure dashboard.">
+{% endblock %}
 {% block content %}
 
 <style>
