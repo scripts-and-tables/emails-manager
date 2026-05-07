@@ -53,6 +53,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "core.middleware.XRobotsTagMiddleware",
 ]
 
 ROOT_URLCONF = "emailsmanager.urls"
@@ -151,6 +152,8 @@ LOGOUT_REDIRECT_URL = "/login/"
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_HTTPONLY = True
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 7  # 7 days
+SESSION_SAVE_EVERY_REQUEST = True       # rolling: each request resets the 7-day clock
 
 # Response-header security (explicit, even where Django's defaults match)
 SECURE_CONTENT_TYPE_NOSNIFF = True              # X-Content-Type-Options: nosniff

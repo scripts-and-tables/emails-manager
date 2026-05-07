@@ -24,6 +24,7 @@ from .email_otp import OtpDeliveryError, issue_and_send, verify
 from .forms import BulkAccountForm, EmailAccountForm, OtpForm, PasswordResetRequestForm, ProfileInfoForm
 from .imap_client import check_status, check_status_bulk, fetch_body, fetch_recent_bulk
 from .models import EmailAccount, UserPreferences
+from .rate_limit import is_rate_limited
 from .password_reset import ResetDeliveryError, send_reset_email
 
 User = get_user_model()
@@ -58,6 +59,10 @@ def login_view(request: HttpRequest) -> HttpResponse:
         return redirect("core:home")
 
     if request.method == "POST":
+        if is_rate_limited(request, "login", max_per_window=20, window_seconds=300):
+            messages.error(request, "Too many sign-in attempts. Try again in a few minutes.")
+            return render(request, "core/login.html", {"form": AuthenticationForm(request)})
+
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             user = form.get_user()
@@ -102,6 +107,11 @@ def verify_otp(request: HttpRequest) -> HttpResponse:
         return redirect("core:login")
 
     if request.method == "POST":
+        if is_rate_limited(request, "otp", max_per_window=15, window_seconds=300, extra=str(user_id)):
+            messages.error(request, "Too many verification attempts. Sign in again.")
+            request.session.pop(PRE_OTP_USER_KEY, None)
+            return redirect("core:login")
+
         if "resend" in request.POST:
             if _send_otp_or_flash(request, user):
                 masked = _mask_email(user.email)
@@ -413,17 +423,22 @@ def password_reset_request(request: HttpRequest) -> HttpResponse:
         form = PasswordResetRequestForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data["email"].strip()
-            user = User.objects.filter(email__iexact=email).first()
-            if user is not None and user.email:
-                uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
-                token = default_token_generator.make_token(user)
-                reset_url = request.build_absolute_uri(
-                    reverse("core:password_reset_confirm", args=[uidb64, token])
-                )
-                try:
-                    send_reset_email(user.email, reset_url)
-                except ResetDeliveryError:
-                    pass  # logged in helper; show generic success either way
+            limited = is_rate_limited(
+                request, "pwreset", max_per_window=5, window_seconds=3600,
+                extra=email.lower(),
+            )
+            if not limited:
+                user = User.objects.filter(email__iexact=email).first()
+                if user is not None and user.email:
+                    uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
+                    token = default_token_generator.make_token(user)
+                    reset_url = request.build_absolute_uri(
+                        reverse("core:password_reset_confirm", args=[uidb64, token])
+                    )
+                    try:
+                        send_reset_email(user.email, reset_url)
+                    except ResetDeliveryError:
+                        pass  # logged in helper; show generic success either way
             return render(request, "core/password_reset_request.html", {"form": form, "sent": True})
     else:
         form = PasswordResetRequestForm()
@@ -497,6 +512,9 @@ def profile(request: HttpRequest) -> HttpResponse:
 @otp_required
 @require_http_methods(["POST"])
 def profile_password_change(request: HttpRequest) -> HttpResponse:
+    if is_rate_limited(request, "pwchange", max_per_window=10, window_seconds=300, extra=str(request.user.pk)):
+        messages.error(request, "Too many password changes. Try again in a few minutes.")
+        return redirect("core:profile")
     password_form = SetPasswordForm(request.user, request.POST)
     _add_bootstrap_class(password_form)
     if password_form.is_valid():
