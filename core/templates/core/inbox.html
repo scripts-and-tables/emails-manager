@@ -4,9 +4,16 @@
 <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3 mb-3">
   <div>
     <h1 class="h4 mb-1">Inbox</h1>
-    <p class="text-secondary small mb-0">Recent messages across your connected accounts.</p>
+    <p class="text-secondary small mb-0">
+      {% if filter_account %}
+        Messages from <strong>{{ filter_account.email_address }}</strong>.
+      {% else %}
+        Recent messages across your connected accounts.
+      {% endif %}
+    </p>
   </div>
   <form method="get" class="d-flex align-items-center gap-2">
+    {% if filter_account %}<input type="hidden" name="account" value="{{ filter_account.pk }}">{% endif %}
     <label class="text-secondary small mb-0 d-none d-sm-inline" for="id_window">Show:</label>
     <select name="window" id="id_window" class="form-select form-select-sm" onchange="this.form.submit()" style="min-width: 9rem;">
       {% for value, label in windows %}
@@ -15,6 +22,18 @@
     </select>
   </form>
 </div>
+
+{% if filter_account %}
+  <div class="alert alert-info d-flex align-items-center gap-2 mb-3 py-2">
+    <i class="bi bi-funnel-fill flex-shrink-0"></i>
+    <span class="flex-grow-1 small">
+      Filtered to <strong>{{ filter_account.email_address }}</strong>.
+    </span>
+    <a href="{% url 'core:inbox' %}?window={{ window }}" class="btn btn-sm btn-outline-secondary">
+      <i class="bi bi-x-lg me-1"></i>Clear filter
+    </a>
+  </div>
+{% endif %}
 
 {% if not has_accounts %}
   <div class="card card-soft">
@@ -80,7 +99,7 @@
                 <td class="truncate-cell" style="max-width:240px">{{ h.from_ }}</td>
                 <td class="truncate-cell position-relative" style="max-width:520px">
                   <a class="stretched-link text-decoration-none text-reset"
-                     href="{% url 'core:email_detail' h.account_id h.uid %}?window={{ window }}">
+                     href="{% url 'core:email_detail' h.account_id h.uid %}?window={{ window }}{% if filter_account %}&amp;account={{ filter_account.pk }}{% endif %}">
                     {% if not h.seen %}<strong>{{ h.subject }}</strong>{% else %}{{ h.subject }}{% endif %}
                   </a>
                 </td>
@@ -96,7 +115,7 @@
       {% for h in headers %}
         <div class="item-card p-3" data-message-row data-search-text="{{ h.subject|lower }} {{ h.from_|lower }}">
           <a class="stretched-link" aria-label="Open message"
-             href="{% url 'core:email_detail' h.account_id h.uid %}?window={{ window }}"></a>
+             href="{% url 'core:email_detail' h.account_id h.uid %}?window={{ window }}{% if filter_account %}&amp;account={{ filter_account.pk }}{% endif %}"></a>
           <div class="d-flex justify-content-between align-items-start gap-2 mb-1">
             <div class="fw-semibold text-truncate">{{ h.from_ }}</div>
             <div class="text-secondary small flex-shrink-0">{{ h.date|date:"M j, H:i" }}</div>

@@ -301,7 +301,22 @@ def inbox(request: HttpRequest) -> HttpResponse:
         window = "1d"
 
     all_accounts = list(EmailAccount.objects.filter(owner=request.user))
-    accounts = [a for a in all_accounts if a.is_enabled]
+
+    filter_account = None
+    raw_filter = request.GET.get("account")
+    if raw_filter:
+        try:
+            filter_pk = int(raw_filter)
+        except (TypeError, ValueError):
+            filter_pk = None
+        if filter_pk is not None:
+            filter_account = next((a for a in all_accounts if a.pk == filter_pk), None)
+
+    if filter_account is not None:
+        accounts = [filter_account]
+    else:
+        accounts = [a for a in all_accounts if a.is_enabled]
+
     headers, errors = fetch_recent_bulk(accounts, days=days)
 
     error_rows = [
@@ -319,7 +334,8 @@ def inbox(request: HttpRequest) -> HttpResponse:
             "window": window,
             "windows": [("1d", "Last 24 hours"), ("7d", "Last 7 days"), ("30d", "Last 30 days")],
             "has_accounts": bool(all_accounts),
-            "all_disabled": bool(all_accounts) and not accounts,
+            "all_disabled": bool(all_accounts) and not [a for a in all_accounts if a.is_enabled] and filter_account is None,
+            "filter_account": filter_account,
         },
     )
 
@@ -331,7 +347,10 @@ def email_detail(request: HttpRequest, account_id: int, uid: str) -> HttpRespons
         message = fetch_body(account, uid)
     except Exception as exc:  # noqa: BLE001
         messages.error(request, f"Could not load email: {exc}")
-        return redirect(reverse("core:inbox") + f"?window={request.GET.get('window', '1d')}")
+        back_qs = f"?window={request.GET.get('window', '1d')}"
+        if request.GET.get("account"):
+            back_qs += f"&account={request.GET.get('account')}"
+        return redirect(reverse("core:inbox") + back_qs)
 
     if message is None:
         messages.error(request, "Email not found.")
@@ -340,7 +359,12 @@ def email_detail(request: HttpRequest, account_id: int, uid: str) -> HttpRespons
     return render(
         request,
         "core/email_detail.html",
-        {"message": message, "account": account, "back_window": request.GET.get("window", "1d")},
+        {
+            "message": message,
+            "account": account,
+            "back_window": request.GET.get("window", "1d"),
+            "back_account": request.GET.get("account") or "",
+        },
     )
 
 
