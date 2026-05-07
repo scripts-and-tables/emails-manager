@@ -152,6 +152,12 @@ SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_HTTPONLY = True
 
+# Response-header security (explicit, even where Django's defaults match)
+SECURE_CONTENT_TYPE_NOSNIFF = True              # X-Content-Type-Options: nosniff
+SECURE_REFERRER_POLICY = "same-origin"          # Referrer-Policy
+SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin"  # Cross-Origin-Opener-Policy
+X_FRAME_OPTIONS = "DENY"                        # X-Frame-Options
+
 if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
