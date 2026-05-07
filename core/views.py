@@ -298,8 +298,9 @@ def account_update_password(request: HttpRequest, pk: int) -> JsonResponse:
     return JsonResponse({"ok": True})
 
 
-@otp_required
-def inbox(request: HttpRequest) -> HttpResponse:
+def _resolve_inbox_params(request: HttpRequest):
+    """Shared by inbox() and inbox_data(): parse window + filter_account
+    + compute account-state flags. Returns a dict suitable for template ctx."""
     window = request.GET.get("window", "1d")
     days_map = {"1d": 1, "7d": 7, "30d": 30}
     days = days_map.get(window, 1)
@@ -323,25 +324,57 @@ def inbox(request: HttpRequest) -> HttpResponse:
     else:
         accounts = [a for a in all_accounts if a.is_enabled]
 
-    headers, errors = fetch_recent_bulk(accounts, days=days)
+    return {
+        "window": window,
+        "days": days,
+        "all_accounts": all_accounts,
+        "accounts": accounts,
+        "filter_account": filter_account,
+    }
 
+
+@otp_required
+def inbox(request: HttpRequest) -> HttpResponse:
+    """Render the inbox shell instantly (no IMAP). Real headers are loaded by
+    inbox_data via fetch() once the page is up."""
+    p = _resolve_inbox_params(request)
+    all_accounts = p["all_accounts"]
+    enabled_accounts = [a for a in all_accounts if a.is_enabled]
+    data_qs = request.GET.urlencode()
+    return render(
+        request,
+        "core/inbox.html",
+        {
+            "window": p["window"],
+            "windows": [("1d", "Last 24 hours"), ("7d", "Last 7 days"), ("30d", "Last 30 days")],
+            "has_accounts": bool(all_accounts),
+            "all_disabled": bool(all_accounts) and not enabled_accounts and p["filter_account"] is None,
+            "filter_account": p["filter_account"],
+            "data_url": reverse("core:inbox_data") + (f"?{data_qs}" if data_qs else ""),
+        },
+    )
+
+
+@otp_required
+def inbox_data(request: HttpRequest) -> HttpResponse:
+    """Returns just the inbox content (errors + rows + count + empty state)
+    as an HTML fragment. Called by the inbox shell via fetch()."""
+    p = _resolve_inbox_params(request)
+    accounts = p["accounts"]
+    headers, errors = fetch_recent_bulk(accounts, days=p["days"])
     error_rows = [
         {"account": acc, "message": errors[acc.id]}
         for acc in accounts
         if acc.id in errors
     ]
-
     return render(
         request,
-        "core/inbox.html",
+        "core/_inbox_content.html",
         {
             "headers": headers,
             "errors": error_rows,
-            "window": window,
-            "windows": [("1d", "Last 24 hours"), ("7d", "Last 7 days"), ("30d", "Last 30 days")],
-            "has_accounts": bool(all_accounts),
-            "all_disabled": bool(all_accounts) and not [a for a in all_accounts if a.is_enabled] and filter_account is None,
-            "filter_account": filter_account,
+            "window": p["window"],
+            "filter_account": p["filter_account"],
         },
     )
 

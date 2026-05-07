@@ -58,120 +58,87 @@
     </div>
   </div>
 {% else %}
-  {% if errors %}
-    <div class="alert alert-warning d-flex gap-2">
-      <i class="bi bi-exclamation-triangle-fill flex-shrink-0 mt-1"></i>
-      <div>
-        <strong>Some accounts failed to fetch:</strong>
-        <ul class="mb-0 mt-1">
-          {% for e in errors %}
-            <li><code>{{ e.account.email_address }}</code> — {{ e.message }}</li>
-          {% endfor %}
-        </ul>
-      </div>
-    </div>
-  {% endif %}
-
   <div class="mb-3">
     <div class="input-group">
       <span class="input-group-text"><i class="bi bi-search"></i></span>
       <input type="search" id="inbox-search" class="form-control"
-             placeholder="Search subject or sender" autocomplete="off">
+             placeholder="Search subject or sender" autocomplete="off" disabled>
     </div>
   </div>
 
-  {% if headers %}
-    <div class="card card-soft d-none d-lg-block" id="inbox-table-card">
-      <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-          <thead>
-            <tr>
-              <th>Account</th>
-              <th>From</th>
-              <th>Subject</th>
-              <th style="width:160px">Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for h in headers %}
-              <tr data-message-row data-search-text="{{ h.subject|lower }} {{ h.from_|lower }}">
-                <td class="text-secondary small">{{ h.account_email }}</td>
-                <td class="truncate-cell" style="max-width:240px">{{ h.from_ }}</td>
-                <td class="truncate-cell position-relative" style="max-width:520px">
-                  <a class="stretched-link text-decoration-none text-reset"
-                     href="{% url 'core:email_detail' h.account_id h.uid %}?window={{ window }}{% if filter_account %}&amp;account={{ filter_account.pk }}{% endif %}">
-                    {% if not h.seen %}<strong>{{ h.subject }}</strong>{% else %}{{ h.subject }}{% endif %}
-                  </a>
-                </td>
-                <td class="text-secondary small">{{ h.date|date:"M j, H:i" }}</td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
+  <div id="inbox-content" data-fetch-url="{{ data_url }}">
+    <div class="inbox-skeleton" aria-hidden="true">
+      <div class="skeleton-row"></div>
+      <div class="skeleton-row"></div>
+      <div class="skeleton-row"></div>
+      <div class="skeleton-row"></div>
+      <div class="skeleton-row"></div>
     </div>
+    <p class="text-secondary small mt-3 mb-0">Loading messages…</p>
+  </div>
 
-    <div class="d-lg-none" id="inbox-cards">
-      {% for h in headers %}
-        <div class="item-card p-3" data-message-row data-search-text="{{ h.subject|lower }} {{ h.from_|lower }}">
-          <a class="stretched-link" aria-label="Open message"
-             href="{% url 'core:email_detail' h.account_id h.uid %}?window={{ window }}{% if filter_account %}&amp;account={{ filter_account.pk }}{% endif %}"></a>
-          <div class="d-flex justify-content-between align-items-start gap-2 mb-1">
-            <div class="fw-semibold text-truncate">{{ h.from_ }}</div>
-            <div class="text-secondary small flex-shrink-0">{{ h.date|date:"M j, H:i" }}</div>
-          </div>
-          <div class="text-truncate {% if not h.seen %}fw-semibold{% endif %} mb-1">
-            {{ h.subject }}
-          </div>
-          <div class="text-secondary small text-truncate">
-            <i class="bi bi-person-circle me-1"></i>{{ h.account_email }}
-          </div>
-        </div>
-      {% endfor %}
-    </div>
+  <style>
+    .skeleton-row {
+      height: 56px;
+      background: var(--bs-tertiary-bg);
+      border: 1px solid var(--bs-border-color);
+      border-radius: .6rem;
+      animation: skeleton-pulse 1.4s ease-in-out infinite;
+    }
+    .skeleton-row + .skeleton-row { margin-top: .6rem; }
+    @keyframes skeleton-pulse {
+      0%, 100% { opacity: .55; }
+      50% { opacity: .9; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .skeleton-row { animation: none; opacity: .7; }
+    }
+  </style>
 
-    <div id="inbox-empty-search" class="card card-soft d-none">
-      <div class="card-body text-center py-4">
-        <div class="empty-state-icon mb-2" style="font-size: 2rem;"><i class="bi bi-search"></i></div>
-        <p class="text-secondary mb-0">No messages match your search.</p>
-      </div>
-    </div>
+  <script>
+  (function () {
+    const contentEl = document.getElementById('inbox-content');
+    const searchEl = document.getElementById('inbox-search');
+    if (!contentEl || !searchEl) return;
+    const fetchUrl = contentEl.dataset.fetchUrl;
+    if (!fetchUrl) return;
 
-    <p class="text-secondary small mt-3 mb-0" id="inbox-count">
-      <span id="inbox-visible-count">{{ headers|length }}</span> of {{ headers|length }} message{{ headers|length|pluralize }}.
-    </p>
+    function applyFilter() {
+      const q = searchEl.value.trim().toLowerCase();
+      document.querySelectorAll('[data-message-row]').forEach((row) => {
+        const matches = !q || (row.dataset.searchText || '').includes(q);
+        row.style.display = matches ? '' : 'none';
+      });
+      let visible = 0;
+      document.querySelectorAll('#inbox-cards [data-message-row]').forEach((row) => {
+        if (row.style.display !== 'none') visible++;
+      });
+      const visCount = document.getElementById('inbox-visible-count');
+      if (visCount) visCount.textContent = visible;
+      const empty = document.getElementById('inbox-empty-search');
+      if (empty) empty.classList.toggle('d-none', !(q.length > 0 && visible === 0));
+    }
 
-    <script>
-    (function () {
-      const searchInput = document.getElementById('inbox-search');
-      const rows = document.querySelectorAll('[data-message-row]');
-      const cardRows = document.querySelectorAll('#inbox-cards [data-message-row]');
-      const emptyState = document.getElementById('inbox-empty-search');
-      const visibleCount = document.getElementById('inbox-visible-count');
+    searchEl.addEventListener('input', applyFilter);
 
-      function applyFilter() {
-        const q = searchInput.value.trim().toLowerCase();
-        rows.forEach((row) => {
-          const matches = !q || (row.dataset.searchText || '').includes(q);
-          row.style.display = matches ? '' : 'none';
-        });
-        let visible = 0;
-        cardRows.forEach((row) => { if (row.style.display !== 'none') visible++; });
-        visibleCount.textContent = visible;
-        emptyState.classList.toggle('d-none', !(q.length > 0 && visible === 0));
-      }
-
-      searchInput.addEventListener('input', applyFilter);
-    })();
-    </script>
-  {% else %}
-    <div class="card card-soft">
-      <div class="card-body text-center py-5">
-        <div class="empty-state-icon mb-3"><i class="bi bi-inbox"></i></div>
-        <h2 class="h5 mb-2">No messages in this window</h2>
-        <p class="text-secondary mb-0">Try a longer time range from the dropdown above.</p>
-      </div>
-    </div>
-  {% endif %}
+    fetch(fetchUrl, { headers: { 'Accept': 'text/html' } })
+      .then((r) => {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.text();
+      })
+      .then((html) => {
+        contentEl.innerHTML = html;
+        searchEl.disabled = false;
+        applyFilter();
+      })
+      .catch((err) => {
+        contentEl.innerHTML = '<div class="alert alert-danger d-flex gap-2 align-items-start">' +
+          '<i class="bi bi-exclamation-triangle-fill flex-shrink-0 mt-1"></i>' +
+          '<div><strong>Couldn\'t load messages.</strong><br>' +
+          '<span class="small">' + (err.message || 'Network error') + '</span></div>' +
+          '</div>';
+      });
+  })();
+  </script>
 {% endif %}
 {% endblock %}

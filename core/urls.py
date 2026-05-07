@@ -30,5 +30,6 @@ urlpatterns = [
     path("accounts/<int:pk>/toggle/", views.account_toggle, name="account_toggle"),
     path("accounts/<int:pk>/password/", views.account_update_password, name="account_update_password"),
     path("inbox/", views.inbox, name="inbox"),
+    path("inbox/data/", views.inbox_data, name="inbox_data"),
     path("inbox/<int:account_id>/<str:uid>/", views.email_detail, name="email_detail"),
 ]

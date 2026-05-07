@@ -1,0 +1,89 @@
+{% comment %}
+Inbox data fragment — rendered by inbox_data view, fetched by inbox.html.
+Rendered into #inbox-content via innerHTML, so any <script> blocks here
+won't execute. Keep all JS in the shell (inbox.html).
+{% endcomment %}
+
+{% if errors %}
+  <div class="alert alert-warning d-flex gap-2">
+    <i class="bi bi-exclamation-triangle-fill flex-shrink-0 mt-1"></i>
+    <div>
+      <strong>Some accounts failed to fetch:</strong>
+      <ul class="mb-0 mt-1">
+        {% for e in errors %}
+          <li><code>{{ e.account.email_address }}</code> — {{ e.message }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+{% endif %}
+
+{% if headers %}
+  <div class="card card-soft d-none d-lg-block" id="inbox-table-card">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Account</th>
+            <th>From</th>
+            <th>Subject</th>
+            <th style="width:160px">Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for h in headers %}
+            <tr data-message-row data-search-text="{{ h.subject|lower }} {{ h.from_|lower }}">
+              <td class="text-secondary small">{{ h.account_email }}</td>
+              <td class="truncate-cell" style="max-width:240px">{{ h.from_ }}</td>
+              <td class="truncate-cell position-relative" style="max-width:520px">
+                <a class="stretched-link text-decoration-none text-reset"
+                   href="{% url 'core:email_detail' h.account_id h.uid %}?window={{ window }}{% if filter_account %}&amp;account={{ filter_account.pk }}{% endif %}">
+                  {% if not h.seen %}<strong>{{ h.subject }}</strong>{% else %}{{ h.subject }}{% endif %}
+                </a>
+              </td>
+              <td class="text-secondary small">{{ h.date|date:"M j, H:i" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="d-lg-none" id="inbox-cards">
+    {% for h in headers %}
+      <div class="item-card p-3" data-message-row data-search-text="{{ h.subject|lower }} {{ h.from_|lower }}">
+        <a class="stretched-link" aria-label="Open message"
+           href="{% url 'core:email_detail' h.account_id h.uid %}?window={{ window }}{% if filter_account %}&amp;account={{ filter_account.pk }}{% endif %}"></a>
+        <div class="d-flex justify-content-between align-items-start gap-2 mb-1">
+          <div class="fw-semibold text-truncate">{{ h.from_ }}</div>
+          <div class="text-secondary small flex-shrink-0">{{ h.date|date:"M j, H:i" }}</div>
+        </div>
+        <div class="text-truncate {% if not h.seen %}fw-semibold{% endif %} mb-1">
+          {{ h.subject }}
+        </div>
+        <div class="text-secondary small text-truncate">
+          <i class="bi bi-person-circle me-1"></i>{{ h.account_email }}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <div id="inbox-empty-search" class="card card-soft d-none">
+    <div class="card-body text-center py-4">
+      <div class="empty-state-icon mb-2" style="font-size: 2rem;"><i class="bi bi-search"></i></div>
+      <p class="text-secondary mb-0">No messages match your search.</p>
+    </div>
+  </div>
+
+  <p class="text-secondary small mt-3 mb-0" id="inbox-count">
+    <span id="inbox-visible-count">{{ headers|length }}</span> of {{ headers|length }} message{{ headers|length|pluralize }}.
+  </p>
+{% else %}
+  <div class="card card-soft">
+    <div class="card-body text-center py-5">
+      <div class="empty-state-icon mb-3"><i class="bi bi-inbox"></i></div>
+      <h2 class="h5 mb-2">No messages in this window</h2>
+      <p class="text-secondary mb-0">Try a longer time range from the dropdown above.</p>
+    </div>
+  </div>
+{% endif %}
