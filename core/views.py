@@ -12,6 +12,9 @@ from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm, SetPasswordForm
 from django.contrib.auth.tokens import default_token_generator
+from django.core.signing import BadSignature, SignatureExpired
+from django.core.signing import dumps as sign_dumps
+from django.core.signing import loads as sign_loads
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -21,7 +24,15 @@ from django.views.decorators.http import require_http_methods
 
 from .decorators import OTP_VERIFIED_SESSION_KEY, is_otp_verified, otp_required
 from .email_otp import OtpDeliveryError, issue_and_send, verify
-from .forms import BulkAccountForm, EmailAccountForm, OtpForm, PasswordResetRequestForm, ProfileInfoForm
+from .email_verify import VerifyDeliveryError, send_verification_email
+from .forms import (
+    BulkAccountForm,
+    EmailAccountForm,
+    OtpForm,
+    PasswordResetRequestForm,
+    ProfileInfoForm,
+    SignupForm,
+)
 from .imap_client import check_status, check_status_bulk, fetch_body, fetch_recent_bulk
 from .models import EmailAccount, UserPreferences
 from .rate_limit import is_rate_limited
@@ -475,6 +486,64 @@ def password_reset_confirm(request: HttpRequest, uidb64: str, token: str) -> Htt
 
 def password_reset_complete(request: HttpRequest) -> HttpResponse:
     return render(request, "core/password_reset_complete.html")
+
+
+SIGNUP_TOKEN_SALT = "signup-verify"
+SIGNUP_TOKEN_TTL = 60 * 60 * 24  # 24h
+
+
+@require_http_methods(["GET", "POST"])
+def signup(request: HttpRequest) -> HttpResponse:
+    if request.user.is_authenticated and is_otp_verified(request):
+        return redirect("core:home")
+
+    form = SignupForm()
+    _add_bootstrap_class(form)
+
+    if request.method == "POST":
+        if is_rate_limited(request, "signup", max_per_window=5, window_seconds=3600):
+            messages.error(request, "Too many sign-up attempts. Try again in a few minutes.")
+            return render(request, "core/signup.html", {"form": form, "sent": False})
+
+        form = SignupForm(request.POST)
+        _add_bootstrap_class(form)
+        if form.is_valid():
+            user = form.save()
+            token = sign_dumps(user.pk, salt=SIGNUP_TOKEN_SALT)
+            verify_url = request.build_absolute_uri(
+                reverse("core:signup_verify", args=[token])
+            )
+            try:
+                send_verification_email(user.email, verify_url)
+            except VerifyDeliveryError:
+                pass  # logged in helper; show generic success either way
+            return render(
+                request,
+                "core/signup.html",
+                {"form": SignupForm(), "sent": True, "sent_email": user.email},
+            )
+
+    return render(request, "core/signup.html", {"form": form, "sent": False})
+
+
+def signup_verify(request: HttpRequest, token: str) -> HttpResponse:
+    user = None
+    try:
+        pk = sign_loads(token, salt=SIGNUP_TOKEN_SALT, max_age=SIGNUP_TOKEN_TTL)
+        user = User.objects.filter(pk=pk).first()
+    except (BadSignature, SignatureExpired):
+        user = None
+
+    if user is None:
+        return render(request, "core/signup_verify.html", {"valid": False})
+
+    if user.is_active:
+        messages.info(request, "Your email is already verified. Sign in to continue.")
+        return redirect("core:login")
+
+    user.is_active = True
+    user.save(update_fields=["is_active"])
+    return render(request, "core/signup_verify.html", {"valid": True})
 
 
 def _add_bootstrap_class(form, css_class: str = "form-control") -> None:

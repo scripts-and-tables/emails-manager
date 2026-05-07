@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import UserCreationForm
 
 from .models import EmailAccount
 
@@ -19,6 +20,45 @@ class OtpForm(forms.Form):
             }
         ),
     )
+
+
+class SignupForm(UserCreationForm):
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={"class": "form-control", "autocomplete": "email"}),
+    )
+    first_name = forms.CharField(
+        required=False, max_length=30,
+        widget=forms.TextInput(attrs={"class": "form-control", "autocomplete": "given-name"}),
+    )
+    last_name = forms.CharField(
+        required=False, max_length=30,
+        widget=forms.TextInput(attrs={"class": "form-control", "autocomplete": "family-name"}),
+    )
+
+    class Meta:
+        model = get_user_model()
+        fields = ("username", "email", "first_name", "last_name", "password1", "password2")
+        widgets = {
+            "username": forms.TextInput(attrs={"class": "form-control", "autocomplete": "username"}),
+        }
+
+    def clean_email(self):
+        email = (self.cleaned_data.get("email") or "").strip()
+        User = get_user_model()
+        if User.objects.filter(email__iexact=email).exists():
+            raise forms.ValidationError("An account with that email already exists.")
+        return email
+
+    def save(self, commit: bool = True):
+        user = super().save(commit=False)
+        user.email = self.cleaned_data["email"]
+        user.first_name = self.cleaned_data.get("first_name", "")
+        user.last_name = self.cleaned_data.get("last_name", "")
+        user.is_active = False  # require email verification before login
+        if commit:
+            user.save()
+        return user
 
 
 class PasswordResetRequestForm(forms.Form):

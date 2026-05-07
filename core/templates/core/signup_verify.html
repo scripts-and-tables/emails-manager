@@ -1,0 +1,42 @@
+{% extends "core/base.html" %}
+{% block title %}Email verified · Mail.Ru Manager{% endblock %}
+{% block content %}
+<div class="auth-card-wrap py-5">
+  <div class="row justify-content-center">
+    <div class="col-12 col-sm-10 col-md-7 col-lg-5" style="max-width: 420px;">
+      <div class="card card-soft shadow-sm">
+        <div class="card-body p-4 p-md-5 text-center">
+          {% if valid %}
+            <div class="mb-4">
+              <span class="brand-mark brand-mark-lg" aria-hidden="true" style="background: linear-gradient(135deg, #198754 0%, #20c997 100%);">
+                <i class="bi bi-check-lg" style="font-size: 32px;"></i>
+              </span>
+            </div>
+            <h1 class="h3 mb-2">Email verified</h1>
+            <p class="text-secondary mb-4">
+              Your account is ready. Sign in to connect your first mailbox.
+            </p>
+            <a class="btn btn-primary w-100 py-2" href="{% url 'core:login' %}">
+              Go to sign in <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+          {% else %}
+            <div class="mb-4">
+              <span class="brand-mark brand-mark-lg" aria-hidden="true" style="background: linear-gradient(135deg, #dc3545 0%, #ff6b6b 100%);">
+                <i class="bi bi-exclamation-triangle" style="font-size: 28px;"></i>
+              </span>
+            </div>
+            <h1 class="h3 mb-2">Link is invalid or expired</h1>
+            <p class="text-secondary mb-4">
+              The verification link you used is no longer valid. It may have expired (after 24 hours)
+              or been altered. Sign up again to get a fresh link.
+            </p>
+            <a class="btn btn-primary w-100 py-2" href="{% url 'core:signup' %}">
+              Back to sign up
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
