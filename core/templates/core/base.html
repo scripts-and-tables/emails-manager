@@ -153,6 +153,21 @@
       });
       group.appendChild(btn);
     });
+
+    // Auto-focus the first form field with errors after a failed submit.
+    // Prefer .is-invalid (Bootstrap signal); fall back to the input nearest
+    // a .text-danger.small message (our standard error-line markup).
+    let target = document.querySelector('.is-invalid');
+    if (!target) {
+      const err = document.querySelector('.text-danger.small');
+      if (err) {
+        const wrap = err.closest('.mb-3, .mb-4, .input-group') || err.parentElement;
+        target = wrap && wrap.querySelector('input:not([type="hidden"]), textarea, select');
+      }
+    }
+    if (target && typeof target.focus === 'function') {
+      target.focus({ preventScroll: false });
+    }
   })();
 </script>
 </body>
