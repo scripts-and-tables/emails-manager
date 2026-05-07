@@ -14,9 +14,15 @@
       {% endif %}
     </p>
   </div>
-  <form method="get" class="d-flex align-items-center gap-2">
+  <form method="get" class="d-flex align-items-center gap-2 flex-wrap">
     {% if filter_account %}<input type="hidden" name="account" value="{{ filter_account.pk }}">{% endif %}
     {% if filter_group %}<input type="hidden" name="group" value="{{ filter_group }}">{% endif %}
+    <label class="text-secondary small mb-0 d-none d-sm-inline" for="id_folder">Folder:</label>
+    <select name="folder" id="id_folder" class="form-select form-select-sm" onchange="this.form.submit()" style="min-width: 7rem;">
+      {% for value, label in folders %}
+        <option value="{{ value }}" {% if value == folder %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
     <label class="text-secondary small mb-0 d-none d-sm-inline" for="id_window">Show:</label>
     <select name="window" id="id_window" class="form-select form-select-sm" onchange="this.form.submit()" style="min-width: 9rem;">
       {% for value, label in windows %}
@@ -32,7 +38,7 @@
     <span class="flex-grow-1 small">
       Filtered to <strong>{{ filter_account.email_address }}</strong>.
     </span>
-    <a href="{% url 'core:inbox' %}?window={{ window }}" class="btn btn-sm btn-outline-secondary">
+    <a href="{% url 'core:inbox' %}?window={{ window }}&amp;folder={{ folder }}" class="btn btn-sm btn-outline-secondary">
       <i class="bi bi-x-lg me-1"></i>Clear filter
     </a>
   </div>
@@ -42,7 +48,7 @@
     <span class="flex-grow-1 small">
       Filtered to group <strong>{{ filter_group }}</strong>.
     </span>
-    <a href="{% url 'core:inbox' %}?window={{ window }}" class="btn btn-sm btn-outline-secondary">
+    <a href="{% url 'core:inbox' %}?window={{ window }}&amp;folder={{ folder }}" class="btn btn-sm btn-outline-secondary">
       <i class="bi bi-x-lg me-1"></i>Clear filter
     </a>
   </div>

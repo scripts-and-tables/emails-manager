@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-import socket
+from collections.abc import Iterable
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
-from typing import Iterable
+from datetime import UTC, datetime, timedelta
 
 from imap_tools import AND, MailBox, MailBoxUnencrypted
 
@@ -43,19 +42,74 @@ class EmailFull:
     text: str = ""
 
 
-def _open_mailbox(account: EmailAccount) -> MailBox:
-    """Open and login to the IMAP mailbox. Caller is responsible for closing."""
+SEMANTIC_FOLDER_FLAGS = {
+    "sent":   ("\\Sent",),
+    "drafts": ("\\Drafts",),
+    "spam":   ("\\Junk",),
+    "trash":  ("\\Trash",),
+}
+SEMANTIC_FOLDER_NAMES = {
+    "sent":   ["Sent", "[Gmail]/Sent Mail", "Отправленные"],
+    "drafts": ["Drafts", "[Gmail]/Drafts", "Черновики"],
+    "spam":   ["Spam", "Junk", "[Gmail]/Spam", "Спам"],
+    "trash":  ["Trash", "Bin", "[Gmail]/Trash", "Корзина"],
+}
+ALLOWED_SEMANTIC_FOLDERS = {"inbox", "sent", "drafts", "spam", "trash"}
+
+
+def _open_mailbox(account: EmailAccount, folder: str = "INBOX") -> MailBox:
+    """Open and login to the IMAP mailbox. Caller is responsible for closing.
+    `folder` is the literal IMAP folder name (already resolved)."""
     mailbox_cls = MailBox if account.imap_port == 993 else MailBoxUnencrypted
     mailbox = mailbox_cls(account.imap_host, port=account.imap_port, timeout=IMAP_TIMEOUT_SECONDS)
-    mailbox.login(account.email_address, account.get_password(), initial_folder="INBOX")
+    mailbox.login(account.email_address, account.get_password(), initial_folder=folder)
     return mailbox
+
+
+def _resolve_folder(mailbox, semantic: str) -> str:
+    """Map a semantic folder name (one of inbox/sent/drafts/spam/trash) to the
+    actual folder name on this server. Tries SPECIAL-USE flags first, falls
+    back to common names."""
+    semantic = (semantic or "inbox").lower()
+    if semantic == "inbox":
+        return "INBOX"
+    flags_wanted = SEMANTIC_FOLDER_FLAGS.get(semantic, ())
+    name_fallbacks = SEMANTIC_FOLDER_NAMES.get(semantic, [])
+    try:
+        folders = list(mailbox.folder.list())
+    except Exception:  # noqa: BLE001
+        return "INBOX"
+    for f in folders:
+        f_flags = getattr(f, "flags", ()) or ()
+        if any(flag in f_flags for flag in flags_wanted):
+            return f.name
+    folder_names = {f.name: f for f in folders}
+    for candidate in name_fallbacks:
+        if candidate in folder_names:
+            return candidate
+    return "INBOX"
+
+
+def _open_with_semantic_folder(account: EmailAccount, semantic: str) -> tuple[MailBox, str]:
+    """Open mailbox at INBOX, resolve the semantic folder, switch to it.
+    Returns (mailbox, resolved_folder_name)."""
+    mailbox = _open_mailbox(account, folder="INBOX")
+    if (semantic or "inbox").lower() == "inbox":
+        return mailbox, "INBOX"
+    real = _resolve_folder(mailbox, semantic)
+    if real != "INBOX":
+        try:
+            mailbox.folder.set(real)
+        except Exception:  # noqa: BLE001
+            pass
+    return mailbox, real
 
 
 def check_status(account: EmailAccount) -> StatusResult:
     try:
         with _open_mailbox(account):
             return StatusResult(account.id, account.email_address, ok=True, message="Connected")
-    except (socket.timeout, TimeoutError):
+    except TimeoutError:
         return StatusResult(account.id, account.email_address, ok=False, message="Connection timed out")
     except Exception as exc:  # noqa: BLE001 — surface any IMAP failure as a row, not a 500
         return StatusResult(account.id, account.email_address, ok=False, message=str(exc) or exc.__class__.__name__)
@@ -79,15 +133,19 @@ def _coerce_aware(value: datetime | None) -> datetime | None:
     if value is None:
         return None
     if value.tzinfo is None:
-        return value.replace(tzinfo=timezone.utc)
+        return value.replace(tzinfo=UTC)
     return value
 
 
-def fetch_recent(account: EmailAccount, since: datetime) -> tuple[list[EmailHeader], str | None]:
-    """Returns (headers, error_message_or_none)."""
+def fetch_recent(
+    account: EmailAccount,
+    since: datetime,
+    folder: str = "inbox",
+) -> tuple[list[EmailHeader], str | None]:
+    """Returns (headers, error_message_or_none). `folder` is a semantic name."""
     headers: list[EmailHeader] = []
     try:
-        with _open_mailbox(account) as mailbox:
+        with _open_with_semantic_folder(account, folder)[0] as mailbox:
             criteria = AND(date_gte=since.date())
             for msg in mailbox.fetch(
                 criteria,
@@ -115,28 +173,29 @@ def fetch_recent(account: EmailAccount, since: datetime) -> tuple[list[EmailHead
 def fetch_recent_bulk(
     accounts: Iterable[EmailAccount],
     days: int,
+    folder: str = "inbox",
 ) -> tuple[list[EmailHeader], dict[int, str]]:
     accounts = list(accounts)
     if not accounts:
         return [], {}
-    since = datetime.now(timezone.utc) - timedelta(days=days)
+    since = datetime.now(UTC) - timedelta(days=days)
     all_headers: list[EmailHeader] = []
     errors: dict[int, str] = {}
     workers = min(MAX_PARALLEL, len(accounts))
     with ThreadPoolExecutor(max_workers=workers) as pool:
-        futures = {pool.submit(fetch_recent, acc, since): acc for acc in accounts}
+        futures = {pool.submit(fetch_recent, acc, since, folder): acc for acc in accounts}
         for fut in as_completed(futures):
             account = futures[fut]
             headers, err = fut.result()
             if err is not None:
                 errors[account.id] = err
             all_headers.extend(headers)
-    all_headers.sort(key=lambda h: h.date or datetime.min.replace(tzinfo=timezone.utc), reverse=True)
+    all_headers.sort(key=lambda h: h.date or datetime.min.replace(tzinfo=UTC), reverse=True)
     return all_headers, errors
 
 
-def fetch_body(account: EmailAccount, uid: str) -> EmailFull | None:
-    with _open_mailbox(account) as mailbox:
+def fetch_body(account: EmailAccount, uid: str, folder: str = "inbox") -> EmailFull | None:
+    with _open_with_semantic_folder(account, folder)[0] as mailbox:
         for msg in mailbox.fetch(AND(uid=uid), mark_seen=True, limit=1):
             return EmailFull(
                 subject=msg.subject or "(no subject)",
@@ -170,17 +229,18 @@ def _find_trash_folder(mailbox) -> str | None:
     return None
 
 
-def mark_unseen(account: EmailAccount, uid: str) -> None:
-    with _open_mailbox(account) as mailbox:
+def mark_unseen(account: EmailAccount, uid: str, folder: str = "inbox") -> None:
+    with _open_with_semantic_folder(account, folder)[0] as mailbox:
         mailbox.flag([uid], ["\\Seen"], False)
 
 
-def delete_message(account: EmailAccount, uid: str) -> None:
+def delete_message(account: EmailAccount, uid: str, folder: str = "inbox") -> None:
     """Move the message to the account's Trash folder if available;
-    otherwise mark it \\Deleted and expunge."""
-    with _open_mailbox(account) as mailbox:
+    otherwise mark it \\Deleted and expunge.
+    `folder` is the semantic folder the message currently lives in."""
+    with _open_with_semantic_folder(account, folder)[0] as mailbox:
         trash = _find_trash_folder(mailbox)
-        if trash and trash != "INBOX":
+        if trash and trash != "INBOX" and trash != mailbox.folder.get():
             mailbox.move([uid], trash)
         else:
             mailbox.delete([uid])

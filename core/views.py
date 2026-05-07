@@ -4,17 +4,16 @@ import csv
 from io import StringIO
 
 from django.contrib import messages
-from django.core.exceptions import ValidationError
-from django.core.validators import validate_email
-from django.contrib.auth import authenticate, get_user_model, update_session_auth_hash
+from django.contrib.auth import get_user_model, update_session_auth_hash
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm, SetPasswordForm
+from django.contrib.auth.forms import AuthenticationForm, SetPasswordForm
 from django.contrib.auth.tokens import default_token_generator
+from django.core.exceptions import ValidationError
 from django.core.signing import BadSignature, SignatureExpired
 from django.core.signing import dumps as sign_dumps
 from django.core.signing import loads as sign_loads
+from django.core.validators import validate_email
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -34,16 +33,16 @@ from .forms import (
     SignupForm,
 )
 from .imap_client import (
+    ALLOWED_SEMANTIC_FOLDERS,
     check_status,
-    check_status_bulk,
     delete_message,
     fetch_body,
     fetch_recent_bulk,
     mark_unseen,
 )
 from .models import EmailAccount, UserPreferences
-from .rate_limit import is_rate_limited
 from .password_reset import ResetDeliveryError, send_reset_email
+from .rate_limit import is_rate_limited
 
 User = get_user_model()
 
@@ -326,15 +325,31 @@ def account_update_password(request: HttpRequest, pk: int) -> JsonResponse:
     return JsonResponse({"ok": True})
 
 
+FOLDER_CHOICES = [
+    ("inbox", "Inbox"),
+    ("sent", "Sent"),
+    ("drafts", "Drafts"),
+    ("spam", "Spam"),
+    ("trash", "Trash"),
+]
+
+
+def _normalize_folder(raw: str | None) -> str:
+    folder = (raw or "inbox").lower()
+    return folder if folder in ALLOWED_SEMANTIC_FOLDERS else "inbox"
+
+
 def _resolve_inbox_params(request: HttpRequest):
     """Shared by inbox() and inbox_data(): parse window + filter_account
-    + filter_group + compute account-state flags. Returns a dict suitable
-    for template ctx."""
+    + filter_group + folder + compute account-state flags. Returns a dict
+    suitable for template ctx."""
     window = request.GET.get("window", "1d")
     days_map = {"1d": 1, "7d": 7, "30d": 30}
     days = days_map.get(window, 1)
     if window not in days_map:
         window = "1d"
+
+    folder = _normalize_folder(request.GET.get("folder"))
 
     all_accounts = list(EmailAccount.objects.filter(owner=request.user))
 
@@ -361,6 +376,7 @@ def _resolve_inbox_params(request: HttpRequest):
     return {
         "window": window,
         "days": days,
+        "folder": folder,
         "all_accounts": all_accounts,
         "accounts": accounts,
         "filter_account": filter_account,
@@ -382,6 +398,8 @@ def inbox(request: HttpRequest) -> HttpResponse:
         {
             "window": p["window"],
             "windows": [("1d", "Last 24 hours"), ("7d", "Last 7 days"), ("30d", "Last 30 days")],
+            "folder": p["folder"],
+            "folders": FOLDER_CHOICES,
             "has_accounts": bool(all_accounts),
             "all_disabled": bool(all_accounts) and not enabled_accounts and p["filter_account"] is None and not p["filter_group"],
             "filter_account": p["filter_account"],
@@ -397,7 +415,7 @@ def inbox_data(request: HttpRequest) -> HttpResponse:
     as an HTML fragment. Called by the inbox shell via fetch()."""
     p = _resolve_inbox_params(request)
     accounts = p["accounts"]
-    headers, errors = fetch_recent_bulk(accounts, days=p["days"])
+    headers, errors = fetch_recent_bulk(accounts, days=p["days"], folder=p["folder"])
     error_rows = [
         {"account": acc, "message": errors[acc.id]}
         for acc in accounts
@@ -410,6 +428,7 @@ def inbox_data(request: HttpRequest) -> HttpResponse:
             "headers": headers,
             "errors": error_rows,
             "window": p["window"],
+            "folder": p["folder"],
             "filter_account": p["filter_account"],
             "filter_group": p["filter_group"],
         },
@@ -419,11 +438,12 @@ def inbox_data(request: HttpRequest) -> HttpResponse:
 @otp_required
 def email_detail(request: HttpRequest, account_id: int, uid: str) -> HttpResponse:
     account = get_object_or_404(EmailAccount, pk=account_id, owner=request.user)
+    folder = _normalize_folder(request.GET.get("folder"))
     try:
-        message = fetch_body(account, uid)
+        message = fetch_body(account, uid, folder=folder)
     except Exception as exc:  # noqa: BLE001
         messages.error(request, f"Could not load email: {exc}")
-        back_qs = f"?window={request.GET.get('window', '1d')}"
+        back_qs = f"?window={request.GET.get('window', '1d')}&folder={folder}"
         if request.GET.get("account"):
             back_qs += f"&account={request.GET.get('account')}"
         return redirect(reverse("core:inbox") + back_qs)
@@ -441,12 +461,15 @@ def email_detail(request: HttpRequest, account_id: int, uid: str) -> HttpRespons
             "uid": uid,
             "back_window": request.GET.get("window", "1d"),
             "back_account": request.GET.get("account") or "",
+            "back_folder": folder,
         },
     )
 
 
 def _back_to_inbox_url(request: HttpRequest) -> str:
     qs = f"?window={request.POST.get('back_window') or request.GET.get('window') or '1d'}"
+    folder = _normalize_folder(request.POST.get("back_folder") or request.GET.get("folder"))
+    qs += f"&folder={folder}"
     back_account = request.POST.get("back_account") or request.GET.get("account") or ""
     if back_account:
         qs += f"&account={back_account}"
@@ -457,8 +480,9 @@ def _back_to_inbox_url(request: HttpRequest) -> str:
 @require_http_methods(["POST"])
 def email_mark_unread(request: HttpRequest, account_id: int, uid: str) -> HttpResponse:
     account = get_object_or_404(EmailAccount, pk=account_id, owner=request.user)
+    folder = _normalize_folder(request.POST.get("back_folder"))
     try:
-        mark_unseen(account, uid)
+        mark_unseen(account, uid, folder=folder)
         messages.success(request, "Marked as unread.")
     except Exception as exc:  # noqa: BLE001
         messages.error(request, f"Couldn't mark as unread: {exc}")
@@ -469,8 +493,9 @@ def email_mark_unread(request: HttpRequest, account_id: int, uid: str) -> HttpRe
 @require_http_methods(["POST"])
 def email_delete(request: HttpRequest, account_id: int, uid: str) -> HttpResponse:
     account = get_object_or_404(EmailAccount, pk=account_id, owner=request.user)
+    folder = _normalize_folder(request.POST.get("back_folder"))
     try:
-        delete_message(account, uid)
+        delete_message(account, uid, folder=folder)
         messages.success(request, "Email deleted.")
     except Exception as exc:  # noqa: BLE001
         messages.error(request, f"Couldn't delete: {exc}")

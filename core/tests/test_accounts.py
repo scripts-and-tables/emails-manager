@@ -65,7 +65,7 @@ class RateLimitTests(TestCase):
 
     def test_first_calls_pass_then_block(self):
         request = self.factory.post("/login/")
-        for i in range(3):
+        for _ in range(3):
             self.assertFalse(is_rate_limited(request, "test", max_per_window=3, window_seconds=60))
         # 4th call exceeds the budget
         self.assertTrue(is_rate_limited(request, "test", max_per_window=3, window_seconds=60))

@@ -37,7 +37,7 @@ won't execute. Keep all JS in the shell (inbox.html).
               <td class="truncate-cell" style="max-width:240px">{{ h.from_ }}</td>
               <td class="truncate-cell position-relative" style="max-width:520px">
                 <a class="stretched-link text-decoration-none text-reset"
-                   href="{% url 'core:email_detail' h.account_id h.uid %}?window={{ window }}{% if filter_account %}&amp;account={{ filter_account.pk }}{% endif %}{% if filter_group %}&amp;group={{ filter_group|urlencode }}{% endif %}">
+                   href="{% url 'core:email_detail' h.account_id h.uid %}?window={{ window }}&amp;folder={{ folder }}{% if filter_account %}&amp;account={{ filter_account.pk }}{% endif %}{% if filter_group %}&amp;group={{ filter_group|urlencode }}{% endif %}">
                   {% if not h.seen %}<strong>{{ h.subject }}</strong>{% else %}{{ h.subject }}{% endif %}
                 </a>
               </td>
@@ -53,7 +53,7 @@ won't execute. Keep all JS in the shell (inbox.html).
     {% for h in headers %}
       <div class="item-card p-3" data-message-row data-search-text="{{ h.subject|lower }} {{ h.from_|lower }}">
         <a class="stretched-link" aria-label="Open message"
-           href="{% url 'core:email_detail' h.account_id h.uid %}?window={{ window }}{% if filter_account %}&amp;account={{ filter_account.pk }}{% endif %}{% if filter_group %}&amp;group={{ filter_group|urlencode }}{% endif %}"></a>
+           href="{% url 'core:email_detail' h.account_id h.uid %}?window={{ window }}&amp;folder={{ folder }}{% if filter_account %}&amp;account={{ filter_account.pk }}{% endif %}{% if filter_group %}&amp;group={{ filter_group|urlencode }}{% endif %}"></a>
         <div class="d-flex justify-content-between align-items-start gap-2 mb-1">
           <div class="fw-semibold text-truncate">{{ h.from_ }}</div>
           <div class="text-secondary small flex-shrink-0">{{ h.date|date:"M j, H:i" }}</div>

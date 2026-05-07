@@ -2,26 +2,28 @@
 {% block title %}{{ message.subject }} · Mail.Ru Manager{% endblock %}
 {% block content %}
 <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
-  <a href="{% url 'core:inbox' %}?window={{ back_window }}{% if back_account %}&amp;account={{ back_account }}{% endif %}"
+  <a href="{% url 'core:inbox' %}?window={{ back_window }}&amp;folder={{ back_folder }}{% if back_account %}&amp;account={{ back_account }}{% endif %}"
      class="text-secondary small text-decoration-none">
-    <i class="bi bi-arrow-left me-1"></i>Back to inbox
+    <i class="bi bi-arrow-left me-1"></i>Back to {{ back_folder|default:"inbox"|title }}
   </a>
   <div class="d-flex gap-2">
     <form method="post" action="{% url 'core:email_mark_unread' account.pk uid %}" class="m-0">
       {% csrf_token %}
       <input type="hidden" name="back_window" value="{{ back_window }}">
       <input type="hidden" name="back_account" value="{{ back_account }}">
+      <input type="hidden" name="back_folder" value="{{ back_folder }}">
       <button type="submit" class="btn btn-outline-secondary btn-sm">
         <i class="bi bi-envelope-paper me-1"></i>Mark as unread
       </button>
     </form>
     <form method="post" action="{% url 'core:email_delete' account.pk uid %}" class="m-0"
-          onsubmit="return confirm('Move this email to Trash? This will remove it from the inbox.');">
+          onsubmit="return confirm('{% if back_folder == 'trash' %}Permanently delete this email? This cannot be undone.{% else %}Move this email to Trash?{% endif %}');">
       {% csrf_token %}
       <input type="hidden" name="back_window" value="{{ back_window }}">
       <input type="hidden" name="back_account" value="{{ back_account }}">
+      <input type="hidden" name="back_folder" value="{{ back_folder }}">
       <button type="submit" class="btn btn-outline-danger btn-sm">
-        <i class="bi bi-trash me-1"></i>Delete
+        <i class="bi bi-trash me-1"></i>{% if back_folder == 'trash' %}Delete forever{% else %}Delete{% endif %}
       </button>
     </form>
   </div>
