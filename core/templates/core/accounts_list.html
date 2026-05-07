@@ -53,6 +53,13 @@
               <td>
                 <a href="{% url 'core:account_detail' account.pk %}"
                    class="text-decoration-none text-reset account-link">{{ account.email_address }}</a>
+                {% if account.group %}
+                  <a href="{% url 'core:inbox' %}?group={{ account.group|urlencode }}"
+                     class="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle ms-1 text-decoration-none"
+                     title="View emails from group {{ account.group }}">
+                    <i class="bi bi-tag"></i> {{ account.group }}
+                  </a>
+                {% endif %}
               </td>
               <td class="text-secondary">{{ account.display_name|default:"—" }}</td>
               <td><code class="small">{{ account.imap_host }}</code></td>
@@ -102,6 +109,13 @@
             <div class="fw-semibold text-truncate">{{ account.email_address }}</div>
             {% if account.display_name %}
               <div class="text-secondary small">{{ account.display_name }}</div>
+            {% endif %}
+            {% if account.group %}
+              <div class="mt-1">
+                <span class="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle">
+                  <i class="bi bi-tag"></i> {{ account.group }}
+                </span>
+              </div>
             {% endif %}
             <div class="text-secondary small mt-1">
               <code>{{ account.imap_host }}:{{ account.imap_port }}</code>

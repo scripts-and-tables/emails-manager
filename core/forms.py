@@ -121,12 +121,13 @@ class EmailAccountForm(forms.ModelForm):
 
     class Meta:
         model = EmailAccount
-        fields = ["email_address", "display_name", "imap_host", "imap_port"]
+        fields = ["email_address", "display_name", "imap_host", "imap_port", "group"]
         widgets = {
             "email_address": forms.EmailInput(attrs={"class": "form-control"}),
             "display_name": forms.TextInput(attrs={"class": "form-control"}),
             "imap_host": forms.TextInput(attrs={"class": "form-control"}),
             "imap_port": forms.NumberInput(attrs={"class": "form-control"}),
+            "group": forms.TextInput(attrs={"class": "form-control", "placeholder": "Personal, Work, …"}),
         }
 
     def clean(self):

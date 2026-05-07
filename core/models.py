@@ -76,6 +76,7 @@ class EmailAccount(models.Model):
     imap_port = models.PositiveIntegerField(default=993)
     encrypted_password = models.BinaryField()
     is_enabled = models.BooleanField(default=True)
+    group = models.CharField(max_length=60, blank=True, default="")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

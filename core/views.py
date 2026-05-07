@@ -328,7 +328,8 @@ def account_update_password(request: HttpRequest, pk: int) -> JsonResponse:
 
 def _resolve_inbox_params(request: HttpRequest):
     """Shared by inbox() and inbox_data(): parse window + filter_account
-    + compute account-state flags. Returns a dict suitable for template ctx."""
+    + filter_group + compute account-state flags. Returns a dict suitable
+    for template ctx."""
     window = request.GET.get("window", "1d")
     days_map = {"1d": 1, "7d": 7, "30d": 30}
     days = days_map.get(window, 1)
@@ -347,8 +348,13 @@ def _resolve_inbox_params(request: HttpRequest):
         if filter_pk is not None:
             filter_account = next((a for a in all_accounts if a.pk == filter_pk), None)
 
+    filter_group = (request.GET.get("group") or "").strip()
+    # Empty string and missing both treated as "no group filter"
+
     if filter_account is not None:
         accounts = [filter_account]
+    elif filter_group:
+        accounts = [a for a in all_accounts if a.is_enabled and a.group == filter_group]
     else:
         accounts = [a for a in all_accounts if a.is_enabled]
 
@@ -358,6 +364,7 @@ def _resolve_inbox_params(request: HttpRequest):
         "all_accounts": all_accounts,
         "accounts": accounts,
         "filter_account": filter_account,
+        "filter_group": filter_group,
     }
 
 
@@ -376,8 +383,9 @@ def inbox(request: HttpRequest) -> HttpResponse:
             "window": p["window"],
             "windows": [("1d", "Last 24 hours"), ("7d", "Last 7 days"), ("30d", "Last 30 days")],
             "has_accounts": bool(all_accounts),
-            "all_disabled": bool(all_accounts) and not enabled_accounts and p["filter_account"] is None,
+            "all_disabled": bool(all_accounts) and not enabled_accounts and p["filter_account"] is None and not p["filter_group"],
             "filter_account": p["filter_account"],
+            "filter_group": p["filter_group"],
             "data_url": reverse("core:inbox_data") + (f"?{data_qs}" if data_qs else ""),
         },
     )
@@ -403,6 +411,7 @@ def inbox_data(request: HttpRequest) -> HttpResponse:
             "errors": error_rows,
             "window": p["window"],
             "filter_account": p["filter_account"],
+            "filter_group": p["filter_group"],
         },
     )
 

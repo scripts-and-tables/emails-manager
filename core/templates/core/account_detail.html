@@ -76,6 +76,17 @@
           <dt class="col-sm-4 col-md-3 text-secondary fw-normal">Display name</dt>
           <dd class="col-sm-8 col-md-9 mb-2">{{ account.display_name|default:"—" }}</dd>
 
+          <dt class="col-sm-4 col-md-3 text-secondary fw-normal">Group</dt>
+          <dd class="col-sm-8 col-md-9 mb-2">
+            {% if account.group %}
+              <span class="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle">
+                <i class="bi bi-tag me-1"></i>{{ account.group }}
+              </span>
+            {% else %}
+              —
+            {% endif %}
+          </dd>
+
           <dt class="col-sm-4 col-md-3 text-secondary fw-normal">IMAP host</dt>
           <dd class="col-sm-8 col-md-9 mb-2"><code>{{ account.imap_host }}</code></dd>
 

@@ -30,12 +30,25 @@
             {% for err in form.email_address.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
           </div>
 
-          <div class="mb-3">
-            <label class="form-label" for="id_display_name">
-              Display name <span class="text-secondary small">(optional)</span>
-            </label>
-            {{ form.display_name }}
-            {% for err in form.display_name.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+          <div class="row">
+            <div class="col-sm-7 mb-3">
+              <label class="form-label" for="id_display_name">
+                Display name <span class="text-secondary small">(optional)</span>
+              </label>
+              {{ form.display_name }}
+              {% for err in form.display_name.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+            </div>
+            <div class="col-sm-5 mb-3">
+              <label class="form-label" for="id_group">
+                Group <span class="text-secondary small">(optional)</span>
+              </label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-tag"></i></span>
+                {{ form.group }}
+              </div>
+              <div class="form-text">Free text. Used to filter the inbox by group.</div>
+              {% for err in form.group.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+            </div>
           </div>
 
           <div class="row">
