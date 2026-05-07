@@ -31,21 +31,21 @@
 
 <div class="card card-soft mb-3">
   <div class="card-body p-3 p-md-4">
-    <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
-      <h1 class="h5 mb-0 flex-grow-1">{{ message.subject|default:"(no subject)" }}</h1>
-      <button class="btn btn-sm btn-outline-secondary border-0 p-1 details-toggle"
-              type="button" data-bs-toggle="collapse" data-bs-target="#email-meta"
-              aria-expanded="true" aria-controls="email-meta"
+    <h1 class="h5 mb-2">{{ message.subject|default:"(no subject)" }}</h1>
+    <div class="d-flex justify-content-between align-items-start gap-2">
+      <div class="text-secondary small flex-grow-1 details-summary">
+        <i class="bi bi-person-circle me-1"></i>{{ message.from_ }}
+        <span class="mx-1">·</span>
+        <span class="text-nowrap">{{ message.date|date:"M j, H:i" }}</span>
+      </div>
+      <button class="details-toggle" type="button"
+              data-bs-toggle="collapse" data-bs-target="#email-meta"
+              aria-expanded="false" aria-controls="email-meta"
               aria-label="Toggle details">
-        <i class="bi bi-chevron-up details-chevron"></i>
+        <i class="bi bi-chevron-down details-chevron"></i>
       </button>
     </div>
-    <div class="text-secondary small mb-0 details-summary">
-      <i class="bi bi-person-circle me-1"></i>{{ message.from_ }}
-      <span class="mx-1">·</span>
-      <span class="text-nowrap">{{ message.date|date:"M j, H:i" }}</span>
-    </div>
-    <div id="email-meta" class="collapse show">
+    <div id="email-meta" class="collapse">
       <dl class="row mb-0 small mt-3">
         <dt class="col-sm-3 col-md-2 text-secondary fw-normal">Account</dt>
         <dd class="col-sm-9 col-md-10 mb-2 mb-sm-1 text-truncate">{{ account.email_address }}</dd>
@@ -76,9 +76,19 @@
 </div>
 
 <style>
-  .details-chevron { transition: transform .2s ease; }
-  .details-toggle[aria-expanded="false"] .details-chevron { transform: rotate(180deg); }
-  .details-toggle[aria-expanded="true"] ~ .details-summary { display: none; }
+  .details-toggle {
+    background: transparent; border: 0; padding: .25rem .4rem;
+    color: var(--bs-secondary-color); border-radius: .35rem;
+    display: inline-flex; align-items: center; justify-content: center;
+    cursor: pointer; flex-shrink: 0;
+    transition: background-color .15s ease, color .15s ease;
+  }
+  .details-toggle:hover { background: rgba(0,0,0,.05); color: var(--bs-body-color); }
+  [data-bs-theme="dark"] .details-toggle:hover { background: rgba(255,255,255,.08); }
+  .details-toggle:focus { outline: none; }
+  .details-toggle:focus-visible { outline: 2px solid var(--bs-primary); outline-offset: 2px; }
+  .details-chevron { transition: transform .2s ease; display: inline-block; }
+  .details-toggle[aria-expanded="true"] .details-chevron { transform: rotate(180deg); }
   @media (min-width: 992px) {
     .email-body-frame { min-height: 480px !important; }
   }
@@ -87,12 +97,17 @@
 <script>
   (function () {
     const meta = document.getElementById('email-meta');
+    const summary = document.querySelector('.details-summary');
     const toggle = document.querySelector('[data-bs-target="#email-meta"]');
-    if (!meta || !toggle) return;
-    if (window.matchMedia('(max-width: 991.98px)').matches) {
-      meta.classList.remove('show');
-      toggle.setAttribute('aria-expanded', 'false');
-    }
+    if (!meta || !summary || !toggle) return;
+    // Drop focus after click so the button doesn't keep its focused look.
+    toggle.addEventListener('click', () => {
+      requestAnimationFrame(() => toggle.blur());
+    });
+    // Hide the one-line summary while the full meta is shown — Bootstrap
+    // collapse events are the most reliable cross-browser hook.
+    meta.addEventListener('show.bs.collapse', () => { summary.style.display = 'none'; });
+    meta.addEventListener('hidden.bs.collapse', () => { summary.style.display = ''; });
   })();
 </script>
 {% endblock %}
