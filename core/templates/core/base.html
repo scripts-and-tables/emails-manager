@@ -99,56 +99,37 @@
     [data-bs-theme="dark"] .theme-icon-dark { display: none; }
     [data-bs-theme="dark"] .theme-icon-light { display: inline-block; }
 
-    .menu-toggle {
-      background: transparent; border: 0; padding: 0;
-      width: 40px; height: 40px;
-      display: inline-flex; align-items: center; justify-content: center;
-      cursor: pointer;
+    /* Bottom navigation (mobile only) */
+    .bottom-nav {
+      position: fixed; left: 0; right: 0; bottom: 0;
+      display: flex; justify-content: space-around;
+      background: var(--bs-body-bg);
+      border-top: 1px solid var(--bs-border-color);
+      box-shadow: 0 -2px 8px rgba(0, 0, 0, .04);
+      padding-bottom: env(safe-area-inset-bottom, 0);
+      z-index: 1030;
     }
-    .menu-toggle:focus { outline: none; box-shadow: 0 0 0 3px rgba(13, 110, 253, .15); border-radius: 8px; }
-    .hamburger-bars { position: relative; width: 22px; height: 18px; display: block; }
-    .hamburger-bars .bar {
-      position: absolute; left: 0;
-      width: 100%; height: 2px;
-      background: var(--bs-body-color); border-radius: 2px;
-      transition: transform .25s ease, top .25s ease, opacity .15s ease;
+    [data-bs-theme="dark"] .bottom-nav { box-shadow: 0 -2px 8px rgba(0, 0, 0, .25); }
+    .bottom-nav-item {
+      flex: 1 1 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: .5rem .25rem;
+      color: var(--bs-secondary-color);
+      text-decoration: none;
+      font-size: .72rem;
+      line-height: 1.2;
+      gap: .15rem;
+      transition: color .15s ease;
     }
-    .hamburger-bars .bar:nth-child(1) { top: 0; }
-    .hamburger-bars .bar:nth-child(2) { top: 8px; }
-    .hamburger-bars .bar:nth-child(3) { top: 16px; }
-    .menu-toggle.is-open .hamburger-bars .bar:nth-child(1) { top: 8px; transform: rotate(45deg); }
-    .menu-toggle.is-open .hamburger-bars .bar:nth-child(2) { opacity: 0; }
-    .menu-toggle.is-open .hamburger-bars .bar:nth-child(3) { top: 8px; transform: rotate(-45deg); }
-
+    .bottom-nav-item i { font-size: 1.4rem; }
+    .bottom-nav-item:hover, .bottom-nav-item:focus { color: var(--bs-body-color); }
+    .bottom-nav-item.active { color: #0d6efd; }
+    [data-bs-theme="dark"] .bottom-nav-item.active { color: #6ea8fe; }
+    @media (min-width: 992px) {
+      .bottom-nav { display: none; }
+    }
     @media (max-width: 991.98px) {
-      .main-nav-drawer.offcanvas-top {
-        --bs-offcanvas-height: calc(100vh - var(--top-nav-height));
-        top: var(--top-nav-height) !important;
-        border-top: 1px solid var(--bs-border-color);
-      }
-      .offcanvas-backdrop {
-        top: var(--top-nav-height) !important;
-      }
-      .main-nav-drawer .navbar-nav .nav-link {
-        padding: 1rem 1.25rem;
-        font-size: 1.05rem;
-        color: var(--bs-body-color);
-        border-bottom: 1px solid var(--bs-border-color);
-        display: flex;
-        align-items: center;
-        gap: .75rem;
-      }
-      .main-nav-drawer .navbar-nav .nav-link i { font-size: 1.25rem; color: var(--bs-secondary-color); width: 1.5rem; text-align: center; }
-      .main-nav-drawer .navbar-nav .nav-link:hover,
-      .main-nav-drawer .navbar-nav .nav-link:focus,
-      .main-nav-drawer .navbar-nav .nav-link:active {
-        background: rgba(13, 110, 253, .06);
-      }
-      .main-nav-drawer .navbar-nav .nav-link.is-logout { color: #dc3545; }
-      .main-nav-drawer .navbar-nav .nav-link.is-logout i { color: #dc3545; }
-      .main-nav-drawer .navbar-nav .nav-link-button {
-        background: transparent; border: 0; width: 100%; text-align: left;
-      }
+      body.has-bottom-nav { padding-bottom: calc(64px + env(safe-area-inset-bottom, 0)); }
     }
 
     @media (max-width: 575.98px) {
@@ -156,7 +137,7 @@
     }
   </style>
 </head>
-<body>
+<body class="{% if user.is_authenticated and request.session.otp_verified %}has-bottom-nav{% endif %}">
 <nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom" style="position: relative; z-index: 1046;">
   <div class="container">
     <a class="navbar-brand" href="{% url 'core:index' %}">
@@ -164,13 +145,13 @@
       <span>{% if user.is_authenticated and request.session.otp_verified %}Manager{% else %}Mail.Ru Manager{% endif %}</span>
     </a>
     <div class="d-flex align-items-center gap-2 ms-auto order-lg-last">
-      <button class="theme-toggle-btn{% if user.is_authenticated and request.session.otp_verified %} d-none d-lg-flex{% endif %}" type="button"
+      <button class="theme-toggle-btn" type="button"
               data-theme-toggle aria-label="Toggle light or dark theme" title="Toggle theme">
         <i class="bi bi-moon-stars theme-icon-dark" aria-hidden="true"></i>
         <i class="bi bi-sun-fill theme-icon-light" aria-hidden="true"></i>
       </button>
       {% if user.is_authenticated and request.session.otp_verified %}
-        <div class="dropdown d-none d-lg-block">
+        <div class="dropdown">
           <button class="user-avatar-btn dropdown-toggle" type="button"
                   data-bs-toggle="dropdown" aria-expanded="false" aria-label="Open user menu">
             <span class="user-avatar">{% if user.first_name and user.last_name %}{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}{% elif user.first_name %}{{ user.first_name|first|upper }}{% else %}{{ user.username|first|upper }}{% endif %}</span>
@@ -195,56 +176,15 @@
             </li>
           </ul>
         </div>
-        <button class="menu-toggle d-lg-none" type="button"
-                data-bs-toggle="offcanvas" data-bs-target="#mainNav"
-                aria-controls="mainNav" aria-label="Toggle navigation menu">
-          <span class="hamburger-bars" aria-hidden="true">
-            <span class="bar"></span>
-            <span class="bar"></span>
-            <span class="bar"></span>
-          </span>
-        </button>
       {% endif %}
     </div>
     {% if user.is_authenticated and request.session.otp_verified %}
-      <div class="offcanvas offcanvas-top offcanvas-lg main-nav-drawer" id="mainNav" tabindex="-1" aria-labelledby="mainNavLabel">
-        <div class="offcanvas-body p-0 align-items-lg-center">
-          <ul class="navbar-nav flex-grow-1 ms-lg-3" id="mainNavLabel">
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'core:home' %}">
-                <i class="bi bi-house d-lg-none"></i><span>Home</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'core:inbox' %}">
-                <i class="bi bi-inbox d-lg-none"></i><span>Inbox</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'core:accounts_list' %}">
-                <i class="bi bi-person-rolodex d-lg-none"></i><span>Accounts</span>
-              </a>
-            </li>
-            <li class="nav-item d-lg-none mt-3" style="border-top: 1px solid var(--bs-border-color); padding-top: .25rem;">
-              <a class="nav-link" href="{% url 'core:profile' %}">
-                <i class="bi bi-person"></i><span>Profile</span>
-              </a>
-            </li>
-            <li class="nav-item d-lg-none">
-              <button type="button" class="nav-link nav-link-button" data-theme-toggle>
-                <i class="bi bi-moon-stars theme-icon-dark"></i>
-                <i class="bi bi-sun-fill theme-icon-light"></i>
-                <span class="theme-icon-dark">Switch to dark theme</span>
-                <span class="theme-icon-light">Switch to light theme</span>
-              </button>
-            </li>
-            <li class="nav-item d-lg-none">
-              <a class="nav-link is-logout" href="{% url 'core:logout' %}">
-                <i class="bi bi-box-arrow-right"></i><span>Logout</span>
-              </a>
-            </li>
-          </ul>
-        </div>
+      <div class="collapse navbar-collapse d-none d-lg-flex">
+        <ul class="navbar-nav ms-lg-3">
+          <li class="nav-item"><a class="nav-link" href="{% url 'core:home' %}"><span>Home</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'core:inbox' %}"><span>Inbox</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'core:accounts_list' %}"><span>Accounts</span></a></li>
+        </ul>
       </div>
     {% endif %}
   </div>
@@ -263,22 +203,38 @@
   {% block content %}{% endblock %}
 </main>
 
+{% if user.is_authenticated and request.session.otp_verified %}
+  {% with cur=request.resolver_match.url_name %}
+  <nav class="bottom-nav d-lg-none" aria-label="Primary">
+    <a href="{% url 'core:home' %}"
+       class="bottom-nav-item {% if cur == 'home' or cur == 'index' %}active{% endif %}">
+      <i class="bi bi-house-door"></i>
+      <span>Home</span>
+    </a>
+    <a href="{% url 'core:inbox' %}"
+       class="bottom-nav-item {% if cur == 'inbox' or cur == 'email_detail' %}active{% endif %}">
+      <i class="bi bi-inbox"></i>
+      <span>Inbox</span>
+    </a>
+    <a href="{% url 'core:accounts_list' %}"
+       class="bottom-nav-item {% if cur == 'accounts_list' or cur == 'account_detail' or cur == 'account_new' or cur == 'account_edit' or cur == 'account_bulk_add' %}active{% endif %}">
+      <i class="bi bi-person-rolodex"></i>
+      <span>Accounts</span>
+    </a>
+    <a href="{% url 'core:profile' %}"
+       class="bottom-nav-item {% if cur == 'profile' or cur == 'profile_password_change' %}active{% endif %}">
+      <i class="bi bi-person-circle"></i>
+      <span>Profile</span>
+    </a>
+  </nav>
+  {% endwith %}
+{% endif %}
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
 <script>
   (function () {
-    const drawer = document.getElementById('mainNav');
-    if (drawer) {
-      const toggles = document.querySelectorAll('.menu-toggle');
-      drawer.addEventListener('show.bs.offcanvas', () => {
-        toggles.forEach((t) => t.classList.add('is-open'));
-      });
-      drawer.addEventListener('hide.bs.offcanvas', () => {
-        toggles.forEach((t) => t.classList.remove('is-open'));
-      });
-    }
-
     document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
       btn.addEventListener('click', () => {
         const root = document.documentElement;
