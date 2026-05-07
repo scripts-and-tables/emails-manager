@@ -111,4 +111,11 @@
 </div>
 
 {% include "core/_account_actions.html" %}
+
+<script>
+  (function () {
+    const btn = document.querySelector('[data-account-row] .test-btn');
+    if (btn) btn.click();
+  })();
+</script>
 {% endblock %}
