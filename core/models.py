@@ -54,6 +54,16 @@ class LoginOtp(models.Model):
         return instance
 
 
+class UserPreferences(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="preferences",
+    )
+    two_factor_enabled = models.BooleanField(default=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
 class EmailAccount(models.Model):
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,

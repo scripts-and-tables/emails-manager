@@ -23,7 +23,7 @@ from .decorators import OTP_VERIFIED_SESSION_KEY, is_otp_verified, otp_required
 from .email_otp import OtpDeliveryError, issue_and_send, verify
 from .forms import BulkAccountForm, EmailAccountForm, OtpForm, PasswordResetRequestForm, ProfileInfoForm
 from .imap_client import check_status, check_status_bulk, fetch_body, fetch_recent_bulk
-from .models import EmailAccount
+from .models import EmailAccount, UserPreferences
 from .password_reset import ResetDeliveryError, send_reset_email
 
 User = get_user_model()
@@ -61,6 +61,12 @@ def login_view(request: HttpRequest) -> HttpResponse:
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             user = form.get_user()
+            prefs, _ = UserPreferences.objects.get_or_create(user=user)
+            if not prefs.two_factor_enabled:
+                auth_login(request, user)
+                request.session[OTP_VERIFIED_SESSION_KEY] = True
+                request.session.pop(PRE_OTP_USER_KEY, None)
+                return redirect("core:home")
             request.session[PRE_OTP_USER_KEY] = user.id
             request.session[OTP_VERIFIED_SESSION_KEY] = False
             if _send_otp_or_flash(request, user):
@@ -434,6 +440,7 @@ def profile(request: HttpRequest) -> HttpResponse:
     info_form = ProfileInfoForm(instance=request.user)
     password_form = SetPasswordForm(request.user)
     _add_bootstrap_class(password_form)
+    prefs, _ = UserPreferences.objects.get_or_create(user=request.user)
 
     if request.method == "POST":
         info_form = ProfileInfoForm(request.POST, instance=request.user)
@@ -445,7 +452,12 @@ def profile(request: HttpRequest) -> HttpResponse:
     return render(
         request,
         "core/profile.html",
-        {"info_form": info_form, "password_form": password_form, "password_modal_open": False},
+        {
+            "info_form": info_form,
+            "password_form": password_form,
+            "password_modal_open": False,
+            "two_factor_enabled": prefs.two_factor_enabled,
+        },
     )
 
 
@@ -461,8 +473,28 @@ def profile_password_change(request: HttpRequest) -> HttpResponse:
         return redirect("core:profile")
 
     info_form = ProfileInfoForm(instance=request.user)
+    prefs, _ = UserPreferences.objects.get_or_create(user=request.user)
     return render(
         request,
         "core/profile.html",
-        {"info_form": info_form, "password_form": password_form, "password_modal_open": True},
+        {
+            "info_form": info_form,
+            "password_form": password_form,
+            "password_modal_open": True,
+            "two_factor_enabled": prefs.two_factor_enabled,
+        },
     )
+
+
+@otp_required
+@require_http_methods(["POST"])
+def profile_2fa_toggle(request: HttpRequest) -> HttpResponse:
+    enabled = request.POST.get("enabled") == "1"
+    prefs, _ = UserPreferences.objects.get_or_create(user=request.user)
+    prefs.two_factor_enabled = enabled
+    prefs.save(update_fields=["two_factor_enabled", "updated_at"])
+    if enabled:
+        messages.success(request, "Two-factor authentication is on. You'll get a code on your next sign-in.")
+    else:
+        messages.warning(request, "Two-factor authentication is off. Sign-in now uses just username and password.")
+    return redirect("core:profile")

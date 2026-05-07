@@ -12,6 +12,7 @@ urlpatterns = [
     path("verify-otp/", views.verify_otp, name="verify_otp"),
     path("profile/", views.profile, name="profile"),
     path("profile/password/", views.profile_password_change, name="profile_password_change"),
+    path("profile/2fa/", views.profile_2fa_toggle, name="profile_2fa_toggle"),
     path("password-reset/", views.password_reset_request, name="password_reset_request"),
     path("password-reset/done/", views.password_reset_complete, name="password_reset_complete"),
     path(
