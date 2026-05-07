@@ -110,6 +110,15 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
+# Serve static files via Django's app-based finders at request time, not
+# from STATIC_ROOT. Railway's RAILPACK builder runs `collectstatic` in a
+# preDeploy phase whose filesystem doesn't propagate into the runtime
+# container, so STATIC_ROOT ends up empty in production and WhiteNoise
+# 404s every /static/ URL (incl. /static/admin/...). Finders work because
+# both Django's contrib/admin/static and our core/static/ are in the
+# runtime image as installed packages and repo source.
+WHITENOISE_USE_FINDERS = True
+
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
