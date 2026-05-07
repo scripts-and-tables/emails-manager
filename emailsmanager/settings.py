@@ -54,6 +54,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "core.middleware.XRobotsTagMiddleware",
+    "core.middleware.NoCacheHTMLMiddleware",
 ]
 
 ROOT_URLCONF = "emailsmanager.urls"
