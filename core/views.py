@@ -17,11 +17,12 @@ from django.core.validators import validate_email
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.views.decorators.http import require_http_methods
 
-from .decorators import OTP_VERIFIED_SESSION_KEY, is_otp_verified, otp_required
+from .decorators import OTP_VERIFIED_SESSION_KEY, is_otp_verified, otp_required, staff_required
 from .email_otp import OtpDeliveryError, issue_and_send, verify
 from .email_verify import VerifyDeliveryError, send_verification_email
 from .forms import (
@@ -48,6 +49,14 @@ from .rate_limit import is_rate_limited
 User = get_user_model()
 
 PRE_OTP_USER_KEY = "pre_otp_user_id"
+
+
+def _stamp_first_login(user) -> None:
+    """Record the first successful sign-in. No-op on subsequent logins."""
+    prefs, _ = UserPreferences.objects.get_or_create(user=user)
+    if prefs.first_login_at is None:
+        prefs.first_login_at = timezone.now()
+        prefs.save(update_fields=["first_login_at", "updated_at"])
 
 
 def _send_otp_or_flash(request: HttpRequest, user) -> bool:
@@ -95,6 +104,7 @@ def login_view(request: HttpRequest) -> HttpResponse:
             prefs, _ = UserPreferences.objects.get_or_create(user=user)
             if not prefs.two_factor_enabled:
                 auth_login(request, user)
+                _stamp_first_login(user)
                 request.session[OTP_VERIFIED_SESSION_KEY] = True
                 request.session.pop(PRE_OTP_USER_KEY, None)
                 return redirect("core:home")
@@ -149,6 +159,7 @@ def verify_otp(request: HttpRequest) -> HttpResponse:
             ok, error = verify(user, form.cleaned_data["token"])
             if ok:
                 auth_login(request, user)
+                _stamp_first_login(user)
                 request.session[OTP_VERIFIED_SESSION_KEY] = True
                 request.session.pop(PRE_OTP_USER_KEY, None)
                 return redirect("core:home")
@@ -744,6 +755,29 @@ def upgrade(request: HttpRequest) -> HttpResponse:
             "account_count": used,
             "account_limit": limit,
             "is_premium": is_premium(request.user),
+        },
+    )
+
+
+@staff_required
+def staff_users(request: HttpRequest) -> HttpResponse:
+    from django.db.models import Count, OuterRef, Subquery
+
+    first_login_qs = UserPreferences.objects.filter(user=OuterRef("pk")).values("first_login_at")[:1]
+    users = (
+        User.objects.all()
+        .annotate(
+            account_count=Count("email_accounts", distinct=True),
+            first_login_at=Subquery(first_login_qs),
+        )
+        .order_by("-date_joined")
+    )
+    return render(
+        request,
+        "core/staff_users.html",
+        {
+            "users": users,
+            "user_count": users.count(),
         },
     )
 

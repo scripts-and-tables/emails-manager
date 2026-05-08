@@ -28,6 +28,7 @@ urlpatterns = [
     path("accounts/new/", views.account_new, name="account_new"),
     path("accounts/bulk/", views.account_bulk_add, name="account_bulk_add"),
     path("upgrade/", views.upgrade, name="upgrade"),
+    path("staff/users/", views.staff_users, name="staff_users"),
     path("accounts/<int:pk>/", views.account_detail, name="account_detail"),
     path("accounts/<int:pk>/edit/", views.account_edit, name="account_edit"),
     path("accounts/<int:pk>/delete/", views.account_delete, name="account_delete"),

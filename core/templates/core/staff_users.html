@@ -1,0 +1,124 @@
+{% extends "core/base.html" %}
+{% block title %}Users · Admin{% endblock %}
+{% block content %}
+<div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3 mb-3">
+  <div>
+    <h1 class="h4 mb-1">
+      Users
+      <span class="badge text-bg-secondary ms-2 align-middle"
+            aria-label="{{ user_count }} users total">
+        {{ user_count }}
+      </span>
+    </h1>
+    <p class="text-secondary small mb-0">
+      Staff-only view. Registration, account count, first and last login per user.
+    </p>
+  </div>
+</div>
+
+{% if users %}
+  <div class="card card-soft d-none d-lg-block">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Email</th>
+            <th>Registered</th>
+            <th class="text-end">Accounts</th>
+            <th>First login</th>
+            <th>Last login</th>
+            <th>Flags</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in users %}
+            <tr>
+              <td>
+                <div class="fw-semibold">{{ u.username }}</div>
+                {% if u.first_name or u.last_name %}
+                  <div class="text-secondary small">{{ u.first_name }} {{ u.last_name }}</div>
+                {% endif %}
+              </td>
+              <td class="text-secondary">{{ u.email|default:"—" }}</td>
+              <td>
+                <span title="{{ u.date_joined|date:'Y-m-d H:i' }}">
+                  {{ u.date_joined|date:"Y-m-d" }}
+                </span>
+              </td>
+              <td class="text-end">
+                <span class="badge text-bg-secondary">{{ u.account_count }}</span>
+              </td>
+              <td>
+                {% if u.first_login_at %}
+                  <span title="{{ u.first_login_at|date:'Y-m-d H:i' }}">
+                    {{ u.first_login_at|date:"Y-m-d" }}
+                  </span>
+                {% else %}
+                  <span class="text-secondary">—</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if u.last_login %}
+                  <span title="{{ u.last_login|date:'Y-m-d H:i' }}">
+                    {{ u.last_login|date:"Y-m-d H:i" }}
+                  </span>
+                {% else %}
+                  <span class="text-secondary">—</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if u.is_superuser %}
+                  <span class="badge text-bg-danger">superuser</span>
+                {% elif u.is_staff %}
+                  <span class="badge text-bg-warning">staff</span>
+                {% endif %}
+                {% if not u.is_active %}
+                  <span class="badge text-bg-secondary">inactive</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="d-lg-none">
+    {% for u in users %}
+      <div class="item-card p-3">
+        <div class="d-flex align-items-start gap-2 mb-2">
+          <div class="flex-grow-1 min-w-0">
+            <div class="fw-semibold text-truncate">{{ u.username }}</div>
+            <div class="text-secondary small text-truncate">{{ u.email|default:"—" }}</div>
+          </div>
+          <span class="badge text-bg-secondary">{{ u.account_count }} acc</span>
+        </div>
+        <dl class="row small mb-0">
+          <dt class="col-5 text-secondary fw-normal">Registered</dt>
+          <dd class="col-7 mb-1">{{ u.date_joined|date:"Y-m-d" }}</dd>
+          <dt class="col-5 text-secondary fw-normal">First login</dt>
+          <dd class="col-7 mb-1">
+            {% if u.first_login_at %}{{ u.first_login_at|date:"Y-m-d" }}{% else %}—{% endif %}
+          </dd>
+          <dt class="col-5 text-secondary fw-normal">Last login</dt>
+          <dd class="col-7 mb-1">
+            {% if u.last_login %}{{ u.last_login|date:"Y-m-d H:i" }}{% else %}—{% endif %}
+          </dd>
+        </dl>
+        {% if u.is_superuser or u.is_staff or not u.is_active %}
+          <div class="mt-2">
+            {% if u.is_superuser %}<span class="badge text-bg-danger">superuser</span>
+            {% elif u.is_staff %}<span class="badge text-bg-warning">staff</span>{% endif %}
+            {% if not u.is_active %}<span class="badge text-bg-secondary">inactive</span>{% endif %}
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="card card-soft">
+    <div class="card-body text-center py-5 text-secondary">No users.</div>
+  </div>
+{% endif %}
+{% endblock %}

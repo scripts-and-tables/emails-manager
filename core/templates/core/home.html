@@ -83,6 +83,28 @@
       </div>
     </a>
   </div>
+
+  {% if user.is_staff %}
+    <div class="col-12 col-sm-6 col-lg-4">
+      <a href="{% url 'core:staff_users' %}" class="card card-soft text-decoration-none text-reset h-100 home-tile home-tile-staff">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <span class="home-tile-icon home-tile-icon-amber"><i class="bi bi-shield-lock"></i></span>
+            <h2 class="h5 mb-0">Users</h2>
+            <span class="badge text-bg-warning ms-auto" title="Visible to staff only">
+              <i class="bi bi-shield-lock-fill me-1"></i>Admin only
+            </span>
+          </div>
+          <p class="text-secondary small mb-0">
+            Registrations, account counts, first and last login. Staff-only view.
+          </p>
+          <div class="text-warning-emphasis small mt-3">
+            Open users <i class="bi bi-arrow-right ms-1"></i>
+          </div>
+        </div>
+      </a>
+    </div>
+  {% endif %}
 </div>
 
 <div class="card card-soft">
@@ -109,5 +131,12 @@
   .home-tile-icon-blue   { background: rgba(13, 110, 253, .1);  color: #0d6efd; }
   .home-tile-icon-green  { background: rgba(25, 135, 84, .1);   color: #198754; }
   .home-tile-icon-violet { background: rgba(111, 66, 193, .1);  color: #6f42c1; }
+  .home-tile-icon-amber  { background: rgba(255, 193, 7, .15);  color: #b58900; }
+  .home-tile-staff {
+    border-color: rgba(255, 193, 7, .55);
+    background-image: linear-gradient(135deg, rgba(255, 193, 7, .04) 0%, transparent 60%);
+  }
+  .home-tile-staff:hover { border-color: rgba(255, 193, 7, .85); }
+  [data-bs-theme="dark"] .home-tile-icon-amber { color: #ffc107; }
 </style>
 {% endblock %}

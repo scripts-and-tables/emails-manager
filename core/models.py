@@ -64,6 +64,9 @@ class UserPreferences(models.Model):
     # null = use the free-tier default from core.limits.FREE_TIER_ACCOUNT_LIMIT.
     # A set value overrides the default upward (paid-tier grants).
     account_limit_override = models.PositiveIntegerField(null=True, blank=True)
+    # Stamped on the user's first successful login. Django's auth user model
+    # only tracks last_login; this captures the *first* one for staff analytics.
+    first_login_at = models.DateTimeField(null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
 
 
