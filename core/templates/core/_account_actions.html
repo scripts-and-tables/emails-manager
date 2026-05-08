@@ -58,6 +58,7 @@ And the controls inside must have these classes / data attrs as needed:
     const dot = row.querySelector('[data-status-dot]');
     const messageCell = row.querySelector('.status-message');
     const testBtn = row.querySelector('.test-btn');
+    const trigger = row.querySelector('[data-test-trigger]');
 
     if (state === 'testing') {
       if (messageCell) {
@@ -65,6 +66,8 @@ And the controls inside must have these classes / data attrs as needed:
         messageCell.textContent = 'Testing…';
       }
       if (testBtn) { testBtn.disabled = true; testBtn.classList.add('is-testing'); }
+      if (trigger) { trigger.disabled = true; }
+      row.classList.add('is-testing');
       setUpdatePasswordVisibility(row, 'hidden');
     } else if (state === 'ok') {
       if (dot) dot.className = 'status-dot-css status-ok-bg';
@@ -73,6 +76,8 @@ And the controls inside must have these classes / data attrs as needed:
         messageCell.textContent = message || 'Connected';
       }
       if (testBtn) { testBtn.disabled = false; testBtn.classList.remove('is-testing'); }
+      if (trigger) { trigger.disabled = false; }
+      row.classList.remove('is-testing');
       setUpdatePasswordVisibility(row, 'hidden');
     } else if (state === 'fail') {
       if (dot) dot.className = 'status-dot-css status-fail-bg';
@@ -81,11 +86,45 @@ And the controls inside must have these classes / data attrs as needed:
         messageCell.textContent = message || 'Failed';
       }
       if (testBtn) { testBtn.disabled = false; testBtn.classList.remove('is-testing'); }
+      if (trigger) { trigger.disabled = false; }
+      row.classList.remove('is-testing');
       setUpdatePasswordVisibility(row, 'available');
     }
   }
 
-  async function testAccount(accountId, url) {
+  function showToast(message, variant) {
+    const v = (variant === 'success' || variant === 'danger' || variant === 'info' || variant === 'warning') ? variant : 'info';
+    let container = document.getElementById('message-toasts');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'message-toasts';
+      container.className = 'toast-container position-fixed top-0 end-0 p-3';
+      container.style.zIndex = '1090';
+      document.body.appendChild(container);
+    }
+    const toast = document.createElement('div');
+    toast.className = `toast text-bg-${v} border-0 mb-2`;
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', 'assertive');
+    toast.setAttribute('aria-atomic', 'true');
+    const closeWhite = (v === 'success' || v === 'danger') ? 'btn-close-white' : '';
+    const safe = String(message || '').replace(/[&<>"]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    toast.innerHTML =
+      `<div class="d-flex">` +
+        `<div class="toast-body flex-grow-1">${safe}</div>` +
+        `<button type="button" class="btn-close ${closeWhite} me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>` +
+      `</div>`;
+    container.appendChild(toast);
+    if (typeof bootstrap !== 'undefined' && bootstrap.Toast) {
+      const persistent = (v === 'danger' || v === 'warning');
+      const t = bootstrap.Toast.getOrCreateInstance(toast, { autohide: !persistent, delay: 4500 });
+      toast.addEventListener('hidden.bs.toast', () => toast.remove());
+      t.show();
+    }
+  }
+
+  async function testAccount(accountId, url, opts) {
+    const showToastResult = !!(opts && opts.toast);
     const rows = findRowsByAccount(accountId);
     rows.forEach((r) => paintRow(r, 'testing'));
     try {
@@ -94,14 +133,21 @@ And the controls inside must have these classes / data attrs as needed:
         headers: { 'X-CSRFToken': csrfToken, 'Accept': 'application/json' },
       });
       if (!response.ok) {
-        rows.forEach((r) => paintRow(r, 'fail', `HTTP ${response.status}`));
+        const msg = `HTTP ${response.status}`;
+        rows.forEach((r) => paintRow(r, 'fail', msg));
+        if (showToastResult) showToast(msg, 'danger');
         return;
       }
       const data = await response.json();
       const state = data.ok ? 'ok' : 'fail';
       rows.forEach((r) => paintRow(r, state, data.message));
+      if (showToastResult) {
+        showToast(data.message || (data.ok ? 'Connected' : 'Failed'), data.ok ? 'success' : 'danger');
+      }
     } catch (err) {
-      rows.forEach((r) => paintRow(r, 'fail', err.message || 'Network error'));
+      const msg = err.message || 'Network error';
+      rows.forEach((r) => paintRow(r, 'fail', msg));
+      if (showToastResult) showToast(msg, 'danger');
     }
   }
 
@@ -110,6 +156,14 @@ And the controls inside must have these classes / data attrs as needed:
       const row = btn.closest('[data-account-row]');
       if (!row) return;
       testAccount(row.dataset.accountId, row.dataset.testUrl);
+    });
+  });
+
+  document.querySelectorAll('[data-test-trigger]').forEach((el) => {
+    el.addEventListener('click', () => {
+      const row = el.closest('[data-account-row]');
+      if (!row) return;
+      testAccount(row.dataset.accountId, row.dataset.testUrl, { toast: true });
     });
   });
 
