@@ -11,7 +11,7 @@ jobs:
     env:
       # Test-only secrets. Never reuse these in any deployed environment.
       SECRET_KEY: "ci-test-only-not-used-anywhere-real"
-      DEBUG: "False"
+      DEBUG: "True"
       ALLOWED_HOSTS: "*"
       FIELD_ENCRYPTION_KEY: "Hv7g3qJZkXyN9vL8fRwTpBmCoUaSdEeFiKlOQrUvWxY="
       RESEND_API_KEY: "test-key-mocked-in-tests"
