@@ -655,7 +655,13 @@ def signup(request: HttpRequest) -> HttpResponse:
             try:
                 send_verification_email(user.email, verify_url)
             except VerifyDeliveryError:
-                pass  # logged in helper; show generic success either way
+                user.delete()
+                messages.error(
+                    request,
+                    "We couldn't send the verification email right now. "
+                    "Please try again in a few minutes, or contact support if the issue persists.",
+                )
+                return render(request, "core/signup.html", {"form": form, "sent": False})
             return render(
                 request,
                 "core/signup.html",

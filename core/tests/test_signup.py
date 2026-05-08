@@ -9,6 +9,8 @@ from django.core.signing import dumps as sign_dumps
 from django.test import TestCase
 from django.urls import reverse
 
+from core.email_verify import VerifyDeliveryError
+
 User = get_user_model()
 
 
@@ -31,6 +33,27 @@ class SignupTests(TestCase):
         self.assertFalse(user.is_active)
         self.assertEqual(user.email, "alice@example.com")
         mock_send.assert_called_once()
+
+    def test_signup_rolls_back_user_when_email_send_fails(self):
+        with patch(
+            "core.views.send_verification_email",
+            side_effect=VerifyDeliveryError("resend down"),
+        ):
+            response = self.client.post(
+                reverse("core:signup"),
+                {
+                    "username": "dave",
+                    "email": "dave@example.com",
+                    "first_name": "Dave",
+                    "last_name": "Example",
+                    "password1": "Sup3rSecr3tPass!",
+                    "password2": "Sup3rSecr3tPass!",
+                },
+            )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "couldn&#x27;t send the verification email")
+        self.assertFalse(User.objects.filter(username="dave").exists())
+        self.assertFalse(User.objects.filter(email="dave@example.com").exists())
 
     def test_duplicate_email_rejected(self):
         User.objects.create_user(username="bob", email="taken@example.com", password="x")
