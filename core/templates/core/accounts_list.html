@@ -87,7 +87,7 @@
               <td>
                 <div class="d-flex align-items-center gap-2">
                   <span class="status-dot-css status-idle-bg" data-status-dot aria-hidden="true"></span>
-                  <span class="status-message text-secondary small flex-grow-1">Not tested</span>
+                  <span class="flex-grow-1"></span>
                   <button type="button"
                           class="btn btn-sm btn-outline-warning border-0 d-none update-password-btn"
                           data-password-url="{% url 'core:account_update_password' account.pk %}"
@@ -155,7 +155,6 @@
                    {% if account.is_enabled %}checked{% endif %}>
           </div>
         </div>
-        <span class="status-message d-none">Not tested</span>
         <div class="d-none mt-2 update-password-form">
           <div class="input-group input-group-sm">
             <span class="input-group-text"><i class="bi bi-key"></i></span>

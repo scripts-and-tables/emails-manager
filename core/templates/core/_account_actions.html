@@ -155,7 +155,8 @@ And the controls inside must have these classes / data attrs as needed:
     btn.addEventListener('click', () => {
       const row = btn.closest('[data-account-row]');
       if (!row) return;
-      testAccount(row.dataset.accountId, row.dataset.testUrl);
+      const wantToast = !row.querySelector('.status-message');
+      testAccount(row.dataset.accountId, row.dataset.testUrl, { toast: wantToast });
     });
   });
 
