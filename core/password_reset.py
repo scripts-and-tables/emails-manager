@@ -22,7 +22,7 @@ def send_reset_email(to_email: str, reset_url: str) -> None:
     if not api_key:
         raise ResetDeliveryError("RESEND_API_KEY is not configured.")
 
-    subject = "Reset your Mail.Ru Manager password"
+    subject = "Reset your Mails Manager App password"
     text = (
         "We received a request to reset your password.\n\n"
         f"Open this link to choose a new password:\n{reset_url}\n\n"
@@ -40,12 +40,16 @@ def send_reset_email(to_email: str, reset_url: str) -> None:
         f"If you didn't request this, you can safely ignore this email.</p>"
     )
 
-    response = requests.post(
-        RESEND_API_URL,
-        headers={"Authorization": f"Bearer {api_key}"},
-        json={"from": from_email, "to": [to_email], "subject": subject, "text": text, "html": html},
-        timeout=RESEND_TIMEOUT,
-    )
+    try:
+        response = requests.post(
+            RESEND_API_URL,
+            headers={"Authorization": f"Bearer {api_key}"},
+            json={"from": from_email, "to": [to_email], "subject": subject, "text": text, "html": html},
+            timeout=RESEND_TIMEOUT,
+        )
+    except requests.exceptions.RequestException as exc:
+        logger.error("Resend reset network error: %s", exc)
+        raise ResetDeliveryError("Could not contact email provider.") from exc
     if not response.ok:
         logger.error("Resend reset send failed: %s %s", response.status_code, response.text[:500])
         raise ResetDeliveryError(f"Resend returned {response.status_code}.")

@@ -1,6 +1,6 @@
 {
-  "name": "Mail.Ru Manager",
-  "short_name": "Mail.Ru Mgr",
+  "name": "Mails Manager App",
+  "short_name": "Mails Manager",
   "description": "All your mailboxes in one place. Connect every mail.ru, Gmail, Yandex, or Outlook account and read recent mail from one fast, secure dashboard.",
   "start_url": "/",
   "scope": "/",

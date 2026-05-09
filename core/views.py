@@ -614,6 +614,7 @@ def password_reset_confirm(request: HttpRequest, uidb64: str, token: str) -> Htt
             field.widget.attrs.setdefault("class", "form-control")
         if form.is_valid():
             form.save()
+            auth_logout(request)
             return redirect("core:password_reset_complete")
     else:
         form = SetPasswordForm(user)

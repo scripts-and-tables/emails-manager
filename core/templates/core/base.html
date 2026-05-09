@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}Mail.Ru Manager{% endblock %}</title>
+  <title>{% block title %}Mails Manager App{% endblock %}</title>
   <meta name="theme-color" content="#005FF9">
   <link rel="icon" type="image/svg+xml" href="{% static 'core/favicon.svg' %}">
   <link rel="manifest" href="{% static 'core/manifest.json' %}">
@@ -191,7 +191,7 @@
   <div class="container">
     <a class="navbar-brand" href="{% url 'core:index' %}">
       <span class="brand-mark" aria-hidden="true">@</span>
-      <span>{% if user.is_authenticated and request.session.otp_verified %}Manager{% else %}Mail.Ru Manager{% endif %}</span>
+      <span>{% if user.is_authenticated and request.session.otp_verified %}Manager{% else %}Mails Manager App{% endif %}</span>
     </a>
     <div class="d-flex align-items-center gap-2 ms-auto order-lg-last">
       <button class="theme-toggle-btn" type="button"

@@ -28,15 +28,15 @@ def send_verification_email(to_email: str, verify_url: str) -> None:
     if not api_key:
         raise VerifyDeliveryError("RESEND_API_KEY is not configured.")
 
-    subject = "Verify your Mail.Ru Manager email"
+    subject = "Verify your Mails Manager App email"
     text = (
-        "Welcome to Mail.Ru Manager!\n\n"
+        "Welcome to Mails Manager App!\n\n"
         f"Open this link to verify your email and finish signing up:\n{verify_url}\n\n"
         f"The link is valid for {TOKEN_TTL_HOURS} hours.\n\n"
         "If you didn't sign up, you can safely ignore this email."
     )
     html = (
-        f"<p>Welcome to Mail.Ru Manager!</p>"
+        f"<p>Welcome to Mails Manager App!</p>"
         f"<p><a href=\"{verify_url}\">Click here to verify your email</a> and finish signing up.</p>"
         f"<p style=\"color:#666;font-size:13px;\">"
         f"Or copy this link into your browser:<br>"
@@ -46,12 +46,16 @@ def send_verification_email(to_email: str, verify_url: str) -> None:
         f"If you didn't sign up, you can safely ignore this email.</p>"
     )
 
-    response = requests.post(
-        RESEND_API_URL,
-        headers={"Authorization": f"Bearer {api_key}"},
-        json={"from": from_email, "to": [to_email], "subject": subject, "text": text, "html": html},
-        timeout=RESEND_TIMEOUT,
-    )
+    try:
+        response = requests.post(
+            RESEND_API_URL,
+            headers={"Authorization": f"Bearer {api_key}"},
+            json={"from": from_email, "to": [to_email], "subject": subject, "text": text, "html": html},
+            timeout=RESEND_TIMEOUT,
+        )
+    except requests.exceptions.RequestException as exc:
+        logger.error("Resend verify network error: %s", exc)
+        raise VerifyDeliveryError("Could not contact email provider.") from exc
     if not response.ok:
         logger.error("Resend verify send failed: %s %s", response.status_code, response.text[:500])
         raise VerifyDeliveryError(f"Resend returned {response.status_code}.")

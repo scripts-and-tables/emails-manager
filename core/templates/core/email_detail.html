@@ -1,5 +1,5 @@
 {% extends "core/base.html" %}
-{% block title %}{{ message.subject }} · Mail.Ru Manager{% endblock %}
+{% block title %}{{ message.subject }} · Mails Manager App{% endblock %}
 {% block content %}
 <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
   <a href="{% url 'core:inbox' %}?window={{ back_window }}&amp;folder={{ back_folder }}{% if back_account %}&amp;account={{ back_account }}{% endif %}"

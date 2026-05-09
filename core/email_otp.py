@@ -30,7 +30,7 @@ def _send_via_resend(to_email: str, code: str) -> None:
     if not api_key:
         raise OtpDeliveryError("RESEND_API_KEY is not configured.")
 
-    subject = "Your Mail.Ru Manager sign-in code"
+    subject = "Your Mails Manager App sign-in code"
     text = (
         f"Your sign-in code is {code}.\n"
         f"It expires in {OTP_TTL_SECONDS // 60} minutes.\n\n"
@@ -43,12 +43,16 @@ def _send_via_resend(to_email: str, code: str) -> None:
         f"<p style=\"color:#666;font-size:12px;\">If you didn't request this, you can ignore this email.</p>"
     )
 
-    response = requests.post(
-        RESEND_API_URL,
-        headers={"Authorization": f"Bearer {api_key}"},
-        json={"from": from_email, "to": [to_email], "subject": subject, "text": text, "html": html},
-        timeout=RESEND_TIMEOUT,
-    )
+    try:
+        response = requests.post(
+            RESEND_API_URL,
+            headers={"Authorization": f"Bearer {api_key}"},
+            json={"from": from_email, "to": [to_email], "subject": subject, "text": text, "html": html},
+            timeout=RESEND_TIMEOUT,
+        )
+    except requests.exceptions.RequestException as exc:
+        logger.error("Resend OTP network error: %s", exc)
+        raise OtpDeliveryError("Could not contact email provider.") from exc
     if not response.ok:
         logger.error("Resend send failed: %s %s", response.status_code, response.text[:500])
         raise OtpDeliveryError(f"Resend returned {response.status_code}.")
