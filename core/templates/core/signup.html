@@ -16,6 +16,11 @@
               We sent a verification link to <strong>{{ sent_email }}</strong>.
               Click it to finish signing up. The link is valid for 24 hours.
             </p>
+            <div class="alert alert-info small text-start mb-4" role="alert">
+              <strong>Don't see it?</strong> Check your <strong>spam</strong> or <strong>junk</strong> folder.
+              If you find the email there, mark it as <strong>Not junk</strong> (or <strong>Not spam</strong>)
+              and add the sender to your contacts so future messages land directly in your inbox.
+            </div>
             <a class="btn btn-outline-secondary w-100" href="{% url 'core:login' %}">
               <i class="bi bi-arrow-left me-1"></i>Back to sign in
             </a>
