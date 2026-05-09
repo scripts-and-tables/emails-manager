@@ -26,7 +26,7 @@ def _generate_code() -> str:
 
 def _send_via_resend(to_email: str, code: str) -> None:
     api_key = getattr(settings, "RESEND_API_KEY", "")
-    from_email = getattr(settings, "OTP_FROM_EMAIL", "onboarding@resend.dev")
+    from_email = getattr(settings, "RESEND_FROM_EMAIL", "onboarding@resend.dev")
     if not api_key:
         raise OtpDeliveryError("RESEND_API_KEY is not configured.")
 

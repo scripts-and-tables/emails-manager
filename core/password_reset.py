@@ -18,7 +18,7 @@ class ResetDeliveryError(Exception):
 
 def send_reset_email(to_email: str, reset_url: str) -> None:
     api_key = getattr(settings, "RESEND_API_KEY", "")
-    from_email = getattr(settings, "OTP_FROM_EMAIL", "onboarding@resend.dev")
+    from_email = getattr(settings, "RESEND_FROM_EMAIL", "onboarding@resend.dev")
     if not api_key:
         raise ResetDeliveryError("RESEND_API_KEY is not configured.")
 

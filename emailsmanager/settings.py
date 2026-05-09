@@ -29,9 +29,9 @@ CSRF_TRUSTED_ORIGINS = config(
 # Fernet key for encrypting IMAP passwords at rest.
 FIELD_ENCRYPTION_KEY = config("FIELD_ENCRYPTION_KEY", default="")
 
-# Email-based 2FA via Resend
+# Outbound transactional email via Resend (signup verify, password reset, login OTP)
 RESEND_API_KEY = config("RESEND_API_KEY", default="")
-OTP_FROM_EMAIL = config("OTP_FROM_EMAIL", default="onboarding@resend.dev")
+RESEND_FROM_EMAIL = config("RESEND_FROM_EMAIL", default="onboarding@resend.dev")
 
 
 INSTALLED_APPS = [

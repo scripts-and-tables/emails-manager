@@ -24,7 +24,7 @@ class VerifyDeliveryError(Exception):
 
 def send_verification_email(to_email: str, verify_url: str) -> None:
     api_key = getattr(settings, "RESEND_API_KEY", "")
-    from_email = getattr(settings, "OTP_FROM_EMAIL", "onboarding@resend.dev")
+    from_email = getattr(settings, "RESEND_FROM_EMAIL", "onboarding@resend.dev")
     if not api_key:
         raise VerifyDeliveryError("RESEND_API_KEY is not configured.")
 
