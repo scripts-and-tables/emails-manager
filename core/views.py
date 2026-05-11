@@ -201,7 +201,7 @@ def account_new(request: HttpRequest) -> HttpResponse:
     if is_at_account_limit(request.user):
         messages.error(
             request,
-            "You've reached your account limit. Upgrade to add more.",
+            "You've reached the account limit for this instance.",
         )
         return redirect("core:accounts_list")
     if request.method == "POST":
@@ -284,8 +284,8 @@ def _parse_bulk_csv(text: str) -> tuple[list[dict], list[tuple[int, str]]]:
 @require_http_methods(["GET", "POST"])
 def account_bulk_add(request: HttpRequest) -> HttpResponse:
     if not can_bulk_add(request.user):
-        messages.error(request, "Bulk add is a Premium feature. Upgrade to import multiple accounts at once.")
-        return redirect("core:upgrade")
+        messages.error(request, "Bulk add isn't available on this account.")
+        return redirect("core:limits")
     used, limit = get_account_usage(request.user)
     at_limit = used >= limit
     ctx = {"account_count": used, "account_limit": limit, "at_limit": at_limit}
@@ -753,11 +753,11 @@ def profile_password_change(request: HttpRequest) -> HttpResponse:
 
 
 @otp_required
-def upgrade(request: HttpRequest) -> HttpResponse:
+def limits(request: HttpRequest) -> HttpResponse:
     used, limit = get_account_usage(request.user)
     return render(
         request,
-        "core/upgrade.html",
+        "core/limits.html",
         {
             "account_count": used,
             "account_limit": limit,

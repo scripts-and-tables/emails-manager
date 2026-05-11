@@ -25,9 +25,9 @@
             <i class="bi bi-lock-fill flex-shrink-0 mt-1"></i>
             <div class="flex-grow-1">
               <strong>You're at your {{ account_limit }}-account limit ({{ account_count }} / {{ account_limit }}).</strong>
-              <div class="small">Importing now won't add new accounts unless you upgrade.</div>
+              <div class="small">Importing now won't add new accounts &mdash; you're already at the cap.</div>
             </div>
-            <a href="{% url 'core:upgrade' %}" class="btn btn-sm btn-warning">Upgrade</a>
+            <a href="{% url 'core:limits' %}" class="btn btn-sm btn-outline-secondary">Details</a>
           </div>
         {% endif %}
 
@@ -52,12 +52,12 @@
                 <strong>Skipped {{ result.skipped_limit|length }} due to account limit:</strong>
                 <ul class="mb-0 small ps-3">
                   {% for line, email in result.skipped_limit %}
-                    <li>Line {{ line }}: <code>{{ email }}</code> &mdash; upgrade to add more</li>
+                    <li>Line {{ line }}: <code>{{ email }}</code> &mdash; over the cap, skipped</li>
                   {% endfor %}
                 </ul>
                 <div class="mt-2">
-                  <a href="{% url 'core:upgrade' %}" class="btn btn-sm btn-warning">
-                    <i class="bi bi-lock-fill me-1"></i>Upgrade
+                  <a href="{% url 'core:limits' %}" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-info-circle me-1"></i>Details
                   </a>
                 </div>
               </div>

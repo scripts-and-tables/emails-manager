@@ -232,12 +232,12 @@ class AccountLimitTests(TestCase):
             {"csv_text": "new@example.com,pw,imap.example.com,993"},
         )
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("core:upgrade"))
+        self.assertEqual(response.url, reverse("core:limits"))
         self.assertEqual(EmailAccount.objects.filter(owner=self.user).count(), 0)
         # GET is also gated.
         response = self.client.get(reverse("core:account_bulk_add"))
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("core:upgrade"))
+        self.assertEqual(response.url, reverse("core:limits"))
 
     def test_bulk_allowed_for_superuser(self):
         admin = User.objects.create_superuser(username="root", email="r@x.com", password="x")

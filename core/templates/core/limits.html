@@ -1,0 +1,48 @@
+{% extends "core/base.html" %}
+{% block title %}Account limit · Mails Manager App{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-md-8 col-lg-6">
+    <div class="mb-3">
+      <a href="{% url 'core:accounts_list' %}" class="text-secondary small text-decoration-none">
+        <i class="bi bi-arrow-left me-1"></i>Back to accounts
+      </a>
+    </div>
+
+    <div class="card card-soft text-center">
+      <div class="card-body p-4 p-md-5">
+        <div class="empty-state-icon mb-3"><i class="bi bi-info-circle text-primary"></i></div>
+        <h1 class="h4 mb-2">
+          {% if is_premium %}You have a raised cap{% else %}Account limit on this instance{% endif %}
+        </h1>
+        <p class="text-secondary mb-4">
+          You're using <strong>{{ account_count }} / {{ account_limit }}</strong> accounts.
+        </p>
+        {% if is_premium %}
+          <p class="text-secondary small mb-4">
+            Your account has a raised cap on this instance. This is an open-source portfolio
+            project, not a commercial service &mdash; the code is on GitHub if you want to run
+            your own copy.
+          </p>
+        {% else %}
+          <p class="text-secondary small mb-4">
+            This hosted instance caps each user at {{ account_limit }} accounts. It's a
+            personal-use / portfolio project, not a commercial service. To run your own
+            copy with whatever cap you like, fork the repo on GitHub.
+          </p>
+        {% endif %}
+        <div class="d-flex justify-content-center gap-2 flex-wrap">
+          <a href="https://github.com/scripts-and-tables/emails-manager"
+             class="btn btn-primary"
+             target="_blank" rel="noopener noreferrer">
+            <i class="bi bi-github me-1"></i>View on GitHub
+          </a>
+          <a href="{% url 'core:accounts_list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Back to accounts
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

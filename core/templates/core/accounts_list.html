@@ -19,7 +19,7 @@
       </button>
     {% endif %}
     {% if at_limit %}
-      <a href="{% url 'core:upgrade' %}" class="btn btn-warning btn-sm"
+      <a href="{% url 'core:limits' %}" class="btn btn-warning btn-sm"
          title="You've reached your {{ account_limit }}-account limit.">
         <i class="bi bi-lock-fill me-1"></i>Account limit reached
       </a>
@@ -29,8 +29,8 @@
           <i class="bi bi-cloud-upload me-1"></i>Bulk add
         </a>
       {% else %}
-        <a href="{% url 'core:upgrade' %}" class="btn btn-outline-secondary btn-sm"
-           title="Bulk add is a Premium feature.">
+        <a href="{% url 'core:limits' %}" class="btn btn-outline-secondary btn-sm"
+           title="Bulk add isn't available on this account.">
           <i class="bi bi-lock-fill me-1"></i>Bulk add
         </a>
       {% endif %}
