@@ -88,6 +88,12 @@ def home(request: HttpRequest) -> HttpResponse:
     )
 
 
+@otp_required
+@require_http_methods(["GET"])
+def guide(request: HttpRequest) -> HttpResponse:
+    return render(request, "core/guide.html")
+
+
 @require_http_methods(["GET", "POST"])
 def login_view(request: HttpRequest) -> HttpResponse:
     if request.user.is_authenticated and is_otp_verified(request):

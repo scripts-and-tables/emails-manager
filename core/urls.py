@@ -9,6 +9,7 @@ urlpatterns = [
     path("", views.index, name="index"),
     path("robots.txt", TemplateView.as_view(template_name="robots.txt", content_type="text/plain"), name="robots"),
     path("home/", views.home, name="home"),
+    path("guide/", views.guide, name="guide"),
     path("login/", views.login_view, name="login"),
     path("logout/", views.logout_view, name="logout"),
     path("verify-otp/", views.verify_otp, name="verify_otp"),
