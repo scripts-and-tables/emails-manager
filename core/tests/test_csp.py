@@ -11,7 +11,6 @@ import re
 
 from django.test import TestCase
 
-
 CSP_HEADER = "Content-Security-Policy"
 
 

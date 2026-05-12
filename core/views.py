@@ -61,7 +61,7 @@ def _stamp_first_login(user) -> None:
 
 def _send_otp_or_flash(request: HttpRequest, user) -> bool:
     try:
-        issue_and_send(user)
+        issue_and_send(user, request=request)
         return True
     except OtpDeliveryError as exc:
         messages.error(request, f"Could not send the verification code: {exc}")
@@ -162,7 +162,7 @@ def verify_otp(request: HttpRequest) -> HttpResponse:
 
         form = OtpForm(request.POST)
         if form.is_valid():
-            ok, error = verify(user, form.cleaned_data["token"])
+            ok, error = verify(user, form.cleaned_data["token"], request=request)
             if ok:
                 auth_login(request, user)
                 _stamp_first_login(user)

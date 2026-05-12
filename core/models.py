@@ -98,3 +98,47 @@ class EmailAccount(models.Model):
 
     def get_password(self) -> str:
         return decrypt(self.encrypted_password)
+
+
+class AuthEvent(models.Model):
+    """Append-only audit log of authentication-related events.
+
+    Records: login success/fail, logout, OTP issued/verified/failed. Useful
+    for forensics and abuse investigation. Application code never edits or
+    deletes rows; rotate via a retention job if it grows.
+    """
+
+    class EventType(models.TextChoices):
+        LOGIN_SUCCESS = "login_success", "Login success"
+        LOGIN_FAILED = "login_failed", "Login failed"
+        LOGOUT = "logout", "Logout"
+        OTP_ISSUED = "otp_issued", "OTP issued"
+        OTP_VERIFIED = "otp_verified", "OTP verified"
+        OTP_FAILED = "otp_failed", "OTP failed"
+
+    event_type = models.CharField(max_length=32, choices=EventType.choices)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="auth_events",
+    )
+    # Username supplied at login time; populated when a non-existent username
+    # was tried (the user FK is null in that case but we still want a record).
+    username = models.CharField(max_length=150, blank=True)
+    ip = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.CharField(max_length=500, blank=True)
+    metadata = models.JSONField(default=dict, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ("-created_at",)
+        indexes = [
+            models.Index(fields=["user", "-created_at"]),
+            models.Index(fields=["event_type", "-created_at"]),
+        ]
+
+    def __str__(self) -> str:
+        who = self.user.get_username() if self.user else (self.username or "anon")
+        return f"{self.created_at:%Y-%m-%d %H:%M} {self.event_type} {who}"

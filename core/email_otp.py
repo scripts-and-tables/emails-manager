@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import logging
 import secrets
+from typing import Any
 
 import requests
 from django.conf import settings
 
-from .models import LoginOtp
+from .audit import log_auth_event
+from .models import AuthEvent, LoginOtp
 
 logger = logging.getLogger(__name__)
 
@@ -58,16 +60,17 @@ def _send_via_resend(to_email: str, code: str) -> None:
         raise OtpDeliveryError(f"Resend returned {response.status_code}.")
 
 
-def issue_and_send(user) -> LoginOtp:
+def issue_and_send(user, request: Any = None) -> LoginOtp:
     if not user.email:
         raise OtpDeliveryError("This user has no email address on file.")
     code = _generate_code()
     otp = LoginOtp.issue(user, code, ttl_seconds=OTP_TTL_SECONDS)
     _send_via_resend(user.email, code)
+    log_auth_event(request, AuthEvent.EventType.OTP_ISSUED, user=user)
     return otp
 
 
-def verify(user, submitted: str) -> tuple[bool, str]:
+def verify(user, submitted: str, request: Any = None) -> tuple[bool, str]:
     """Returns (ok, error_message). On success the OTP is marked consumed."""
     submitted = (submitted or "").strip()
     otp = LoginOtp.objects.filter(user=user).first()
@@ -82,9 +85,11 @@ def verify(user, submitted: str) -> tuple[bool, str]:
     if not otp.matches(submitted):
         otp.attempts += 1
         otp.save(update_fields=["attempts"])
+        log_auth_event(request, AuthEvent.EventType.OTP_FAILED, user=user)
         return False, "Invalid code, try again."
 
     from django.utils import timezone
     otp.consumed_at = timezone.now()
     otp.save(update_fields=["consumed_at"])
+    log_auth_event(request, AuthEvent.EventType.OTP_VERIFIED, user=user)
     return True, ""

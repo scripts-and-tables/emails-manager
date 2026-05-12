@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import EmailAccount
+from .models import AuthEvent, EmailAccount
 
 
 @admin.register(EmailAccount)
@@ -12,3 +12,30 @@ class EmailAccountAdmin(admin.ModelAdmin):
     list_display = ("email_address", "owner", "imap_host", "imap_port", "updated_at")
     search_fields = ("email_address", "owner__username")
     readonly_fields = ("encrypted_password", "created_at", "updated_at")
+
+
+@admin.register(AuthEvent)
+class AuthEventAdmin(admin.ModelAdmin):
+    """Read-only view of the auth audit log. Rows are created by signal
+    handlers and never edited; the admin reflects that with all-readonly
+    fields and no add permission."""
+
+    list_display = ("created_at", "event_type", "user", "username", "ip")
+    list_filter = ("event_type", "created_at")
+    search_fields = ("user__username", "username", "ip")
+    readonly_fields = (
+        "event_type",
+        "user",
+        "username",
+        "ip",
+        "user_agent",
+        "metadata",
+        "created_at",
+    )
+    date_hierarchy = "created_at"
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
