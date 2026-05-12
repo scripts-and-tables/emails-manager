@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mails Manager App — One inbox for every Mail.ru mailbox</title>
+  <meta name="description" content="A Django web app for connecting and managing multiple IMAP email accounts from a single dashboard. Encrypted credentials, email-based 2FA, live IMAP. Portfolio project, open source.">
+  <meta name="theme-color" content="#005FF9">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <script>
+    (function () {
+      try {
+        const stored = localStorage.getItem('theme');
+        let theme = stored;
+        if (theme !== 'dark' && theme !== 'light') {
+          theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-bs-theme', theme);
+      } catch (e) { /* fall through to default */ }
+    })();
+  </script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/css/site.css" rel="stylesheet">
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to content</a>
+
+<nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">
+      <span class="brand-mark" aria-hidden="true">@</span>
+      <span>Mails Manager App</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+            data-bs-target="#site-nav-collapse" aria-controls="site-nav-collapse"
+            aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="site-nav-collapse">
+      <ul class="navbar-nav ms-auto align-items-lg-center">
+        <li class="nav-item"><a class="nav-link active" aria-current="page" href="index.html">Overview</a></li>
+        <li class="nav-item"><a class="nav-link" href="features.html">Features</a></li>
+        <li class="nav-item"><a class="nav-link" href="screenshots.html">Screenshots</a></li>
+        <li class="nav-item"><a class="nav-link" href="guide.html">Guide</a></li>
+        <li class="nav-item"><a class="nav-link" href="self-hosting.html">Self-hosting</a></li>
+        <li class="nav-item"><a class="nav-link" href="security.html">Security</a></li>
+        <li class="nav-item">
+          <button class="theme-toggle-btn ms-lg-2" type="button" data-theme-toggle
+                  aria-label="Toggle light or dark theme" title="Toggle theme">
+            <i class="bi bi-moon-stars theme-icon-dark" aria-hidden="true"></i>
+            <i class="bi bi-sun-fill theme-icon-light" aria-hidden="true"></i>
+          </button>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/scripts-and-tables/emails-manager"
+             target="_blank" rel="noopener noreferrer">
+            <i class="bi bi-github"></i> GitHub
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main id="main-content" class="container py-4 py-md-5">
+
+  <section class="hero mb-5">
+    <div class="row align-items-center g-4">
+      <div class="col-12 col-md-auto">
+        <span class="brand-mark brand-mark-lg" aria-hidden="true">@</span>
+      </div>
+      <div class="col">
+        <h1 class="mb-2">One dashboard for every mailbox.</h1>
+        <p class="lead mb-4">
+          A Django web app for connecting and managing multiple IMAP email accounts
+          from a single place. Encrypted credentials at rest, email-based two-factor
+          authentication, and live IMAP access without server-side message caching.
+        </p>
+        <div class="d-flex flex-wrap gap-2">
+          <a href="#" class="btn btn-light btn-lg" data-live-app><!-- TODO: live demo URL -->
+            <i class="bi bi-box-arrow-up-right me-1"></i>Try the live app
+          </a>
+          <a href="https://github.com/scripts-and-tables/emails-manager"
+             class="btn btn-outline-light btn-lg"
+             target="_blank" rel="noopener noreferrer">
+            <i class="bi bi-github me-1"></i>View source
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mb-5">
+    <h2 class="h4 mb-3">What it is</h2>
+    <div class="row g-3">
+      <div class="col-md-4">
+        <div class="card card-soft h-100">
+          <div class="card-body p-4">
+            <h3 class="h6 text-primary"><i class="bi bi-bullseye me-1"></i>The pitch</h3>
+            <p class="mb-0 small text-secondary">
+              Connect several IMAP mailboxes once, then read recent mail across all of
+              them from one inbox. Built for people who juggle multiple addresses.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card card-soft h-100">
+          <div class="card-body p-4">
+            <h3 class="h6 text-primary"><i class="bi bi-layers me-1"></i>The shape</h3>
+            <p class="mb-0 small text-secondary">
+              A small but production-shaped Django application — auth, transactional
+              email, Fernet-encrypted credentials, hardened headers, and a
+              Postgres-or-SQLite deploy story.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card card-soft h-100">
+          <div class="card-body p-4">
+            <h3 class="h6 text-primary"><i class="bi bi-clipboard-check me-1"></i>The honesty</h3>
+            <p class="mb-0 small text-secondary">
+              Built solo as a portfolio piece. Currently Mail.ru-only on the hosted
+              instance; open source on GitHub so anyone can run their own copy.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mb-5">
+    <h2 class="h4 mb-3">At a glance</h2>
+    <div class="row g-3">
+      <div class="col-md-6 col-lg-4">
+        <div class="feature-tile">
+          <span class="feature-tile-icon tile-icon-blue"><i class="bi bi-envelope-check"></i></span>
+          <div>
+            <strong class="d-block mb-1">Email-verified signup</strong>
+            <span class="small text-secondary">New accounts confirm via a signed link before activation.</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="feature-tile">
+          <span class="feature-tile-icon tile-icon-green"><i class="bi bi-shield-check"></i></span>
+          <div>
+            <strong class="d-block mb-1">Login by email OTP</strong>
+            <span class="small text-secondary">One-time code with TTL, attempt lockout, and rate-limited resend.</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="feature-tile">
+          <span class="feature-tile-icon tile-icon-violet"><i class="bi bi-person-rolodex"></i></span>
+          <div>
+            <strong class="d-block mb-1">Multi-account IMAP</strong>
+            <span class="small text-secondary">Add accounts one at a time or bulk-import via CSV.</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="feature-tile">
+          <span class="feature-tile-icon tile-icon-amber"><i class="bi bi-lock-fill"></i></span>
+          <div>
+            <strong class="d-block mb-1">Encrypted credentials</strong>
+            <span class="small text-secondary">IMAP passwords stored as Fernet ciphertext, never in plaintext.</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="feature-tile">
+          <span class="feature-tile-icon tile-icon-pink"><i class="bi bi-inbox"></i></span>
+          <div>
+            <strong class="d-block mb-1">Live inbox</strong>
+            <span class="small text-secondary">Read, mark unread, and delete messages directly against IMAP.</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="feature-tile">
+          <span class="feature-tile-icon tile-icon-teal"><i class="bi bi-gear-fill"></i></span>
+          <div>
+            <strong class="d-block mb-1">Production-shaped</strong>
+            <span class="small text-secondary">HSTS, secure cookies, WhiteNoise statics, Postgres-or-SQLite.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mb-5">
+    <h2 class="h4 mb-3">Tech stack</h2>
+    <div class="d-flex flex-wrap gap-2">
+      <span class="tech-chip"><i class="bi bi-code-slash"></i>Django 5.1+</span>
+      <span class="tech-chip"><i class="bi bi-database"></i>PostgreSQL · SQLite</span>
+      <span class="tech-chip"><i class="bi bi-shield-lock"></i>Fernet (cryptography)</span>
+      <span class="tech-chip"><i class="bi bi-envelope"></i>Resend (transactional email)</span>
+      <span class="tech-chip"><i class="bi bi-key"></i>django-otp + qrcode</span>
+      <span class="tech-chip"><i class="bi bi-mailbox"></i>imap-tools</span>
+      <span class="tech-chip"><i class="bi bi-cloud"></i>WhiteNoise · Gunicorn</span>
+      <span class="tech-chip"><i class="bi bi-bootstrap"></i>Bootstrap 5.3</span>
+    </div>
+  </section>
+
+  <section class="row g-3 mb-4">
+    <div class="col-md-6">
+      <a href="guide.html" class="card card-soft h-100 text-decoration-none text-reset feature-tile" style="padding: 0;">
+        <div class="card-body p-4 d-flex align-items-start gap-3">
+          <span class="feature-tile-icon tile-icon-blue flex-shrink-0"><i class="bi bi-book"></i></span>
+          <div>
+            <h3 class="h5 mb-1">Read the Guide</h3>
+            <p class="small text-secondary mb-0">
+              Step-by-step setup, including the Mail.ru aliases trick that turns one
+              real mailbox into up to ten connectable IMAP logins.
+            </p>
+          </div>
+        </div>
+      </a>
+    </div>
+    <div class="col-md-6">
+      <a href="self-hosting.html" class="card card-soft h-100 text-decoration-none text-reset feature-tile" style="padding: 0;">
+        <div class="card-body p-4 d-flex align-items-start gap-3">
+          <span class="feature-tile-icon tile-icon-violet flex-shrink-0"><i class="bi bi-terminal"></i></span>
+          <div>
+            <h3 class="h5 mb-1">Self-host it</h3>
+            <p class="small text-secondary mb-0">
+              Clone, set a few env vars, migrate, and run. No commercial service to
+              depend on — the whole stack runs from your machine or VPS.
+            </p>
+          </div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer mt-5 py-4 border-top">
+  <div class="container">
+    <div class="row gy-3 align-items-center">
+      <div class="col-md-6 small text-secondary">
+        &copy; Mails Manager App &middot; Built solo as a portfolio project &middot;
+        <a href="https://github.com/scripts-and-tables/emails-manager/blob/main/LICENSE"
+           class="text-decoration-none" target="_blank" rel="noopener noreferrer">MIT License</a>
+      </div>
+      <div class="col-md-6 text-md-end small">
+        <a href="#" class="text-decoration-none me-3" data-live-app><!-- TODO: live demo URL -->
+          <i class="bi bi-box-arrow-up-right me-1"></i>Try the live app
+        </a>
+        <a href="https://github.com/scripts-and-tables/emails-manager"
+           class="text-decoration-none" target="_blank" rel="noopener noreferrer">
+          <i class="bi bi-github me-1"></i>Source
+        </a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+<script>
+  document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const root = document.documentElement;
+      const next = root.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-bs-theme', next);
+      try { localStorage.setItem('theme', next); } catch (e) { /* ignore */ }
+    });
+  });
+</script>
+</body>
+</html>

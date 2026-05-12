@@ -4,6 +4,12 @@ A Django web app for connecting and managing multiple IMAP email accounts from a
 
 > Showcase / portfolio project. Built solo as an exercise in shipping a small but production-shaped Django application end-to-end — auth, transactional email, encrypted credential storage, security headers, and a Postgres-or-SQLite deploy story.
 
+## Live demo & project site
+
+- **Live app**: _coming soon_ — fill in the deployed URL here
+- **Project site**: <https://scripts-and-tables.github.io/emails-manager/> — overview, features, screenshots, public Guide, [self-hosting](https://scripts-and-tables.github.io/emails-manager/self-hosting.html), [security](https://scripts-and-tables.github.io/emails-manager/security.html)
+- **Source**: this repo
+
 ## Features
 
 - **Email-verified signup** — new accounts confirm via a signed link before activation.
@@ -30,7 +36,7 @@ A Django web app for connecting and managing multiple IMAP email accounts from a
 
 ## Screenshots
 
-_Coming soon — drop PNGs into `docs/screenshots/` and link them here._
+A walk-through gallery lives on the [project site](https://scripts-and-tables.github.io/emails-manager/screenshots.html). PNG sources sit under [`docs/assets/screenshots/`](docs/assets/screenshots/README.md).
 
 ## Local setup
 

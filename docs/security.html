@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Security &amp; privacy · Mails Manager App</title>
+  <meta name="description" content="Security model: portal password hashing, IMAP credential encryption with Fernet, hardening headers, rate limiting, and the project's threat model.">
+  <meta name="theme-color" content="#005FF9">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <script>
+    (function () {
+      try {
+        const stored = localStorage.getItem('theme');
+        let theme = stored;
+        if (theme !== 'dark' && theme !== 'light') {
+          theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-bs-theme', theme);
+      } catch (e) { /* fall through */ }
+    })();
+  </script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/css/site.css" rel="stylesheet">
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to content</a>
+
+<nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">
+      <span class="brand-mark" aria-hidden="true">@</span>
+      <span>Mails Manager App</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+            data-bs-target="#site-nav-collapse" aria-controls="site-nav-collapse"
+            aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="site-nav-collapse">
+      <ul class="navbar-nav ms-auto align-items-lg-center">
+        <li class="nav-item"><a class="nav-link" href="index.html">Overview</a></li>
+        <li class="nav-item"><a class="nav-link" href="features.html">Features</a></li>
+        <li class="nav-item"><a class="nav-link" href="screenshots.html">Screenshots</a></li>
+        <li class="nav-item"><a class="nav-link" href="guide.html">Guide</a></li>
+        <li class="nav-item"><a class="nav-link" href="self-hosting.html">Self-hosting</a></li>
+        <li class="nav-item"><a class="nav-link active" aria-current="page" href="security.html">Security</a></li>
+        <li class="nav-item">
+          <button class="theme-toggle-btn ms-lg-2" type="button" data-theme-toggle
+                  aria-label="Toggle light or dark theme" title="Toggle theme">
+            <i class="bi bi-moon-stars theme-icon-dark" aria-hidden="true"></i>
+            <i class="bi bi-sun-fill theme-icon-light" aria-hidden="true"></i>
+          </button>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/scripts-and-tables/emails-manager"
+             target="_blank" rel="noopener noreferrer">
+            <i class="bi bi-github"></i> GitHub
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main id="main-content" class="container py-4 py-md-5">
+
+  <div class="mb-4">
+    <h1 class="h2 mb-2">Security &amp; privacy</h1>
+    <p class="text-secondary mb-0">
+      This portal holds the IMAP credentials and live mail of every connected
+      mailbox, so security is treated as a first-class concern, not an
+      afterthought. Here's what's actually in place.
+    </p>
+  </div>
+
+  <section class="card card-soft mb-4">
+    <div class="card-body p-4">
+      <h2 class="h5"><i class="bi bi-key text-primary me-2"></i>Your credentials</h2>
+      <ul class="mb-0">
+        <li class="mb-2">
+          <strong>Portal password is hashed, never stored in plaintext.</strong>
+          Django's default password hasher writes a salted
+          <strong>PBKDF2-SHA256</strong> digest (hundreds of thousands of iterations
+          per password) to the database. At login we re-hash what you typed and
+          compare against the stored digest; the original password is never written
+          anywhere on the server.
+        </li>
+        <li class="mb-2">
+          <strong>Password strength is enforced at signup.</strong> Django's standard
+          validators reject too-short passwords, all-numeric passwords, passwords
+          too similar to your email or username, and passwords on the well-known
+          common-password list.
+        </li>
+        <li class="mb-2">
+          <strong>IMAP passwords are encrypted at rest.</strong> Stored as
+          <a href="https://cryptography.io/en/latest/fernet/"
+             target="_blank" rel="noopener noreferrer">Fernet</a> ciphertext
+          (AES-128-CBC + HMAC-SHA256) using a <code>FIELD_ENCRYPTION_KEY</code>
+          that is separate from Django's <code>SECRET_KEY</code>. The two keys
+          can be rotated independently. Passwords are never written to logs.
+        </li>
+        <li>
+          <strong>Message bodies are never persisted.</strong> The Inbox fetches them
+          live from IMAP on every request; the server keeps no cache. Close the tab
+          and the messages stay only on your Mail.ru side.
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="card card-soft mb-4">
+    <div class="card-body p-4">
+      <h2 class="h5"><i class="bi bi-shield-shaded text-primary me-2"></i>Hardening on every request</h2>
+      <ul class="mb-0">
+        <li class="mb-2">
+          <strong>HTTPS everywhere in production.</strong>
+          <code>SECURE_SSL_REDIRECT</code> forces HTTPS, and HSTS is preloaded with
+          <code>includeSubDomains</code> so browsers refuse to fall back to plain HTTP.
+        </li>
+        <li class="mb-2">
+          <strong>Secure, HttpOnly, SameSite=Lax cookies.</strong> Session and CSRF
+          cookies can't be read by JavaScript or sent on cross-site requests in
+          normal flows.
+        </li>
+        <li class="mb-2">
+          <strong>No clickjacking.</strong> <code>X-Frame-Options: DENY</code> blocks
+          every attempt to embed the portal in a frame, on every page.
+        </li>
+        <li class="mb-2">
+          <strong>No MIME sniffing, minimal referrer leakage.</strong>
+          <code>X-Content-Type-Options: nosniff</code> and
+          <code>Referrer-Policy: same-origin</code> are set explicitly.
+        </li>
+        <li class="mb-2">
+          <strong>Cross-origin isolation.</strong>
+          <code>Cross-Origin-Opener-Policy: same-origin</code> keeps the portal in
+          its own browsing-context group.
+        </li>
+        <li class="mb-2">
+          <strong>No HTML caching.</strong> A custom no-cache middleware tags every
+          HTML response so logged-in pages don't sit in proxy or browser caches
+          after you log out.
+        </li>
+        <li>
+          <strong>Rate limiting on auth endpoints.</strong> Login, signup, OTP entry,
+          OTP resend, and password reset all have per-user / per-IP budgets backed
+          by Django's cache; abusive bursts get blocked.
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="card card-soft mb-4">
+    <div class="card-body p-4">
+      <h2 class="h5"><i class="bi bi-eye-slash text-primary me-2"></i>What we don't collect</h2>
+      <ul class="mb-0">
+        <li>No analytics, no third-party trackers, no ad pixels &mdash; the portal
+          and this site are both clean of all of it.</li>
+        <li>No message body persistence. The portal reads IMAP and renders.
+          Nothing is stored server-side.</li>
+        <li>No marketing emails. The only mail you'll ever get from the portal
+          is transactional: signup verification, OTP codes, and password reset
+          links.</li>
+        <li>No "telemetry" beep-back to the dev. Production logs are
+          stdout-only, scoped to errors.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="card card-soft mb-4">
+    <div class="card-body p-4">
+      <h2 class="h5"><i class="bi bi-clipboard-data text-primary me-2"></i>Threat model</h2>
+      <p class="small text-secondary mb-2">
+        Being honest about scope: this is a portfolio project. The security
+        story above is real and the controls are in place, but the threat
+        model is deliberately bounded.
+      </p>
+      <ul class="small text-secondary mb-0">
+        <li class="mb-2">
+          <strong>In scope:</strong> standard web-app threats &mdash; credential
+          stuffing, brute-force, session hijack, CSRF, clickjacking, plaintext
+          credential disclosure, MITM, basic abuse / rate-limit bypass.
+        </li>
+        <li class="mb-2">
+          <strong>Out of scope:</strong> nation-state attackers, advanced
+          persistent threats, supply-chain compromise of pinned upstream
+          packages, side-channel attacks on the hosting provider.
+        </li>
+        <li>
+          <strong>Recommendation:</strong> use the portal for personal mail
+          and side projects. Don't connect mailboxes that hold high-value
+          secrets (corporate, financial, legal). If you need that, fork the
+          repo, audit it yourself, and self-host.
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="card card-soft mb-4">
+    <div class="card-body p-4">
+      <h2 class="h5"><i class="bi bi-tools text-primary me-2"></i>Self-hoster note</h2>
+      <p class="small text-secondary mb-2">
+        If you're running your own copy:
+      </p>
+      <ul class="small text-secondary mb-0">
+        <li class="mb-2">
+          <strong>Keep <code>FIELD_ENCRYPTION_KEY</code> stable.</strong>
+          Rotating it invalidates every stored IMAP password. There's no
+          re-wrap migration shipped with the app; you'd need to re-enter
+          passwords after a rotation.
+        </li>
+        <li class="mb-2">
+          <strong>Don't reuse the example values in
+          <code>.env.example</code> or CI.</strong> The repo's CI workflow uses
+          known test-only values explicitly labelled as such.
+        </li>
+        <li class="mb-2">
+          <strong>Verify your Resend sender domain.</strong>
+          Transactional emails won't deliver reliably from an unverified
+          domain, and the portal won't fall back to a different sender.
+        </li>
+        <li>
+          <strong>Pin your dependencies.</strong> <code>requirements.txt</code>
+          uses minimum-bound versions. For production, generate a fully pinned
+          lockfile (<code>pip-compile</code> or similar).
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="card card-soft mb-4">
+    <div class="card-body p-4">
+      <h2 class="h5"><i class="bi bi-flag text-primary me-2"></i>Reporting a security issue</h2>
+      <p class="small text-secondary mb-0">
+        If you find a vulnerability, please don't open a public GitHub issue.
+        Instead, email the maintainer privately via the contact address listed
+        on the project's GitHub profile, or use GitHub's
+        <a href="https://docs.github.com/en/code-security/security-advisories/guidance-on-reporting-and-writing-information-about-vulnerabilities/privately-reporting-a-security-vulnerability"
+           target="_blank" rel="noopener noreferrer">private vulnerability reporting</a>.
+        Public disclosure can wait until the fix is shipped.
+      </p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer mt-5 py-4 border-top">
+  <div class="container">
+    <div class="row gy-3 align-items-center">
+      <div class="col-md-6 small text-secondary">
+        &copy; Mails Manager App &middot; Built solo as a portfolio project &middot;
+        <a href="https://github.com/scripts-and-tables/emails-manager/blob/main/LICENSE"
+           class="text-decoration-none" target="_blank" rel="noopener noreferrer">MIT License</a>
+      </div>
+      <div class="col-md-6 text-md-end small">
+        <a href="#" class="text-decoration-none me-3" data-live-app><!-- TODO: live demo URL -->
+          <i class="bi bi-box-arrow-up-right me-1"></i>Try the live app
+        </a>
+        <a href="https://github.com/scripts-and-tables/emails-manager"
+           class="text-decoration-none" target="_blank" rel="noopener noreferrer">
+          <i class="bi bi-github me-1"></i>Source
+        </a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+<script>
+  document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const root = document.documentElement;
+      const next = root.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-bs-theme', next);
+      try { localStorage.setItem('theme', next); } catch (e) { /* ignore */ }
+    });
+  });
+</script>
+</body>
+</html>
