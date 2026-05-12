@@ -1,51 +1,71 @@
 {% extends "core/base.html" %}
 {% block title %}Sign in · Mails Manager App{% endblock %}
 {% block content %}
-<div class="auth-card-wrap py-5">
+<div class="auth-card-wrap py-4 py-lg-5">
   <div class="row justify-content-center">
-    <div class="col-12 col-sm-10 col-md-7 col-lg-5" style="max-width: 420px;">
-      <div class="card card-soft shadow-sm">
-        <div class="card-body p-4 p-md-5">
-          <div class="text-center mb-4">
-            <span class="brand-mark brand-mark-lg" aria-hidden="true">@</span>
-          </div>
-          <h1 class="h3 mb-2 text-center">Welcome back</h1>
-          <p class="text-secondary text-center mb-4">Sign in to your Mails Manager App account.</p>
-          <form method="post" novalidate>
-            {% csrf_token %}
-            {% if form.non_field_errors %}
-              <div class="alert alert-danger">{{ form.non_field_errors }}</div>
-            {% endif %}
-            <div class="mb-3">
-              <label class="form-label" for="id_username">Username</label>
-              <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-person"></i></span>
-                <input type="text" name="username" id="id_username" autofocus autocomplete="username"
-                       class="form-control{% if form.username.errors %} is-invalid{% endif %}"
-                       value="{{ form.username.value|default:'' }}" required>
-              </div>
-              {% for err in form.username.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+    <div class="col-12 col-sm-10 col-md-8 col-lg-10" style="max-width: 800px;">
+      <div class="card card-soft shadow-sm overflow-hidden">
+        <div class="row g-0">
+
+          {# Left welcome panel — desktop only #}
+          <div class="col-lg-6 d-none d-lg-flex login-welcome-panel">
+            <div class="d-flex flex-column justify-content-center p-5 w-100">
+              <span class="brand-mark brand-mark-lg mb-4" aria-hidden="true"
+                    style="background: rgba(255,255,255,.18); box-shadow: none;">@</span>
+              <h1 class="h2 mb-2">Welcome back</h1>
+              <p class="mb-0 opacity-75">Sign in to your Mails Manager App account.</p>
             </div>
-            <div class="mb-4">
-              <label class="form-label" for="id_password">Password</label>
-              <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                <input type="password" name="password" id="id_password" autocomplete="current-password"
-                       class="form-control{% if form.password.errors %} is-invalid{% endif %}" required>
+          </div>
+
+          {# Right form column — always visible #}
+          <div class="col-12 col-lg-6">
+            <div class="card-body p-4 p-md-5">
+
+              {# Mobile-only welcome content — collapses into the form column below lg #}
+              <div class="d-lg-none text-center mb-4">
+                <span class="brand-mark brand-mark-lg" aria-hidden="true">@</span>
               </div>
-              {% for err in form.password.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+              <h1 class="h3 mb-2 text-center d-lg-none">Welcome back</h1>
+              <p class="text-secondary text-center mb-4 d-lg-none">Sign in to your Mails Manager App account.</p>
+
+              <form method="post" novalidate>
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                  <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+                {% endif %}
+                <div class="mb-3">
+                  <label class="form-label" for="id_username">Username</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-person"></i></span>
+                    <input type="text" name="username" id="id_username" autofocus autocomplete="username"
+                           class="form-control{% if form.username.errors %} is-invalid{% endif %}"
+                           value="{{ form.username.value|default:'' }}" required>
+                  </div>
+                  {% for err in form.username.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+                </div>
+                <div class="mb-4">
+                  <label class="form-label" for="id_password">Password</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                    <input type="password" name="password" id="id_password" autocomplete="current-password"
+                           class="form-control{% if form.password.errors %} is-invalid{% endif %}" required>
+                  </div>
+                  {% for err in form.password.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2">
+                  Continue <i class="bi bi-arrow-right ms-1"></i>
+                </button>
+              </form>
+              <div class="mt-4 text-center small">
+                <a href="{% url 'core:password_reset_request' %}" class="text-decoration-none">Forgot your password?</a>
+              </div>
+              <div class="mt-2 text-center small text-secondary">
+                Don't have an account?
+                <a href="{% url 'core:signup' %}" class="text-decoration-none">Sign up</a>
+              </div>
             </div>
-            <button type="submit" class="btn btn-primary w-100 py-2">
-              Continue <i class="bi bi-arrow-right ms-1"></i>
-            </button>
-          </form>
-          <div class="mt-4 text-center small">
-            <a href="{% url 'core:password_reset_request' %}" class="text-decoration-none">Forgot your password?</a>
           </div>
-          <div class="mt-2 text-center small text-secondary">
-            Don't have an account?
-            <a href="{% url 'core:signup' %}" class="text-decoration-none">Sign up</a>
-          </div>
+
         </div>
       </div>
     </div>
