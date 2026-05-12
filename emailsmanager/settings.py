@@ -33,6 +33,29 @@ FIELD_ENCRYPTION_KEY = config("FIELD_ENCRYPTION_KEY", default="")
 RESEND_API_KEY = config("RESEND_API_KEY", default="")
 RESEND_FROM_EMAIL = config("RESEND_FROM_EMAIL", default="onboarding@resend.dev")
 
+# Error monitoring — Sentry. No-op when SENTRY_DSN is empty (local dev / CI).
+SENTRY_DSN = config("SENTRY_DSN", default="")
+SENTRY_ENVIRONMENT = config(
+    "SENTRY_ENVIRONMENT",
+    default="local" if DEBUG else "production",
+)
+SENTRY_TRACES_SAMPLE_RATE = config("SENTRY_TRACES_SAMPLE_RATE", default=0.1, cast=float)
+
+if SENTRY_DSN:
+    import sentry_sdk
+    from sentry_sdk.integrations.django import DjangoIntegration
+
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        environment=SENTRY_ENVIRONMENT,
+        integrations=[DjangoIntegration()],
+        traces_sample_rate=SENTRY_TRACES_SAMPLE_RATE,
+        # Never ship usernames, emails, or IMAP credentials in error events.
+        # PII has to be opt-in per request via sentry_sdk.set_user(...) when
+        # we explicitly want context (we don't today).
+        send_default_pii=False,
+    )
+
 
 INSTALLED_APPS = [
     "django.contrib.admin",

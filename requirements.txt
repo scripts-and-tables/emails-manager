@@ -4,6 +4,7 @@ imap-tools>=1.7
 django-otp>=1.5
 qrcode[pil]>=7.4
 cryptography>=42
+sentry-sdk[django]>=2.0
 dj-database-url>=2.2
 python-decouple>=3.8
 psycopg[binary]>=3.2
