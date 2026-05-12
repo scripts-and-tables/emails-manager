@@ -16,7 +16,7 @@
 **[Project site](https://scripts-and-tables.github.io/emails-manager/)** &nbsp;·&nbsp;
 **[Documentation](https://scripts-and-tables.github.io/emails-manager/guide.html)** &nbsp;·&nbsp;
 **[Screenshots](https://scripts-and-tables.github.io/emails-manager/screenshots.html)** &nbsp;·&nbsp;
-**[Live app](#)** <!-- TODO: replace # with the deployed URL -->
+**[Live app](https://m-m.up.railway.app)**
 
 </div>
 
