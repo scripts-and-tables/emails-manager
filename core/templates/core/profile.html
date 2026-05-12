@@ -151,7 +151,7 @@
 </div>
 
 {% if password_modal_open %}
-<script>
+<script nonce="{{ request.csp_nonce }}">
   document.addEventListener('DOMContentLoaded', () => {
     const el = document.getElementById('resetPasswordModal');
     if (el) bootstrap.Modal.getOrCreateInstance(el).show();
@@ -159,7 +159,7 @@
 </script>
 {% endif %}
 
-<script>
+<script nonce="{{ request.csp_nonce }}">
   (function () {
     const cb = document.getElementById('2fa-checkbox');
     const form = document.getElementById('toggle-2fa-form');

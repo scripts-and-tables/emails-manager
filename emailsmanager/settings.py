@@ -47,6 +47,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
+    "csp.middleware.CSPMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -179,3 +180,30 @@ if not DEBUG:
     SECURE_HSTS_SECONDS = 60 * 60 * 24 * 30
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
+
+
+# Content Security Policy — defends against injected scripts/styles.
+# Inline <script> and <style> blocks must carry a per-request nonce that
+# matches the one in the CSP header (templates use {{ request.csp_nonce }}).
+# Inline style="..." attributes are allowed via style-src-attr; refactoring
+# the ~70 existing inline style attributes to CSS classes is a separate task.
+from csp.constants import NONCE, NONE, SELF, UNSAFE_INLINE  # noqa: E402
+
+_JSDELIVR = "https://cdn.jsdelivr.net"
+
+CONTENT_SECURITY_POLICY = {
+    "DIRECTIVES": {
+        "default-src": [SELF],
+        "script-src": [SELF, _JSDELIVR, NONCE],
+        "style-src": [SELF, _JSDELIVR, NONCE],
+        "style-src-attr": [UNSAFE_INLINE],
+        "img-src": [SELF, "data:"],
+        "font-src": [SELF, _JSDELIVR],
+        "connect-src": [SELF],
+        "frame-ancestors": [NONE],
+        "base-uri": [SELF],
+        "form-action": [SELF],
+        "object-src": [NONE],
+        "upgrade-insecure-requests": True,
+    },
+}

@@ -110,7 +110,7 @@
         <i class="bi bi-pencil me-1"></i>Edit
       </a>
       <form method="post" action="{% url 'core:account_delete' account.pk %}"
-            onsubmit="return confirm('Remove {{ account.email_address }}? This cannot be undone.');">
+            data-confirm-message="Remove {{ account.email_address }}? This cannot be undone.">
         {% csrf_token %}
         <button type="submit" class="btn btn-outline-danger w-100">
           <i class="bi bi-trash me-1"></i>Delete
@@ -125,7 +125,7 @@
 
 {% include "core/_account_actions.html" %}
 
-<script>
+<script nonce="{{ request.csp_nonce }}">
   (function () {
     const btn = document.querySelector('[data-account-row] .test-btn');
     if (btn) btn.click();

@@ -16,7 +16,7 @@ And the controls inside must have these classes / data attrs as needed:
       .update-password-input, .update-password-save, .update-password-cancel
 {% endcomment %}
 
-<style>
+<style nonce="{{ request.csp_nonce }}">
   .test-btn.is-testing i { animation: test-spin 0.7s linear infinite; display: inline-block; }
   @keyframes test-spin { to { transform: rotate(360deg); } }
   .test-btn:disabled { opacity: 1; }
@@ -25,7 +25,7 @@ And the controls inside must have these classes / data attrs as needed:
   .form-switch .toggle-switch:checked { background-color: #198754; border-color: #198754; }
 </style>
 
-<script>
+<script nonce="{{ request.csp_nonce }}">
 (function () {
   const csrfInput = document.querySelector('input[name="csrfmiddlewaretoken"]');
   if (!csrfInput) return;

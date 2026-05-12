@@ -100,14 +100,14 @@
             {% for err in form.csv_text.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
           </div>
 
-          <style>
+          <style nonce="{{ request.csp_nonce }}">
             .csv-masked {
               -webkit-text-security: disc;
               -moz-text-security: disc;
               text-security: disc;
             }
           </style>
-          <script>
+          <script nonce="{{ request.csp_nonce }}">
             (function () {
               const toggle = document.getElementById('mask-passwords-toggle');
               const textarea = document.getElementById('id_csv_text');

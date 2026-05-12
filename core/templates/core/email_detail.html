@@ -17,7 +17,7 @@
       </button>
     </form>
     <form method="post" action="{% url 'core:email_delete' account.pk uid %}" class="m-0"
-          onsubmit="return confirm('{% if back_folder == 'trash' %}Permanently delete this email? This cannot be undone.{% else %}Move this email to Trash?{% endif %}');">
+          data-confirm-message="{% if back_folder == 'trash' %}Permanently delete this email? This cannot be undone.{% else %}Move this email to Trash?{% endif %}">
       {% csrf_token %}
       <input type="hidden" name="back_window" value="{{ back_window }}">
       <input type="hidden" name="back_account" value="{{ back_account }}">
@@ -75,7 +75,7 @@
   </div>
 </div>
 
-<style>
+<style nonce="{{ request.csp_nonce }}">
   .details-toggle {
     background: transparent; border: 0; padding: .25rem .4rem;
     color: var(--bs-secondary-color); border-radius: .35rem;
@@ -94,7 +94,7 @@
   }
 </style>
 
-<script>
+<script nonce="{{ request.csp_nonce }}">
   (function () {
     const meta = document.getElementById('email-meta');
     const summary = document.querySelector('.details-summary');

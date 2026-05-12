@@ -170,7 +170,7 @@
     {% endfor %}
   </div>
 
-  <style>
+  <style nonce="{{ request.csp_nonce }}">
     .account-link:hover { color: #0d6efd; }
   </style>
 

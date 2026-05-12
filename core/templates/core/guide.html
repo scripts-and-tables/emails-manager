@@ -2,7 +2,7 @@
 {% block title %}Guide · Mails Manager App{% endblock %}
 
 {% block extra_head %}
-<style>
+<style nonce="{{ request.csp_nonce }}">
   .guide-toc {
     position: sticky;
     top: 1rem;

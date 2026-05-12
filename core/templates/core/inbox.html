@@ -18,13 +18,13 @@
     {% if filter_account %}<input type="hidden" name="account" value="{{ filter_account.pk }}">{% endif %}
     {% if filter_group %}<input type="hidden" name="group" value="{{ filter_group }}">{% endif %}
     <label class="text-secondary small mb-0 d-none d-sm-inline" for="id_folder">Folder:</label>
-    <select name="folder" id="id_folder" class="form-select form-select-sm" onchange="this.form.submit()" style="min-width: 7rem;">
+    <select name="folder" id="id_folder" class="form-select form-select-sm" data-auto-submit style="min-width: 7rem;">
       {% for value, label in folders %}
         <option value="{{ value }}" {% if value == folder %}selected{% endif %}>{{ label }}</option>
       {% endfor %}
     </select>
     <label class="text-secondary small mb-0 d-none d-sm-inline" for="id_window">Show:</label>
-    <select name="window" id="id_window" class="form-select form-select-sm" onchange="this.form.submit()" style="min-width: 9rem;">
+    <select name="window" id="id_window" class="form-select form-select-sm" data-auto-submit style="min-width: 9rem;">
       {% for value, label in windows %}
         <option value="{{ value }}" {% if value == window %}selected{% endif %}>{{ label }}</option>
       {% endfor %}
@@ -96,7 +96,7 @@
     <p class="text-secondary small mt-3 mb-0">Loading messages…</p>
   </div>
 
-  <style>
+  <style nonce="{{ request.csp_nonce }}">
     .skeleton-row {
       height: 56px;
       background: var(--bs-tertiary-bg);
@@ -114,7 +114,7 @@
     }
   </style>
 
-  <script>
+  <script nonce="{{ request.csp_nonce }}">
   (function () {
     const contentEl = document.getElementById('inbox-content');
     const searchEl = document.getElementById('inbox-search');
