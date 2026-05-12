@@ -51,14 +51,6 @@
     border-left-color: #ffc107;
     background: rgba(255, 193, 7, .06);
   }
-  .guide-faq summary {
-    cursor: pointer;
-    font-weight: 500;
-    padding: .5rem 0;
-  }
-  .guide-faq summary:hover { color: var(--bs-primary); }
-  .guide-faq[open] summary { color: var(--bs-primary); }
-  .guide-faq + .guide-faq { border-top: 1px solid var(--bs-border-color); }
   .guide-kbd {
     background: var(--bs-tertiary-bg);
     border: 1px solid var(--bs-border-color);
@@ -88,7 +80,6 @@
             <li class="list-group-item"><a href="#two-factor" class="text-decoration-none">Two-factor authentication</a></li>
             <li class="list-group-item"><a href="#inbox" class="text-decoration-none">Inbox & email actions</a></li>
             <li class="list-group-item"><a href="#security" class="text-decoration-none">Security & privacy</a></li>
-            <li class="list-group-item"><a href="#troubleshooting" class="text-decoration-none">Troubleshooting</a></li>
           </ul>
         </div>
       </div>
@@ -403,93 +394,81 @@ alias3@list.ru,app-password,imap.mail.ru,993</code></pre>
     <section id="security" class="card card-soft mb-4 guide-section">
       <div class="card-body p-4">
         <h2><i class="bi bi-lock text-primary me-2"></i>Security &amp; privacy</h2>
+        <p class="text-secondary">
+          This portal holds the IMAP credentials and live mail of every connected
+          mailbox, so security is treated as a first-class concern, not an
+          afterthought. Here's what's actually in place.
+        </p>
+
+        <h3 class="h6 mt-3">Your credentials</h3>
         <ul>
           <li>
-            <strong>IMAP passwords are encrypted at rest.</strong> We store them as
+            <strong>Portal password is hashed, never stored in plaintext.</strong>
+            Django's default password hasher writes a salted
+            <strong>PBKDF2-SHA256</strong> digest (hundreds of thousands of iterations
+            per password) to the database. At login we re-hash what you typed and
+            compare against the stored digest; the original password is never written
+            anywhere on the server.
+          </li>
+          <li>
+            <strong>Password strength is enforced at signup.</strong> Django's standard
+            validators reject too-short passwords, all-numeric passwords, passwords
+            too similar to your email or username, and passwords on the well-known
+            common-password list.
+          </li>
+          <li>
+            <strong>IMAP passwords are encrypted at rest.</strong> Stored as
             <a href="https://cryptography.io/en/latest/fernet/"
-               target="_blank" rel="noopener noreferrer">Fernet</a> ciphertext, using a
-            <code>FIELD_ENCRYPTION_KEY</code> that is separate from the Django
+               target="_blank" rel="noopener noreferrer">Fernet</a> ciphertext using
+            a <code>FIELD_ENCRYPTION_KEY</code> that is separate from Django's
             <code>SECRET_KEY</code>. Passwords are never written to logs.
           </li>
           <li>
             <strong>Message bodies are never persisted.</strong> The Inbox fetches them
-            live from IMAP on every request. If you close the tab, the messages stay
-            only on your Mail.ru side.
-          </li>
-          <li>
-            <strong>HTTPS, HSTS, and secure cookies</strong> are enabled by default in
-            production deployments.
-          </li>
-          <li>
-            <strong>Rate limiting</strong> protects the login, OTP, signup, and password
-            reset endpoints from brute-force attempts.
-          </li>
-          <li>
-            <strong>Self-hoster note:</strong> rotating <code>FIELD_ENCRYPTION_KEY</code>
-            invalidates every stored IMAP password. Keep the key stable, or be prepared
-            to re-enter every password.
+            live from IMAP on every request; the server keeps no cache. Close the tab
+            and the messages stay only on your Mail.ru side.
           </li>
         </ul>
-      </div>
-    </section>
 
-    <section id="troubleshooting" class="card card-soft mb-4 guide-section">
-      <div class="card-body p-4">
-        <h2><i class="bi bi-life-preserver text-primary me-2"></i>Troubleshooting</h2>
+        <h3 class="h6 mt-3">Hardening on every request</h3>
+        <ul>
+          <li>
+            <strong>HTTPS everywhere in production.</strong>
+            <code>SECURE_SSL_REDIRECT</code> forces HTTPS, and HSTS is preloaded with
+            <code>includeSubDomains</code> so browsers refuse to fall back to plain HTTP.
+          </li>
+          <li>
+            <strong>Secure, HttpOnly, SameSite=Lax cookies.</strong> Session and CSRF
+            cookies can't be read by JavaScript or sent on cross-site requests in
+            normal flows.
+          </li>
+          <li>
+            <strong>No clickjacking.</strong> <code>X-Frame-Options: DENY</code> blocks
+            every attempt to embed the portal in a frame, on every page.
+          </li>
+          <li>
+            <strong>No MIME sniffing, minimal referrer leakage.</strong>
+            <code>X-Content-Type-Options: nosniff</code> and
+            <code>Referrer-Policy: same-origin</code> are set explicitly.
+          </li>
+          <li>
+            <strong>No HTML caching.</strong> A custom no-cache middleware tags every
+            HTML response so logged-in pages don't sit in proxy or browser caches
+            after you log out.
+          </li>
+          <li>
+            <strong>Rate limiting on auth endpoints.</strong> Login, signup, OTP entry,
+            OTP resend, and password reset all have per-user / per-IP budgets backed
+            by Django's cache; abusive bursts get blocked.
+          </li>
+        </ul>
 
-        <details class="guide-faq">
-          <summary><i class="bi bi-chevron-right me-1"></i>An account turned itself off.</summary>
-          <p class="small text-secondary mb-2">
-            Repeated connection failures auto-disable an account so we stop hammering
-            Mail.ru with bad credentials. Re-enable it from
-            <a href="{% url 'core:accounts_list' %}">Accounts</a> (toggle the switch),
-            then update the password if Mail.ru rejected the old one.
-          </p>
-        </details>
-
-        <details class="guide-faq">
-          <summary><i class="bi bi-chevron-right me-1"></i>"Test" says authentication failed.</summary>
-          <p class="small text-secondary mb-2">
-            Three things to check:
-          </p>
-          <ol class="small text-secondary mb-2">
-            <li>IMAP access is turned <em>on</em> in Mail.ru's settings.</li>
-            <li>If Mail.ru-side 2FA is on, you're using an application password — not
-            the account password.</li>
-            <li>Host is <span class="guide-kbd">imap.mail.ru</span> and port is
-            <span class="guide-kbd">993</span>.</li>
-          </ol>
-        </details>
-
-        <details class="guide-faq">
-          <summary><i class="bi bi-chevron-right me-1"></i>I can't add another account.</summary>
-          <p class="small text-secondary mb-2">
-            You've hit your account cap. See <a href="#limits">Account limits</a> or
-            visit <a href="{% url 'core:limits' %}">Limits</a> to view your usage.
-          </p>
-        </details>
-
-        <details class="guide-faq">
-          <summary><i class="bi bi-chevron-right me-1"></i>The signup or login email didn't arrive.</summary>
-          <p class="small text-secondary mb-2">
-            Check the Spam folder first — first-time messages from a new domain often
-            land there. If it's still missing after a couple of minutes, request a new
-            code (login) or resend the verification link (signup). If you're
-            self-hosting, also confirm that <code>RESEND_API_KEY</code> and
-            <code>RESEND_FROM_EMAIL</code> are set and the sender domain is verified in
-            Resend.
-          </p>
-        </details>
-
-        <details class="guide-faq">
-          <summary><i class="bi bi-chevron-right me-1"></i>I changed my Mail.ru password — what now?</summary>
-          <p class="small text-secondary mb-2">
-            Each connected account has an <strong>Update password</strong> action on
-            the <a href="{% url 'core:accounts_list' %}">Accounts</a> page. Set the new
-            value there; we'll re-encrypt and store it. The old ciphertext is replaced
-            in place.
-          </p>
-        </details>
+        <h3 class="h6 mt-3">Self-hoster note</h3>
+        <p class="mb-0">
+          Rotating <code>FIELD_ENCRYPTION_KEY</code> invalidates every stored IMAP
+          password. Keep the key stable, or be prepared to re-enter every password
+          after the rotation.
+        </p>
       </div>
     </section>
 
