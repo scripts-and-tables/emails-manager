@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 320" preserveAspectRatio="xMidYMid meet"
+     role="img" aria-label="Mails Manager App — One dashboard for every mailbox.">
+  <title>Mails Manager App — One dashboard for every mailbox.</title>
+
+  <defs>
+    <linearGradient id="hero-l-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#005FF9"/>
+      <stop offset="100%" stop-color="#0099FF"/>
+    </linearGradient>
+    <linearGradient id="hero-l-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbfcfd"/>
+      <stop offset="100%" stop-color="#eef2f7"/>
+    </linearGradient>
+    <radialGradient id="hero-l-glow" cx="80%" cy="50%" r="55%">
+      <stop offset="0%" stop-color="#005FF9" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#005FF9" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="hero-l-dots" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#005FF9" fill-opacity="0.06"/>
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1280" height="320" fill="url(#hero-l-bg)" rx="12"/>
+  <rect width="1280" height="320" fill="url(#hero-l-dots)" rx="12"/>
+  <rect width="1280" height="320" fill="url(#hero-l-glow)" rx="12"/>
+
+  <!-- Logo lockup, top-left -->
+  <g transform="translate(72, 64)">
+    <rect x="0" y="0" width="76" height="76" rx="16" fill="url(#hero-l-grad)"/>
+    <text x="38" y="54" text-anchor="middle"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="46" font-weight="700" fill="#ffffff">@</text>
+
+    <text x="96" y="44"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="38" font-weight="700" fill="#1a1d20" letter-spacing="-0.01em">Mails Manager</text>
+    <text x="96" y="70"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="14" font-weight="500" fill="#6c757d" letter-spacing="0.22em">A&#160;P&#160;P</text>
+  </g>
+
+  <!-- Tagline -->
+  <text x="72" y="208"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="28" font-weight="600" fill="#1a1d20" letter-spacing="-0.005em">One dashboard for every mailbox.</text>
+
+  <!-- Sub-text / feature pills -->
+  <g transform="translate(72, 240)" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#495057">
+    <g transform="translate(0, 0)">
+      <rect x="0" y="0" width="160" height="28" rx="14" fill="#ffffff" stroke="#dee2e6"/>
+      <circle cx="14" cy="14" r="4" fill="#005FF9"/>
+      <text x="26" y="18" font-weight="500">Encrypted credentials</text>
+    </g>
+    <g transform="translate(172, 0)">
+      <rect x="0" y="0" width="136" height="28" rx="14" fill="#ffffff" stroke="#dee2e6"/>
+      <circle cx="14" cy="14" r="4" fill="#198754"/>
+      <text x="26" y="18" font-weight="500">Email-OTP 2FA</text>
+    </g>
+    <g transform="translate(320, 0)">
+      <rect x="0" y="0" width="106" height="28" rx="14" fill="#ffffff" stroke="#dee2e6"/>
+      <circle cx="14" cy="14" r="4" fill="#6f42c1"/>
+      <text x="26" y="18" font-weight="500">Live IMAP</text>
+    </g>
+    <g transform="translate(438, 0)">
+      <rect x="0" y="0" width="118" height="28" rx="14" fill="#ffffff" stroke="#dee2e6"/>
+      <circle cx="14" cy="14" r="4" fill="#d63384"/>
+      <text x="26" y="18" font-weight="500">Open source</text>
+    </g>
+  </g>
+
+  <!-- Decorative envelope stack, right -->
+  <g transform="translate(880, 56)">
+    <!-- Back envelope -->
+    <g transform="rotate(-9 140 110)" opacity="0.45">
+      <rect x="20" y="40" width="240" height="156" rx="12" fill="url(#hero-l-grad)"/>
+      <path d="M 20 52 L 140 130 L 260 52" stroke="#ffffff" stroke-width="3" fill="none" stroke-linejoin="round"/>
+    </g>
+    <!-- Middle envelope -->
+    <g transform="rotate(-1 150 120)" opacity="0.78">
+      <rect x="30" y="50" width="240" height="156" rx="12" fill="url(#hero-l-grad)"/>
+      <path d="M 30 62 L 150 140 L 270 62" stroke="#ffffff" stroke-width="3" fill="none" stroke-linejoin="round"/>
+    </g>
+    <!-- Front envelope -->
+    <g transform="rotate(8 160 130)">
+      <rect x="40" y="60" width="240" height="156" rx="12" fill="url(#hero-l-grad)"/>
+      <path d="M 40 72 L 160 150 L 280 72" stroke="#ffffff" stroke-width="3" fill="none" stroke-linejoin="round"/>
+      <!-- Subtle envelope body lines -->
+      <line x1="62" y1="180" x2="180" y2="180" stroke="#ffffff" stroke-width="2" opacity="0.55"/>
+      <line x1="62" y1="194" x2="150" y2="194" stroke="#ffffff" stroke-width="2" opacity="0.4"/>
+    </g>
+  </g>
+</svg>

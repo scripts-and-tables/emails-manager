@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 64" role="img" aria-label="Mails Manager App">
+  <title>Mails Manager App</title>
+  <defs>
+    <linearGradient id="logo-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#005FF9"/>
+      <stop offset="100%" stop-color="#0099FF"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Icon tile -->
+  <rect x="0" y="0" width="64" height="64" rx="14" fill="url(#logo-grad)"/>
+  <text x="32" y="44" text-anchor="middle"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="38" font-weight="700" fill="#ffffff">@</text>
+
+  <!-- Wordmark -->
+  <text x="80" y="38"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="22" font-weight="700" fill="#1a1d20" letter-spacing="-0.01em">Mails Manager</text>
+  <text x="80" y="58"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="13" font-weight="500" fill="#6c757d" letter-spacing="0.18em">A&#160;P&#160;P</text>
+</svg>
