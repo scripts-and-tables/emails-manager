@@ -21,3 +21,6 @@ Thumbs.db
 .claude/
 *.swp
 *.swo
+
+promo/*.mp4
+promo/Recording*.mp4

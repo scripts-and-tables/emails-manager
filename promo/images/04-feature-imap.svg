@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" preserveAspectRatio="xMidYMid meet"
+     role="img" aria-label="Mails Manager App — live IMAP">
+  <title>Mails Manager App — live IMAP</title>
+
+  <defs>
+    <linearGradient id="g4-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#005FF9"/>
+      <stop offset="100%" stop-color="#0099FF"/>
+    </linearGradient>
+    <linearGradient id="g4-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbfcfd"/>
+      <stop offset="100%" stop-color="#eef2f7"/>
+    </linearGradient>
+    <pattern id="g4-dots" x="0" y="0" width="28" height="28" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#005FF9" fill-opacity="0.06"/>
+    </pattern>
+    <radialGradient id="g4-glow" cx="80%" cy="50%" r="55%">
+      <stop offset="0%" stop-color="#6f42c1" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#6f42c1" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="1200" fill="url(#g4-bg)"/>
+  <rect width="1200" height="1200" fill="url(#g4-dots)"/>
+  <rect width="1200" height="1200" fill="url(#g4-glow)"/>
+
+  <!-- Eyebrow -->
+  <g transform="translate(120, 140)">
+    <rect x="0" y="0" width="220" height="44" rx="22" fill="#ffffff" stroke="#dee2e6"/>
+    <circle cx="22" cy="22" r="6" fill="#6f42c1"/>
+    <text x="42" y="29"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="15" font-weight="600" fill="#1a1d20" letter-spacing="0.18em">F E A T U R E &#160;· &#160;0 3</text>
+  </g>
+
+  <!-- Headline -->
+  <text x="120" y="260"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="84" font-weight="800" fill="#1a1d20" letter-spacing="-0.02em">Live IMAP.</text>
+  <text x="120" y="360"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="84" font-weight="800" letter-spacing="-0.02em" fill="url(#g4-grad)">Real mailboxes.</text>
+
+  <text x="120" y="430"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="28" font-weight="500" fill="#495057">Connect Gmail, Outlook, FastMail — any IMAP host.</text>
+  <text x="120" y="468"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="28" font-weight="500" fill="#495057">No third-party API limits. Just protocol.</text>
+
+  <!-- Three account cards -->
+  <g transform="translate(120, 560)">
+    <!-- Card 1 -->
+    <g>
+      <rect x="0" y="0" width="960" height="130" rx="20" fill="#ffffff" stroke="#dee2e6"/>
+      <rect x="20" y="20" width="90" height="90" rx="16" fill="#dc3545"/>
+      <text x="65" y="80" text-anchor="middle"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="46" font-weight="800" fill="#ffffff">G</text>
+      <text x="138" y="56"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="28" font-weight="700" fill="#1a1d20">alex@gmail.com</text>
+      <text x="138" y="94"
+            font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
+            font-size="18" font-weight="500" fill="#6c757d">imap.gmail.com · 993 · TLS</text>
+      <g transform="translate(740, 40)">
+        <rect x="0" y="0" width="180" height="50" rx="25" fill="#d1e7dd" stroke="#a3cfbb"/>
+        <circle cx="22" cy="25" r="7" fill="#198754"/>
+        <circle cx="22" cy="25" r="12" fill="#198754" fill-opacity="0.25"/>
+        <text x="40" y="32"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="18" font-weight="600" fill="#0a3622">Connected</text>
+      </g>
+    </g>
+
+    <!-- Card 2 -->
+    <g transform="translate(0, 150)">
+      <rect x="0" y="0" width="960" height="130" rx="20" fill="#ffffff" stroke="#dee2e6"/>
+      <rect x="20" y="20" width="90" height="90" rx="16" fill="#0078d4"/>
+      <text x="65" y="80" text-anchor="middle"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="46" font-weight="800" fill="#ffffff">O</text>
+      <text x="138" y="56"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="28" font-weight="700" fill="#1a1d20">alex@outlook.com</text>
+      <text x="138" y="94"
+            font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
+            font-size="18" font-weight="500" fill="#6c757d">outlook.office365.com · 993 · TLS</text>
+      <g transform="translate(740, 40)">
+        <rect x="0" y="0" width="180" height="50" rx="25" fill="#d1e7dd" stroke="#a3cfbb"/>
+        <circle cx="22" cy="25" r="7" fill="#198754"/>
+        <circle cx="22" cy="25" r="12" fill="#198754" fill-opacity="0.25"/>
+        <text x="40" y="32"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="18" font-weight="600" fill="#0a3622">Connected</text>
+      </g>
+    </g>
+
+    <!-- Card 3 -->
+    <g transform="translate(0, 300)">
+      <rect x="0" y="0" width="960" height="130" rx="20" fill="#ffffff" stroke="#dee2e6"/>
+      <rect x="20" y="20" width="90" height="90" rx="16" fill="#6f42c1"/>
+      <text x="65" y="80" text-anchor="middle"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="46" font-weight="800" fill="#ffffff">F</text>
+      <text x="138" y="56"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="28" font-weight="700" fill="#1a1d20">alex@fastmail.com</text>
+      <text x="138" y="94"
+            font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
+            font-size="18" font-weight="500" fill="#6c757d">imap.fastmail.com · 993 · TLS</text>
+      <g transform="translate(740, 40)">
+        <rect x="0" y="0" width="180" height="50" rx="25" fill="#d1e7dd" stroke="#a3cfbb"/>
+        <circle cx="22" cy="25" r="7" fill="#198754"/>
+        <circle cx="22" cy="25" r="12" fill="#198754" fill-opacity="0.25"/>
+        <text x="40" y="32"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="18" font-weight="600" fill="#0a3622">Connected</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Footer -->
+  <g transform="translate(120, 1110)">
+    <rect x="0" y="0" width="48" height="48" rx="10" fill="url(#g4-grad)"/>
+    <text x="24" y="36" text-anchor="middle"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="28" font-weight="700" fill="#ffffff">@</text>
+    <text x="64" y="34"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="22" font-weight="700" fill="#1a1d20">Mails Manager App</text>
+  </g>
+</svg>

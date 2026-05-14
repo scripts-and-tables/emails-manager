@@ -1,0 +1,731 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Mails Manager App — promo demo</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    :root {
+      --grad-from: #005FF9;
+      --grad-to:   #0099FF;
+      --bg:        #0a0f1c;
+      --panel:     #ffffff;
+      --muted:     #6c757d;
+      --ok:        #198754;
+      --fail:      #dc3545;
+      --line:      rgba(0,0,0,.08);
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; overflow: hidden; }
+    body {
+      background:
+        radial-gradient(70% 50% at 80% 0%, rgba(0, 153, 255, .22), transparent 60%),
+        radial-gradient(60% 40% at 0% 30%, rgba(0, 95, 249, .20), transparent 60%),
+        var(--bg);
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      display: grid;
+      place-items: center;
+    }
+
+    /* ===== Stage ===== */
+    .stage {
+      position: relative;
+      width: 1080px;
+      height: 1080px;        /* 1:1 — perfect for LinkedIn feed */
+      max-width: 100vmin;
+      max-height: 100vmin;
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 48px;
+      padding: 80px;
+      align-items: center;
+    }
+
+    /* Optional: switch to 9:16 for Stories / Reels via ?v=portrait */
+    body.portrait .stage {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto;
+      width: 608px;
+      height: 1080px;
+    }
+    body.portrait .stage-text { text-align: center; }
+
+    /* ===== Headline column ===== */
+    .stage-text h1 {
+      font-size: 56px;
+      font-weight: 800;
+      letter-spacing: -.02em;
+      line-height: 1.05;
+      margin: 0 0 16px;
+    }
+    .stage-text h1 .grad {
+      background: linear-gradient(135deg, var(--grad-from) 0%, var(--grad-to) 60%, #00D9FF 100%);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .stage-text p {
+      font-size: 22px;
+      color: rgba(255,255,255,.7);
+      max-width: 32ch;
+      margin: 0 0 24px;
+    }
+    .scene-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: rgba(13, 110, 253, .18);
+      color: #6ea8fe;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    .scene-label::before {
+      content: '';
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--grad-from), var(--grad-to));
+      box-shadow: 0 0 12px var(--grad-to);
+    }
+    .url {
+      margin-top: 24px;
+      font-size: 18px;
+      color: rgba(255,255,255,.55);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    /* ===== Phone ===== */
+    .phone {
+      position: relative;
+      width: 320px;
+      height: 660px;
+      background: linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%);
+      border-radius: 44px;
+      padding: 14px;
+      margin: 0 auto;
+      box-shadow:
+        0 40px 80px -20px rgba(0,0,0,.6),
+        0 0 0 1px rgba(255,255,255,.06) inset;
+    }
+    .notch {
+      position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+      width: 110px; height: 24px;
+      background: #0a0a0a;
+      border-radius: 14px;
+      z-index: 50;
+    }
+    .screen {
+      width: 100%; height: 100%;
+      border-radius: 30px;
+      background: #f7f8fa;
+      color: #212529;
+      overflow: hidden;
+      position: relative;
+      font-size: 13px;
+    }
+    .status-bar {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 26px 0;
+      font-size: 12px; font-weight: 600;
+      height: 40px;
+    }
+    .navbar {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+    .brand {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-weight: 700; font-size: 14px;
+    }
+    .brand-mark {
+      width: 26px; height: 26px;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, var(--grad-from), var(--grad-to));
+      color: #fff; border-radius: 7px;
+      font-weight: 700;
+    }
+    .content { padding: 16px; height: calc(100% - 92px); position: relative; }
+
+    /* ===== Scenes (stacked, faded in by keyframes) ===== */
+    .scene {
+      position: absolute; inset: 0;
+      padding: 16px;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity .35s ease, transform .35s ease;
+    }
+    .scene.is-active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    h2.h-title { font-size: 18px; font-weight: 700; margin: 6px 0 14px; }
+
+    /* --- Scene 1: sign in --- */
+    .field {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+      font-size: 13px;
+      color: #495057;
+      min-height: 38px;
+      display: flex; align-items: center;
+    }
+    .field .label { font-size: 11px; color: var(--muted); margin-bottom: 2px; }
+    .field-stack { display: flex; flex-direction: column; gap: 0; }
+    .typed { display: inline-block; overflow: hidden; white-space: nowrap; vertical-align: bottom; }
+
+    .btn-primary {
+      display: block; width: 100%;
+      background: linear-gradient(135deg, var(--grad-from), var(--grad-to));
+      color: #fff; border: 0;
+      padding: 12px;
+      border-radius: 10px;
+      font-weight: 600;
+      box-shadow: 0 6px 16px rgba(0, 95, 249, .35);
+      margin-top: 6px;
+    }
+    .btn-press { animation: press 350ms ease-out forwards; }
+    @keyframes press {
+      0% { transform: scale(1); }
+      40% { transform: scale(.97); box-shadow: 0 2px 8px rgba(0, 95, 249, .35); }
+      100% { transform: scale(1); }
+    }
+
+    /* --- Scene 2: OTP --- */
+    .otp-row {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      margin: 22px 0 16px;
+    }
+    .otp-cell {
+      aspect-ratio: 1 / 1.2;
+      border: 2px solid var(--line);
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: 20px;
+      color: #212529;
+      background: #fff;
+    }
+    .otp-cell.is-filled { border-color: var(--grad-from); }
+    .otp-hint { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+    .check-pop {
+      position: absolute; inset: 0;
+      display: grid; place-items: center;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .check-pop .ring {
+      width: 96px; height: 96px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--grad-from), var(--grad-to));
+      display: grid; place-items: center;
+      color: #fff; font-size: 48px;
+      box-shadow: 0 12px 24px rgba(0, 95, 249, .35);
+      transform: scale(.6);
+    }
+
+    /* --- Scene 3: add account --- */
+    .form-row { margin-bottom: 10px; }
+    .form-row .label { font-size: 11px; color: var(--muted); margin-bottom: 4px; font-weight: 600; }
+    .form-row .input {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 9px 11px;
+      font-size: 13px;
+      min-height: 36px;
+      color: #212529;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+    .toast {
+      position: absolute; left: 14px; right: 14px; bottom: 16px;
+      background: #198754;
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      display: flex; align-items: center; gap: 8px;
+      opacity: 0;
+      transform: translateY(8px);
+      box-shadow: 0 8px 16px rgba(25, 135, 84, .35);
+    }
+
+    /* --- Scene 4: account status --- */
+    .acct-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+    }
+    .acct-email { font-weight: 600; font-size: 13px; }
+    .acct-host { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .acct-status { display: flex; align-items: center; gap: 6px; margin-top: 8px; font-size: 12px; }
+    .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .dot.idle { background: #adb5bd; box-shadow: 0 0 0 3px rgba(173, 181, 189, .18); }
+    .dot.ok   { background: var(--ok); box-shadow: 0 0 0 3px rgba(25, 135, 84, .15); }
+    .dot.fail { background: var(--fail); box-shadow: 0 0 0 3px rgba(220, 53, 69, .15); }
+    .refresh-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 11px;
+      color: var(--grad-from);
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .refresh-pill i { animation: spin 1.4s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* --- Scene 5: inbox --- */
+    .search {
+      display: flex; align-items: center; gap: 8px;
+      background: #fff; border: 1px solid var(--line); border-radius: 9px;
+      padding: 8px 12px; color: var(--muted); font-size: 12px;
+      margin-bottom: 12px;
+    }
+    .mail-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    .mail-row { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+    .from { font-weight: 700; font-size: 13px; }
+    .when { font-size: 11px; color: var(--muted); flex-shrink: 0; }
+    .subj { font-size: 12px; margin-top: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .subj.unread { font-weight: 700; }
+    .acc { font-size: 11px; color: var(--muted); margin-top: 4px; }
+    .acc .acc-pill { color: var(--grad-from); font-weight: 600; }
+
+    /* ===== Timeline (24 s loop) ===== */
+    /* 0–5s   sign in
+       5–10s  OTP
+       10–14s add account
+       14–18s account status
+       18–24s inbox */
+    .timeline-1  { animation: act1  24s ease-in-out infinite; }
+    .timeline-2  { animation: act2  24s ease-in-out infinite; }
+    .timeline-3  { animation: act3  24s ease-in-out infinite; }
+    .timeline-4  { animation: act4  24s ease-in-out infinite; }
+    .timeline-5  { animation: act5  24s ease-in-out infinite; }
+
+    @keyframes act1 {
+      0%, 18% { opacity: 1; transform: translateY(0); }
+      22%, 100% { opacity: 0; transform: translateY(8px); }
+    }
+    @keyframes act2 {
+      0%, 18% { opacity: 0; transform: translateY(8px); }
+      22%, 40% { opacity: 1; transform: translateY(0); }
+      44%, 100% { opacity: 0; transform: translateY(8px); }
+    }
+    @keyframes act3 {
+      0%, 40% { opacity: 0; transform: translateY(8px); }
+      44%, 56% { opacity: 1; transform: translateY(0); }
+      60%, 100% { opacity: 0; transform: translateY(8px); }
+    }
+    @keyframes act4 {
+      0%, 56% { opacity: 0; transform: translateY(8px); }
+      60%, 72% { opacity: 1; transform: translateY(0); }
+      76%, 100% { opacity: 0; transform: translateY(8px); }
+    }
+    @keyframes act5 {
+      0%, 72% { opacity: 0; transform: translateY(8px); }
+      76%, 100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Caption sync */
+    .caption-1 { animation: cap1 24s ease-in-out infinite; }
+    .caption-2 { animation: cap2 24s ease-in-out infinite; }
+    .caption-3 { animation: cap3 24s ease-in-out infinite; }
+    .caption-4 { animation: cap4 24s ease-in-out infinite; }
+    .caption-5 { animation: cap5 24s ease-in-out infinite; }
+    .caption-1, .caption-2, .caption-3, .caption-4, .caption-5 {
+      position: absolute; inset: 0;
+      opacity: 0;
+    }
+    @keyframes cap1 { 0%,18%{opacity:1} 22%,100%{opacity:0} }
+    @keyframes cap2 { 0%,18%{opacity:0} 22%,40%{opacity:1} 44%,100%{opacity:0} }
+    @keyframes cap3 { 0%,40%{opacity:0} 44%,56%{opacity:1} 60%,100%{opacity:0} }
+    @keyframes cap4 { 0%,56%{opacity:0} 60%,72%{opacity:1} 76%,100%{opacity:0} }
+    @keyframes cap5 { 0%,72%{opacity:0} 76%,100%{opacity:1} }
+
+    /* Per-scene micro-animations (all 24-second cycles so they re-sync each loop) */
+
+    /* Scene 1: type email then password, press button */
+    .type-email   { animation: typeEmail 24s linear infinite; }
+    .type-passwd  { animation: typePasswd 24s linear infinite; }
+    .press-signin { animation: pressSignin 24s linear infinite; transform-origin: center; }
+    @keyframes typeEmail  {
+      0% { width: 0; }
+      6%, 100% { width: 18ch; }
+    }
+    @keyframes typePasswd {
+      0%, 7% { width: 0; }
+      13%, 100% { width: 9ch; }
+    }
+    @keyframes pressSignin {
+      0%, 14% { transform: scale(1); box-shadow: 0 6px 16px rgba(0, 95, 249, .35); }
+      15% { transform: scale(.97); box-shadow: 0 2px 8px rgba(0, 95, 249, .35); }
+      17%, 100% { transform: scale(1); box-shadow: 0 6px 16px rgba(0, 95, 249, .35); }
+    }
+
+    /* Scene 2: OTP cells fill 1..6, then check pops */
+    .otp-cell.c1 { animation: cell 24s linear infinite; animation-delay: 0s; }
+    .otp-cell.c2 { animation: cell 24s linear infinite; }
+    .otp-cell.c3 { animation: cell 24s linear infinite; }
+    .otp-cell.c4 { animation: cell 24s linear infinite; }
+    .otp-cell.c5 { animation: cell 24s linear infinite; }
+    .otp-cell.c6 { animation: cell 24s linear infinite; }
+    @keyframes cell {
+      0%, 23% { color: transparent; border-color: var(--line); }
+      24%, 100% { color: #212529; border-color: var(--grad-from); }
+    }
+    .otp-cell.c1 { animation-name: cell1 }
+    .otp-cell.c2 { animation-name: cell2 }
+    .otp-cell.c3 { animation-name: cell3 }
+    .otp-cell.c4 { animation-name: cell4 }
+    .otp-cell.c5 { animation-name: cell5 }
+    .otp-cell.c6 { animation-name: cell6 }
+    @keyframes cell1 { 0%, 24% { color: transparent; border-color: var(--line); } 25%, 100% { color: #212529; border-color: var(--grad-from); } }
+    @keyframes cell2 { 0%, 27% { color: transparent; border-color: var(--line); } 28%, 100% { color: #212529; border-color: var(--grad-from); } }
+    @keyframes cell3 { 0%, 30% { color: transparent; border-color: var(--line); } 31%, 100% { color: #212529; border-color: var(--grad-from); } }
+    @keyframes cell4 { 0%, 33% { color: transparent; border-color: var(--line); } 34%, 100% { color: #212529; border-color: var(--grad-from); } }
+    @keyframes cell5 { 0%, 36% { color: transparent; border-color: var(--line); } 37%, 100% { color: #212529; border-color: var(--grad-from); } }
+    @keyframes cell6 { 0%, 38% { color: transparent; border-color: var(--line); } 39%, 100% { color: #212529; border-color: var(--grad-from); } }
+
+    .check-pop { animation: checkPop 24s ease-in-out infinite; }
+    @keyframes checkPop {
+      0%, 38% { opacity: 0; }
+      40%, 43% { opacity: 1; }
+      40% { transform: none; }
+      45%, 100% { opacity: 0; }
+    }
+    .check-pop .ring { animation: checkRing 24s ease-in-out infinite; }
+    @keyframes checkRing {
+      0%, 39% { transform: scale(.6); }
+      41% { transform: scale(1.08); }
+      43%, 100% { transform: scale(1); }
+    }
+
+    /* Scene 3: form fills, toast appears */
+    .add-email  { animation: typeAddEmail 24s linear infinite; }
+    .add-host   { animation: typeAddHost 24s linear infinite; }
+    .add-pass   { animation: typeAddPass 24s linear infinite; }
+    .toast      { animation: toastIn 24s ease-in-out infinite; }
+    @keyframes typeAddEmail {
+      0%, 45% { width: 0 }
+      49%, 100% { width: 17ch }
+    }
+    @keyframes typeAddHost {
+      0%, 49% { width: 0 }
+      52%, 100% { width: 13ch }
+    }
+    @keyframes typeAddPass {
+      0%, 52% { width: 0 }
+      55%, 100% { width: 16ch }
+    }
+    @keyframes toastIn {
+      0%, 56% { opacity: 0; transform: translateY(8px); }
+      58%, 60% { opacity: 1; transform: translateY(0); }
+      62%, 100% { opacity: 0; transform: translateY(8px); }
+    }
+
+    /* Scene 4: dots flip idle -> ok */
+    .acct-1 .dot { animation: dot1 24s ease-in-out infinite; }
+    .acct-2 .dot { animation: dot2 24s ease-in-out infinite; }
+    .acct-3 .dot { animation: dot3 24s ease-in-out infinite; }
+    @keyframes dot1 {
+      0%, 62% { background: #adb5bd; box-shadow: 0 0 0 3px rgba(173, 181, 189, .18); }
+      63%, 100% { background: var(--ok); box-shadow: 0 0 0 3px rgba(25, 135, 84, .15); }
+    }
+    @keyframes dot2 {
+      0%, 64% { background: #adb5bd; box-shadow: 0 0 0 3px rgba(173, 181, 189, .18); }
+      65%, 100% { background: var(--ok); box-shadow: 0 0 0 3px rgba(25, 135, 84, .15); }
+    }
+    @keyframes dot3 {
+      0%, 66% { background: #adb5bd; box-shadow: 0 0 0 3px rgba(173, 181, 189, .18); }
+      67%, 75% { background: var(--ok); box-shadow: 0 0 0 3px rgba(25, 135, 84, .15); }
+      76%, 100% { background: var(--fail); box-shadow: 0 0 0 3px rgba(220, 53, 69, .15); }
+    }
+    .acct-1 .status-text, .acct-2 .status-text { animation: textOK 24s ease-in-out infinite; }
+    .acct-3 .status-text { animation: textFail 24s ease-in-out infinite; }
+    @keyframes textOK {
+      0%, 62% { color: var(--muted); }
+      63%, 100% { color: var(--ok); }
+    }
+    @keyframes textFail {
+      0%, 66% { color: var(--muted); }
+      67%, 75% { color: var(--ok); }
+      76%, 100% { color: var(--fail); }
+    }
+
+    /* Scene 5: mail cards stream in */
+    .mail-1 { animation: mailIn 24s ease-out infinite; }
+    .mail-2 { animation: mailIn 24s ease-out infinite; }
+    .mail-3 { animation: mailIn 24s ease-out infinite; }
+    .mail-4 { animation: mailIn 24s ease-out infinite; }
+    @keyframes mailIn {
+      0%, 76% { opacity: 0; transform: translateY(8px); }
+      80%, 100% { opacity: 1; transform: translateY(0); }
+    }
+    .mail-1 { animation-name: m1 }
+    .mail-2 { animation-name: m2 }
+    .mail-3 { animation-name: m3 }
+    .mail-4 { animation-name: m4 }
+    @keyframes m1 { 0%, 77% { opacity:0; transform: translateY(8px) } 79%, 100% { opacity:1; transform: translateY(0) } }
+    @keyframes m2 { 0%, 80% { opacity:0; transform: translateY(8px) } 82%, 100% { opacity:1; transform: translateY(0) } }
+    @keyframes m3 { 0%, 83% { opacity:0; transform: translateY(8px) } 85%, 100% { opacity:1; transform: translateY(0) } }
+    @keyframes m4 { 0%, 86% { opacity:0; transform: translateY(8px) } 88%, 100% { opacity:1; transform: translateY(0) } }
+
+    /* ===== Helper bar (hidden when recording) ===== */
+    .record-hint {
+      position: fixed; right: 16px; bottom: 16px;
+      background: rgba(0,0,0,.55);
+      backdrop-filter: blur(8px);
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 12px;
+      max-width: 320px;
+      line-height: 1.45;
+      z-index: 1000;
+    }
+    .record-hint kbd {
+      background: rgba(255,255,255,.15);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 11px;
+    }
+    .record-hint .h { font-weight: 700; margin-bottom: 4px; }
+    .record-hint.is-hidden { display: none; }
+
+    .progress {
+      position: absolute;
+      left: 80px; right: 80px; bottom: 32px;
+      height: 4px;
+      background: rgba(255,255,255,.08);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .progress .bar {
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, var(--grad-from), var(--grad-to));
+      transform-origin: left;
+      animation: bar 24s linear infinite;
+    }
+    @keyframes bar { 0% { transform: scaleX(0) } 100% { transform: scaleX(1) } }
+
+    body.clean .record-hint { display: none; }
+    body.clean .progress { display: none; }
+  </style>
+</head>
+<body>
+  <div class="stage">
+
+    <!-- Left column: headline & captions -->
+    <div class="stage-text" style="position: relative; height: 360px;">
+      <div class="caption-1">
+        <span class="scene-label">Step 1 · Sign in</span>
+        <h1>One login,<br><span class="grad">every mailbox.</span></h1>
+        <p>Email and password. Same flow you already know.</p>
+        <div class="url">m-m.up.railway.app</div>
+      </div>
+      <div class="caption-2">
+        <span class="scene-label">Step 2 · Two-factor</span>
+        <h1>2FA<br><span class="grad">on by default.</span></h1>
+        <p>A six-digit code emailed to you. Expires in 10 minutes.</p>
+        <div class="url">m-m.up.railway.app</div>
+      </div>
+      <div class="caption-3">
+        <span class="scene-label">Step 3 · Add accounts</span>
+        <h1>Add a mailbox<br><span class="grad">in seconds.</span></h1>
+        <p>Paste an app-specific password once. Encrypted at rest with Fernet.</p>
+        <div class="url">m-m.up.railway.app</div>
+      </div>
+      <div class="caption-4">
+        <span class="scene-label">Step 4 · Status at a glance</span>
+        <h1>Healthy or not,<br><span class="grad">at a glance.</span></h1>
+        <p>Live IMAP connection tests. Per account, or all in parallel.</p>
+        <div class="url">m-m.up.railway.app</div>
+      </div>
+      <div class="caption-5">
+        <span class="scene-label">Step 5 · Unified inbox</span>
+        <h1>Every mailbox.<br><span class="grad">One feed.</span></h1>
+        <p>Search, filter by window, open and read. mail.ru, Gmail, Yandex, Outlook.</p>
+        <div class="url">m-m.up.railway.app</div>
+      </div>
+    </div>
+
+    <!-- Right column: phone -->
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen">
+        <div class="status-bar">
+          <span>9:41</span>
+          <span><i class="bi bi-reception-4"></i> <i class="bi bi-wifi"></i> <i class="bi bi-battery-full"></i></span>
+        </div>
+        <div class="navbar">
+          <span class="brand"><span class="brand-mark">@</span> Manager</span>
+          <i class="bi bi-list" style="color: #495057; font-size: 20px;"></i>
+        </div>
+        <div class="content">
+
+          <!-- Scene 1 — Sign in -->
+          <div class="scene timeline-1">
+            <h2 class="h-title">Sign in</h2>
+            <div class="field field-stack">
+              <span class="label">Email</span>
+              <span><span class="typed type-email">alex@example.com</span></span>
+            </div>
+            <div class="field field-stack">
+              <span class="label">Password</span>
+              <span><span class="typed type-passwd">•••••••••</span></span>
+            </div>
+            <button class="btn-primary press-signin">Sign in <i class="bi bi-arrow-right"></i></button>
+            <div style="margin-top: 14px; text-align: center; font-size: 12px; color: var(--muted);">
+              Forgot password? · Create account
+            </div>
+          </div>
+
+          <!-- Scene 2 — OTP -->
+          <div class="scene timeline-2">
+            <h2 class="h-title">Two-factor code</h2>
+            <p class="otp-hint">We just emailed a 6-digit code. It expires in 10 minutes.</p>
+            <div class="otp-row">
+              <div class="otp-cell c1">4</div>
+              <div class="otp-cell c2">8</div>
+              <div class="otp-cell c3">2</div>
+              <div class="otp-cell c4">7</div>
+              <div class="otp-cell c5">1</div>
+              <div class="otp-cell c6">3</div>
+            </div>
+            <button class="btn-primary">Verify</button>
+            <div class="check-pop">
+              <div class="ring"><i class="bi bi-check-lg"></i></div>
+            </div>
+          </div>
+
+          <!-- Scene 3 — Add account -->
+          <div class="scene timeline-3">
+            <h2 class="h-title">Add account</h2>
+            <div class="form-row">
+              <div class="label">EMAIL</div>
+              <div class="input"><span class="typed add-email">work@mail.ru</span></div>
+            </div>
+            <div class="form-row">
+              <div class="label">IMAP HOST</div>
+              <div class="input"><span class="typed add-host">imap.mail.ru</span></div>
+            </div>
+            <div class="form-row">
+              <div class="label">APP PASSWORD</div>
+              <div class="input"><span class="typed add-pass">••••••••••••••••</span></div>
+            </div>
+            <button class="btn-primary">Save · encrypt at rest</button>
+            <div class="toast"><i class="bi bi-check-circle-fill"></i> Account added &amp; encrypted</div>
+          </div>
+
+          <!-- Scene 4 — Account status -->
+          <div class="scene timeline-4">
+            <h2 class="h-title">Accounts</h2>
+            <div class="refresh-pill"><i class="bi bi-arrow-repeat"></i> Refreshing all</div>
+            <div class="acct-card acct-1">
+              <div class="acct-email">work@mail.ru</div>
+              <div class="acct-host">imap.mail.ru:993</div>
+              <div class="acct-status">
+                <span class="dot idle"></span>
+                <span class="status-text">Connected</span>
+              </div>
+            </div>
+            <div class="acct-card acct-2">
+              <div class="acct-email">side@gmail.com</div>
+              <div class="acct-host">imap.gmail.com:993</div>
+              <div class="acct-status">
+                <span class="dot idle"></span>
+                <span class="status-text">Connected</span>
+              </div>
+            </div>
+            <div class="acct-card acct-3">
+              <div class="acct-email">old@mail.ru</div>
+              <div class="acct-host">imap.mail.ru:993</div>
+              <div class="acct-status">
+                <span class="dot idle"></span>
+                <span class="status-text">Auth failed</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Scene 5 — Inbox -->
+          <div class="scene timeline-5">
+            <h2 class="h-title">Inbox</h2>
+            <div class="search"><i class="bi bi-search"></i> Search subject or sender</div>
+            <div class="mail-card mail-1">
+              <div class="mail-row">
+                <div class="from">Linear</div>
+                <div class="when">11:22</div>
+              </div>
+              <div class="subj unread">3 issues moved to In Progress</div>
+              <div class="acc"><span class="acc-pill">@ work@mail.ru</span></div>
+            </div>
+            <div class="mail-card mail-2">
+              <div class="mail-row">
+                <div class="from">Stripe</div>
+                <div class="when">10:01</div>
+              </div>
+              <div class="subj unread">Payout completed</div>
+              <div class="acc"><span class="acc-pill">@ side@gmail.com</span></div>
+            </div>
+            <div class="mail-card mail-3">
+              <div class="mail-row">
+                <div class="from">GitHub</div>
+                <div class="when">09:48</div>
+              </div>
+              <div class="subj">New PR ready for review</div>
+              <div class="acc"><span class="acc-pill">@ dev@gmail.com</span></div>
+            </div>
+            <div class="mail-card mail-4">
+              <div class="mail-row">
+                <div class="from">Booking.com</div>
+                <div class="when">Yesterday</div>
+              </div>
+              <div class="subj">Your trip to Lisbon · check in tips</div>
+              <div class="acc"><span class="acc-pill">@ travel@mail.ru</span></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="progress"><div class="bar"></div></div>
+  </div>
+
+  <div class="record-hint" id="hint">
+    <div class="h">Recording tips</div>
+    Loop is <b>24 seconds</b>. Press <kbd>C</kbd> to hide this panel + progress bar for a clean capture.<br>
+    <kbd>Win</kbd>+<kbd>G</kbd> opens the Windows Game Bar — point it at this window and record one full loop.<br>
+    Add <code>?v=portrait</code> for 9:16 (Stories / Reels).
+  </div>
+
+  <script>
+    if (location.search.includes('v=portrait')) document.body.classList.add('portrait');
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'c' || e.key === 'C') document.body.classList.toggle('clean');
+      if (e.key === 'h' || e.key === 'H') document.getElementById('hint').classList.toggle('is-hidden');
+    });
+  </script>
+</body>
+</html>

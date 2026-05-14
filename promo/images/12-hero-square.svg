@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" preserveAspectRatio="xMidYMid meet"
+     role="img" aria-label="Mails Manager App — one dashboard for every mailbox.">
+  <title>Mails Manager App — one dashboard for every mailbox.</title>
+
+  <defs>
+    <linearGradient id="g12-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#005FF9"/>
+      <stop offset="100%" stop-color="#0099FF"/>
+    </linearGradient>
+    <linearGradient id="g12-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbfcfd"/>
+      <stop offset="100%" stop-color="#eef2f7"/>
+    </linearGradient>
+    <pattern id="g12-dots" x="0" y="0" width="28" height="28" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#005FF9" fill-opacity="0.06"/>
+    </pattern>
+    <radialGradient id="g12-glow" cx="100%" cy="100%" r="80%">
+      <stop offset="0%" stop-color="#005FF9" stop-opacity="0.14"/>
+      <stop offset="100%" stop-color="#005FF9" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="1200" fill="url(#g12-bg)"/>
+  <rect width="1200" height="1200" fill="url(#g12-dots)"/>
+  <rect width="1200" height="1200" fill="url(#g12-glow)"/>
+
+  <!-- Logo lockup, top -->
+  <g transform="translate(120, 140)">
+    <rect x="0" y="0" width="120" height="120" rx="26" fill="url(#g12-grad)"/>
+    <text x="60" y="92" text-anchor="middle"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="76" font-weight="700" fill="#ffffff">@</text>
+
+    <text x="148" y="68"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="58" font-weight="700" fill="#1a1d20" letter-spacing="-0.01em">Mails Manager</text>
+    <text x="148" y="108"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="22" font-weight="500" fill="#6c757d" letter-spacing="0.22em">A&#160;P&#160;P</text>
+  </g>
+
+  <!-- Tagline -->
+  <text x="120" y="400"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="80" font-weight="800" fill="#1a1d20" letter-spacing="-0.02em">One dashboard</text>
+  <text x="120" y="490"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="80" font-weight="800" letter-spacing="-0.02em" fill="url(#g12-grad)">for every mailbox.</text>
+
+  <!-- Feature pills -->
+  <g transform="translate(120, 560)" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="20" fill="#1a1d20">
+    <g>
+      <rect x="0" y="0" width="280" height="52" rx="26" fill="#ffffff" stroke="#dee2e6"/>
+      <circle cx="26" cy="26" r="7" fill="#005FF9"/>
+      <text x="46" y="34" font-weight="500">Encrypted credentials</text>
+    </g>
+    <g transform="translate(296, 0)">
+      <rect x="0" y="0" width="232" height="52" rx="26" fill="#ffffff" stroke="#dee2e6"/>
+      <circle cx="26" cy="26" r="7" fill="#198754"/>
+      <text x="46" y="34" font-weight="500">Email-OTP 2FA</text>
+    </g>
+    <g transform="translate(544, 0)">
+      <rect x="0" y="0" width="188" height="52" rx="26" fill="#ffffff" stroke="#dee2e6"/>
+      <circle cx="26" cy="26" r="7" fill="#6f42c1"/>
+      <text x="46" y="34" font-weight="500">Live IMAP</text>
+    </g>
+    <g transform="translate(0, 68)">
+      <rect x="0" y="0" width="216" height="52" rx="26" fill="#ffffff" stroke="#dee2e6"/>
+      <circle cx="26" cy="26" r="7" fill="#d63384"/>
+      <text x="46" y="34" font-weight="500">Open source</text>
+    </g>
+    <g transform="translate(232, 68)">
+      <rect x="0" y="0" width="268" height="52" rx="26" fill="#ffffff" stroke="#dee2e6"/>
+      <circle cx="26" cy="26" r="7" fill="#fd7e14"/>
+      <text x="46" y="34" font-weight="500">Deployed on Railway</text>
+    </g>
+  </g>
+
+  <!-- Decorative envelope stack -->
+  <g transform="translate(620, 720)">
+    <g transform="rotate(-9 200 150)" opacity="0.35">
+      <rect x="0" y="0" width="380" height="240" rx="18" fill="url(#g12-grad)"/>
+      <path d="M 0 16 L 190 175 L 380 16" stroke="#ffffff" stroke-width="4" fill="none" stroke-linejoin="round"/>
+    </g>
+    <g transform="rotate(-1 220 170)" opacity="0.65">
+      <rect x="20" y="20" width="380" height="240" rx="18" fill="url(#g12-grad)"/>
+      <path d="M 20 36 L 210 195 L 400 36" stroke="#ffffff" stroke-width="4" fill="none" stroke-linejoin="round"/>
+    </g>
+    <g transform="rotate(8 240 200)">
+      <rect x="40" y="40" width="380" height="240" rx="18" fill="url(#g12-grad)"/>
+      <path d="M 40 56 L 230 215 L 420 56" stroke="#ffffff" stroke-width="4" fill="none" stroke-linejoin="round"/>
+      <line x1="80" y1="240" x2="320" y2="240" stroke="#ffffff" stroke-width="3" opacity="0.55"/>
+      <line x1="80" y1="262" x2="260" y2="262" stroke="#ffffff" stroke-width="3" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- URL footer -->
+  <g transform="translate(120, 1080)">
+    <rect x="0" y="0" width="500" height="60" rx="14" fill="#0f1726"/>
+    <text x="22" y="40"
+          font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
+          font-size="24" font-weight="700" fill="#9bb3ff">m-m.up.railway.app</text>
+  </g>
+</svg>

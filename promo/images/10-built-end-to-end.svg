@@ -1,0 +1,197 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" preserveAspectRatio="xMidYMid meet"
+     role="img" aria-label="Mails Manager App — built end-to-end">
+  <title>Mails Manager App — built end-to-end</title>
+
+  <defs>
+    <linearGradient id="g10-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#005FF9"/>
+      <stop offset="100%" stop-color="#0099FF"/>
+    </linearGradient>
+    <linearGradient id="g10-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbfcfd"/>
+      <stop offset="100%" stop-color="#eef2f7"/>
+    </linearGradient>
+    <pattern id="g10-dots" x="0" y="0" width="28" height="28" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#005FF9" fill-opacity="0.06"/>
+    </pattern>
+    <radialGradient id="g10-glow" cx="0%" cy="100%" r="65%">
+      <stop offset="0%" stop-color="#005FF9" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#005FF9" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="1200" fill="url(#g10-bg)"/>
+  <rect width="1200" height="1200" fill="url(#g10-dots)"/>
+  <rect width="1200" height="1200" fill="url(#g10-glow)"/>
+
+  <!-- Eyebrow -->
+  <g transform="translate(120, 140)">
+    <rect x="0" y="0" width="200" height="44" rx="22" fill="#ffffff" stroke="#dee2e6"/>
+    <circle cx="22" cy="22" r="6" fill="#fd7e14"/>
+    <text x="42" y="29"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="15" font-weight="600" fill="#1a1d20" letter-spacing="0.18em">P O R T F O L I O</text>
+  </g>
+
+  <text x="120" y="270"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="86" font-weight="800" fill="#1a1d20" letter-spacing="-0.02em">Built end-to-end.</text>
+  <text x="120" y="370"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="86" font-weight="800" letter-spacing="-0.02em" fill="url(#g10-grad)">Auth to inbox.</text>
+
+  <text x="120" y="440"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="28" font-weight="500" fill="#495057">One Django repo. Models, views, security, deploy.</text>
+
+  <!-- 4 scope cards in 2x2 grid -->
+  <g transform="translate(120, 530)">
+    <!-- Auth -->
+    <g>
+      <rect x="0" y="0" width="460" height="240" rx="22" fill="#ffffff" stroke="#dee2e6" stroke-width="2"/>
+      <g transform="translate(28, 28)">
+        <rect x="0" y="0" width="56" height="56" rx="12" fill="url(#g10-grad)"/>
+        <path d="M 18 30 L 26 38 L 40 22" stroke="#ffffff" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      </g>
+      <text x="100" y="56"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="14" font-weight="700" fill="#6c757d" letter-spacing="0.18em">0 1 &#160;· &#160;A U T H</text>
+      <text x="100" y="84"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="26" font-weight="700" fill="#1a1d20">Email signup + OTP login</text>
+      <text x="28" y="140"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="17" font-weight="500" fill="#495057">Email-verified signup, password reset,</text>
+      <text x="28" y="162"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="17" font-weight="500" fill="#495057">2FA on by default, AuthEvent audit log.</text>
+      <g transform="translate(28, 184)">
+        <rect x="0" y="0" width="86" height="32" rx="16" fill="#eef2f7" stroke="#dee2e6"/>
+        <text x="43" y="21" text-anchor="middle"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="13" font-weight="600" fill="#495057">django-otp</text>
+      </g>
+      <g transform="translate(122, 184)">
+        <rect x="0" y="0" width="62" height="32" rx="16" fill="#eef2f7" stroke="#dee2e6"/>
+        <text x="31" y="21" text-anchor="middle"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="13" font-weight="600" fill="#495057">Resend</text>
+      </g>
+    </g>
+
+    <!-- IMAP -->
+    <g transform="translate(480, 0)">
+      <rect x="0" y="0" width="460" height="240" rx="22" fill="#ffffff" stroke="#dee2e6" stroke-width="2"/>
+      <g transform="translate(28, 28)">
+        <rect x="0" y="0" width="56" height="56" rx="12" fill="#6f42c1"/>
+        <path d="M 14 24 L 28 36 L 42 24" stroke="#ffffff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <rect x="14" y="18" width="28" height="22" rx="2" fill="none" stroke="#ffffff" stroke-width="3"/>
+      </g>
+      <text x="100" y="56"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="14" font-weight="700" fill="#6c757d" letter-spacing="0.18em">0 2 &#160;· &#160;I M A P</text>
+      <text x="100" y="84"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="26" font-weight="700" fill="#1a1d20">Multi-account mailbox</text>
+      <text x="28" y="140"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="17" font-weight="500" fill="#495057">Add, test, list IMAP accounts. Unified</text>
+      <text x="28" y="162"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="17" font-weight="500" fill="#495057">inbox aggregates messages live.</text>
+      <g transform="translate(28, 184)">
+        <rect x="0" y="0" width="106" height="32" rx="16" fill="#eef2f7" stroke="#dee2e6"/>
+        <text x="53" y="21" text-anchor="middle"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="13" font-weight="600" fill="#495057">imaplib · TLS</text>
+      </g>
+    </g>
+
+    <!-- Security -->
+    <g transform="translate(0, 260)">
+      <rect x="0" y="0" width="460" height="240" rx="22" fill="#ffffff" stroke="#dee2e6" stroke-width="2"/>
+      <g transform="translate(28, 28)">
+        <rect x="0" y="0" width="56" height="56" rx="12" fill="#198754"/>
+        <path d="M 22 16 L 22 12 a 6 6 0 0 1 12 0 L 34 16" stroke="#ffffff" stroke-width="3" fill="none"/>
+        <rect x="16" y="16" width="24" height="24" rx="4" fill="#ffffff"/>
+      </g>
+      <text x="100" y="56"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="14" font-weight="700" fill="#6c757d" letter-spacing="0.18em">0 3 &#160;· &#160;S E C U R I T Y</text>
+      <text x="100" y="84"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="26" font-weight="700" fill="#1a1d20">Production-shaped</text>
+      <text x="28" y="140"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="17" font-weight="500" fill="#495057">Fernet for IMAP creds, CSP with</text>
+      <text x="28" y="162"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="17" font-weight="500" fill="#495057">per-request nonces, HSTS, secure cookies.</text>
+      <g transform="translate(28, 184)">
+        <rect x="0" y="0" width="60" height="32" rx="16" fill="#eef2f7" stroke="#dee2e6"/>
+        <text x="30" y="21" text-anchor="middle"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="13" font-weight="600" fill="#495057">Fernet</text>
+      </g>
+      <g transform="translate(96, 184)">
+        <rect x="0" y="0" width="48" height="32" rx="16" fill="#eef2f7" stroke="#dee2e6"/>
+        <text x="24" y="21" text-anchor="middle"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="13" font-weight="600" fill="#495057">CSP</text>
+      </g>
+      <g transform="translate(152, 184)">
+        <rect x="0" y="0" width="58" height="32" rx="16" fill="#eef2f7" stroke="#dee2e6"/>
+        <text x="29" y="21" text-anchor="middle"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="13" font-weight="600" fill="#495057">HSTS</text>
+      </g>
+    </g>
+
+    <!-- Deploy -->
+    <g transform="translate(480, 260)">
+      <rect x="0" y="0" width="460" height="240" rx="22" fill="#ffffff" stroke="#dee2e6" stroke-width="2"/>
+      <g transform="translate(28, 28)">
+        <rect x="0" y="0" width="56" height="56" rx="12" fill="#0b0d0e"/>
+        <path d="M 18 22 L 38 22 M 18 30 L 38 30 M 18 38 L 38 38" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+      </g>
+      <text x="100" y="56"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="14" font-weight="700" fill="#6c757d" letter-spacing="0.18em">0 4 &#160;· &#160;D E P L O Y</text>
+      <text x="100" y="84"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="26" font-weight="700" fill="#1a1d20">Live on Railway</text>
+      <text x="28" y="140"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="17" font-weight="500" fill="#495057">Gunicorn, Postgres, collectstatic,</text>
+      <text x="28" y="162"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="17" font-weight="500" fill="#495057">migrate on every push. ~50s build.</text>
+      <g transform="translate(28, 184)">
+        <rect x="0" y="0" width="74" height="32" rx="16" fill="#eef2f7" stroke="#dee2e6"/>
+        <text x="37" y="21" text-anchor="middle"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="13" font-weight="600" fill="#495057">Railway</text>
+      </g>
+      <g transform="translate(110, 184)">
+        <rect x="0" y="0" width="84" height="32" rx="16" fill="#eef2f7" stroke="#dee2e6"/>
+        <text x="42" y="21" text-anchor="middle"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="13" font-weight="600" fill="#495057">Gunicorn</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Footer -->
+  <g transform="translate(120, 1110)">
+    <rect x="0" y="0" width="48" height="48" rx="10" fill="url(#g10-grad)"/>
+    <text x="24" y="36" text-anchor="middle"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="28" font-weight="700" fill="#ffffff">@</text>
+    <text x="64" y="32"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="22" font-weight="700" fill="#1a1d20">Mails Manager App</text>
+    <text x="64" y="56"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="16" font-weight="500" fill="#6c757d">m-m.up.railway.app</text>
+  </g>
+</svg>

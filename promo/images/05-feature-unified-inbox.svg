@@ -1,0 +1,217 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" preserveAspectRatio="xMidYMid meet"
+     role="img" aria-label="Mails Manager App — unified inbox">
+  <title>Mails Manager App — unified inbox</title>
+
+  <defs>
+    <linearGradient id="g5-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#005FF9"/>
+      <stop offset="100%" stop-color="#0099FF"/>
+    </linearGradient>
+    <linearGradient id="g5-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbfcfd"/>
+      <stop offset="100%" stop-color="#eef2f7"/>
+    </linearGradient>
+    <pattern id="g5-dots" x="0" y="0" width="28" height="28" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#005FF9" fill-opacity="0.06"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="1200" fill="url(#g5-bg)"/>
+  <rect width="1200" height="1200" fill="url(#g5-dots)"/>
+
+  <!-- Eyebrow -->
+  <g transform="translate(120, 100)">
+    <rect x="0" y="0" width="220" height="44" rx="22" fill="#ffffff" stroke="#dee2e6"/>
+    <circle cx="22" cy="22" r="6" fill="#005FF9"/>
+    <text x="42" y="29"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="15" font-weight="600" fill="#1a1d20" letter-spacing="0.18em">F E A T U R E &#160;· &#160;0 4</text>
+  </g>
+
+  <!-- Headline -->
+  <text x="120" y="220"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="72" font-weight="800" fill="#1a1d20" letter-spacing="-0.02em">One dashboard</text>
+  <text x="120" y="298"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="72" font-weight="800" letter-spacing="-0.02em" fill="url(#g5-grad)">for every mailbox.</text>
+
+  <!-- Browser-style inbox mock -->
+  <g transform="translate(80, 380)">
+    <rect x="0" y="0" width="1040" height="720" rx="24" fill="#ffffff" stroke="#dee2e6" stroke-width="2"/>
+
+    <!-- Window chrome -->
+    <rect x="0" y="0" width="1040" height="60" rx="24" fill="#f1f3f5"/>
+    <rect x="0" y="40" width="1040" height="20" fill="#f1f3f5"/>
+    <circle cx="28" cy="30" r="8" fill="#dc3545"/>
+    <circle cx="56" cy="30" r="8" fill="#ffc107"/>
+    <circle cx="84" cy="30" r="8" fill="#198754"/>
+
+    <!-- Tab bar -->
+    <g transform="translate(120, 14)">
+      <rect x="0" y="0" width="280" height="32" rx="8" fill="#ffffff" stroke="#dee2e6"/>
+      <text x="20" y="22"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="14" font-weight="600" fill="#1a1d20">m-m.up.railway.app/inbox</text>
+    </g>
+
+    <!-- Sidebar -->
+    <g transform="translate(20, 80)">
+      <rect x="0" y="0" width="240" height="620" rx="12" fill="#f8f9fa" stroke="#dee2e6"/>
+      <text x="20" y="36"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="13" font-weight="700" fill="#6c757d" letter-spacing="0.18em">A C C O U N T S</text>
+
+      <!-- All -->
+      <g transform="translate(12, 60)">
+        <rect x="0" y="0" width="216" height="48" rx="10" fill="url(#g5-grad)"/>
+        <circle cx="22" cy="24" r="9" fill="#ffffff" fill-opacity="0.3"/>
+        <text x="22" y="29" text-anchor="middle"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="13" font-weight="700" fill="#ffffff">@</text>
+        <text x="46" y="30"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="16" font-weight="600" fill="#ffffff">All inboxes</text>
+        <text x="180" y="30"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="14" font-weight="700" fill="#ffffff">17</text>
+      </g>
+
+      <!-- Gmail -->
+      <g transform="translate(12, 122)">
+        <rect x="0" y="0" width="216" height="48" rx="10" fill="transparent"/>
+        <circle cx="22" cy="24" r="10" fill="#dc3545"/>
+        <text x="22" y="29" text-anchor="middle"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="13" font-weight="700" fill="#ffffff">G</text>
+        <text x="46" y="30"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="16" font-weight="500" fill="#1a1d20">Gmail</text>
+        <text x="190" y="30"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="14" font-weight="600" fill="#6c757d">7</text>
+      </g>
+
+      <!-- Outlook -->
+      <g transform="translate(12, 178)">
+        <rect x="0" y="0" width="216" height="48" rx="10" fill="transparent"/>
+        <circle cx="22" cy="24" r="10" fill="#0078d4"/>
+        <text x="22" y="29" text-anchor="middle"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="13" font-weight="700" fill="#ffffff">O</text>
+        <text x="46" y="30"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="16" font-weight="500" fill="#1a1d20">Outlook</text>
+        <text x="190" y="30"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="14" font-weight="600" fill="#6c757d">6</text>
+      </g>
+
+      <!-- Fastmail -->
+      <g transform="translate(12, 234)">
+        <rect x="0" y="0" width="216" height="48" rx="10" fill="transparent"/>
+        <circle cx="22" cy="24" r="10" fill="#6f42c1"/>
+        <text x="22" y="29" text-anchor="middle"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="13" font-weight="700" fill="#ffffff">F</text>
+        <text x="46" y="30"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="16" font-weight="500" fill="#1a1d20">Fastmail</text>
+        <text x="190" y="30"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="14" font-weight="600" fill="#6c757d">4</text>
+      </g>
+    </g>
+
+    <!-- Inbox list -->
+    <g transform="translate(280, 90)">
+      <text x="0" y="20"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="26" font-weight="700" fill="#1a1d20">Inbox</text>
+      <text x="80" y="20"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="16" font-weight="500" fill="#6c757d">17 messages · 3 accounts</text>
+
+      <!-- Email rows -->
+      <g transform="translate(0, 50)">
+        <rect x="0" y="0" width="720" height="100" rx="14" fill="#f8f9fa" stroke="#dee2e6"/>
+        <circle cx="30" cy="50" r="14" fill="#dc3545"/>
+        <text x="30" y="55" text-anchor="middle"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="14" font-weight="700" fill="#ffffff">G</text>
+        <text x="60" y="36"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="17" font-weight="700" fill="#1a1d20">Stripe — Payout to your account</text>
+        <text x="60" y="62"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="14" font-weight="500" fill="#495057">A payout of $1,284.00 is on its way…</text>
+        <text x="60" y="84"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="12" font-weight="600" fill="#6c757d">alex@gmail.com · 2 min ago</text>
+        <circle cx="690" cy="30" r="8" fill="#005FF9"/>
+      </g>
+
+      <g transform="translate(0, 168)">
+        <rect x="0" y="0" width="720" height="100" rx="14" fill="#f8f9fa" stroke="#dee2e6"/>
+        <circle cx="30" cy="50" r="14" fill="#0078d4"/>
+        <text x="30" y="55" text-anchor="middle"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="14" font-weight="700" fill="#ffffff">O</text>
+        <text x="60" y="36"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="17" font-weight="700" fill="#1a1d20">Recruiter — re: Senior backend role</text>
+        <text x="60" y="62"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="14" font-weight="500" fill="#495057">Thanks for the call — sending a brief…</text>
+        <text x="60" y="84"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="12" font-weight="600" fill="#6c757d">alex@outlook.com · 18 min ago</text>
+      </g>
+
+      <g transform="translate(0, 286)">
+        <rect x="0" y="0" width="720" height="100" rx="14" fill="#f8f9fa" stroke="#dee2e6"/>
+        <circle cx="30" cy="50" r="14" fill="#6f42c1"/>
+        <text x="30" y="55" text-anchor="middle"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="14" font-weight="700" fill="#ffffff">F</text>
+        <text x="60" y="36"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="17" font-weight="700" fill="#1a1d20">GitHub — new release on django/django</text>
+        <text x="60" y="62"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="14" font-weight="500" fill="#495057">5.2 is out. Highlights and migration notes…</text>
+        <text x="60" y="84"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="12" font-weight="600" fill="#6c757d">alex@fastmail.com · 1 h ago</text>
+      </g>
+
+      <g transform="translate(0, 404)">
+        <rect x="0" y="0" width="720" height="100" rx="14" fill="#f8f9fa" stroke="#dee2e6"/>
+        <circle cx="30" cy="50" r="14" fill="#dc3545"/>
+        <text x="30" y="55" text-anchor="middle"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="14" font-weight="700" fill="#ffffff">G</text>
+        <text x="60" y="36"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="17" font-weight="700" fill="#1a1d20">Mom — Sunday lunch?</text>
+        <text x="60" y="62"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="14" font-weight="500" fill="#495057">If you're free we'd love to see you…</text>
+        <text x="60" y="84"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="12" font-weight="600" fill="#6c757d">alex@gmail.com · 3 h ago</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Footer -->
+  <g transform="translate(120, 1140)">
+    <rect x="0" y="0" width="40" height="40" rx="8" fill="url(#g5-grad)"/>
+    <text x="20" y="30" text-anchor="middle"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="24" font-weight="700" fill="#ffffff">@</text>
+    <text x="52" y="28"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="18" font-weight="700" fill="#1a1d20">m-m.up.railway.app</text>
+  </g>
+</svg>

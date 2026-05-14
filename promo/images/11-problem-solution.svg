@@ -1,0 +1,142 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" preserveAspectRatio="xMidYMid meet"
+     role="img" aria-label="Mails Manager App — three mailboxes, one dashboard">
+  <title>Mails Manager App — three mailboxes, one dashboard</title>
+
+  <defs>
+    <linearGradient id="g11-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#005FF9"/>
+      <stop offset="100%" stop-color="#0099FF"/>
+    </linearGradient>
+    <linearGradient id="g11-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbfcfd"/>
+      <stop offset="100%" stop-color="#eef2f7"/>
+    </linearGradient>
+    <pattern id="g11-dots" x="0" y="0" width="28" height="28" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#005FF9" fill-opacity="0.06"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="1200" fill="url(#g11-bg)"/>
+  <rect width="1200" height="1200" fill="url(#g11-dots)"/>
+
+  <!-- Eyebrow -->
+  <g transform="translate(120, 100)">
+    <rect x="0" y="0" width="200" height="44" rx="22" fill="#ffffff" stroke="#dee2e6"/>
+    <circle cx="22" cy="22" r="6" fill="#dc3545"/>
+    <text x="42" y="29"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="15" font-weight="600" fill="#1a1d20" letter-spacing="0.18em">T H E &#160;P R O B L E M</text>
+  </g>
+
+  <!-- Before headline -->
+  <text x="120" y="220"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="62" font-weight="800" fill="#1a1d20" letter-spacing="-0.02em">3 mailboxes.</text>
+  <text x="120" y="284"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="62" font-weight="800" fill="#1a1d20" letter-spacing="-0.02em">3 browser tabs.</text>
+  <text x="120" y="348"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="62" font-weight="800" fill="#dc3545" letter-spacing="-0.02em">3 logins a day.</text>
+
+  <!-- Three messy tabs -->
+  <g transform="translate(120, 410)">
+    <g>
+      <rect x="0" y="0" width="280" height="42" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+      <circle cx="20" cy="21" r="10" fill="#dc3545"/>
+      <text x="20" y="26" text-anchor="middle"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="13" font-weight="700" fill="#ffffff">G</text>
+      <text x="40" y="27"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="14" font-weight="500" fill="#1a1d20">Gmail · Inbox (1,283)</text>
+      <circle cx="260" cy="21" r="6" fill="#dc3545"/>
+    </g>
+    <g transform="translate(300, 0)">
+      <rect x="0" y="0" width="280" height="42" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+      <circle cx="20" cy="21" r="10" fill="#0078d4"/>
+      <text x="20" y="26" text-anchor="middle"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="13" font-weight="700" fill="#ffffff">O</text>
+      <text x="40" y="27"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="14" font-weight="500" fill="#1a1d20">Outlook · Inbox (97)</text>
+      <circle cx="260" cy="21" r="6" fill="#dc3545"/>
+    </g>
+    <g transform="translate(600, 0)">
+      <rect x="0" y="0" width="280" height="42" rx="10" fill="#ffffff" stroke="#dee2e6"/>
+      <circle cx="20" cy="21" r="10" fill="#6f42c1"/>
+      <text x="20" y="26" text-anchor="middle"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="13" font-weight="700" fill="#ffffff">F</text>
+      <text x="40" y="27"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="14" font-weight="500" fill="#1a1d20">Fastmail · Inbox (412)</text>
+      <circle cx="260" cy="21" r="6" fill="#dc3545"/>
+    </g>
+  </g>
+
+  <!-- Divider with arrow -->
+  <g transform="translate(120, 510)">
+    <line x1="0" y1="40" x2="380" y2="40" stroke="#dee2e6" stroke-width="2"/>
+    <g transform="translate(390, 0)">
+      <rect x="0" y="14" width="180" height="52" rx="26" fill="url(#g11-grad)"/>
+      <text x="90" y="48" text-anchor="middle"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="18" font-weight="700" fill="#ffffff" letter-spacing="0.10em">M M A   F I X E S   T H I S</text>
+    </g>
+    <line x1="580" y1="40" x2="960" y2="40" stroke="#dee2e6" stroke-width="2"/>
+  </g>
+
+  <!-- After headline -->
+  <g transform="translate(120, 620)">
+    <rect x="0" y="0" width="232" height="44" rx="22" fill="#ffffff" stroke="#dee2e6"/>
+    <circle cx="22" cy="22" r="6" fill="#198754"/>
+    <text x="42" y="29"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="15" font-weight="600" fill="#1a1d20" letter-spacing="0.18em">T H E &#160;S O L U T I O N</text>
+  </g>
+
+  <text x="120" y="740"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="76" font-weight="800" letter-spacing="-0.02em" fill="url(#g11-grad)">One dashboard.</text>
+  <text x="120" y="816"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="76" font-weight="800" fill="#1a1d20" letter-spacing="-0.02em">Every mailbox.</text>
+
+  <!-- One unified tab -->
+  <g transform="translate(120, 880)">
+    <rect x="0" y="0" width="880" height="80" rx="18" fill="#ffffff" stroke="#dee2e6" stroke-width="2"/>
+    <rect x="0" y="0" width="880" height="80" rx="18" fill="url(#g11-grad)" fill-opacity="0.06"/>
+    <g transform="translate(22, 22)">
+      <rect x="0" y="0" width="36" height="36" rx="8" fill="url(#g11-grad)"/>
+      <text x="18" y="27" text-anchor="middle"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="22" font-weight="700" fill="#ffffff">@</text>
+    </g>
+    <text x="80" y="40"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="20" font-weight="700" fill="#1a1d20">m-m.up.railway.app · All inboxes</text>
+    <text x="80" y="66"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="16" font-weight="500" fill="#6c757d">3 accounts · 1,792 messages · 1 login</text>
+    <g transform="translate(760, 22)">
+      <rect x="0" y="0" width="100" height="36" rx="18" fill="#d1e7dd" stroke="#a3cfbb"/>
+      <circle cx="20" cy="18" r="6" fill="#198754"/>
+      <text x="38" y="24"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="14" font-weight="700" fill="#0a3622">Live</text>
+    </g>
+  </g>
+
+  <!-- Footer -->
+  <g transform="translate(120, 1110)">
+    <rect x="0" y="0" width="48" height="48" rx="10" fill="url(#g11-grad)"/>
+    <text x="24" y="36" text-anchor="middle"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="28" font-weight="700" fill="#ffffff">@</text>
+    <text x="64" y="34"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="22" font-weight="700" fill="#1a1d20">Mails Manager App · m-m.up.railway.app</text>
+  </g>
+</svg>
