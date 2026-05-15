@@ -1,0 +1,132 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" preserveAspectRatio="xMidYMid meet"
+     role="img" aria-label="Why Fernet — don't roll your own crypto">
+  <title>Why Fernet — don't roll your own crypto</title>
+
+  <defs>
+    <linearGradient id="g17-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#005FF9"/>
+      <stop offset="100%" stop-color="#0099FF"/>
+    </linearGradient>
+    <linearGradient id="g17-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbfcfd"/>
+      <stop offset="100%" stop-color="#eef2f7"/>
+    </linearGradient>
+    <pattern id="g17-dots" x="0" y="0" width="28" height="28" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#005FF9" fill-opacity="0.06"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="1200" fill="url(#g17-bg)"/>
+  <rect width="1200" height="1200" fill="url(#g17-dots)"/>
+
+  <!-- Eyebrow -->
+  <g transform="translate(120, 140)">
+    <rect x="0" y="0" width="170" height="44" rx="22" fill="#ffffff" stroke="#dee2e6"/>
+    <circle cx="22" cy="22" r="6" fill="#005FF9"/>
+    <text x="42" y="29"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="15" font-weight="600" fill="#1a1d20" letter-spacing="0.18em">C R Y P T O &#160;1 0 1</text>
+  </g>
+
+  <text x="120" y="270"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="88" font-weight="800" fill="#1a1d20" letter-spacing="-0.02em">Don't roll</text>
+  <text x="120" y="370"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="88" font-weight="800" letter-spacing="-0.02em" fill="url(#g17-grad)">your own crypto.</text>
+
+  <text x="120" y="440"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="28" font-weight="500" fill="#495057">This app uses Fernet from the cryptography library.</text>
+  <text x="120" y="478"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="28" font-weight="500" fill="#495057">It's the boring, audited choice for a reason.</text>
+
+  <!-- What Fernet gives you -->
+  <g transform="translate(120, 550)">
+    <rect x="0" y="0" width="960" height="430" rx="28" fill="#ffffff" stroke="#dee2e6" stroke-width="2"/>
+
+    <text x="40" y="60"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="16" font-weight="700" fill="#6c757d" letter-spacing="0.18em">W H A T &#160;Y O U &#160;G E T</text>
+
+    <!-- 2x2 grid of properties -->
+    <g transform="translate(40, 100)" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+      <!-- AEAD -->
+      <g>
+        <rect x="0" y="0" width="56" height="56" rx="12" fill="url(#g17-grad)"/>
+        <text x="28" y="38" text-anchor="middle"
+              font-size="22" font-weight="800" fill="#ffffff">🔒</text>
+        <text x="74" y="26" font-size="22" font-weight="700" fill="#1a1d20">AES-128-CBC + HMAC-SHA256</text>
+        <text x="74" y="50" font-size="16" font-weight="500" fill="#6c757d">Authenticated encryption — tampering is detected</text>
+      </g>
+
+      <!-- IV per message -->
+      <g transform="translate(440, 0)">
+        <rect x="0" y="0" width="56" height="56" rx="12" fill="url(#g17-grad)"/>
+        <text x="28" y="38" text-anchor="middle"
+              font-size="22" font-weight="800" fill="#ffffff">⤭</text>
+        <text x="74" y="26" font-size="22" font-weight="700" fill="#1a1d20">Random IV per message</text>
+        <text x="74" y="50" font-size="16" font-weight="500" fill="#6c757d">Same plaintext → different ciphertext</text>
+      </g>
+
+      <!-- Timestamp -->
+      <g transform="translate(0, 100)">
+        <rect x="0" y="0" width="56" height="56" rx="12" fill="url(#g17-grad)"/>
+        <text x="28" y="38" text-anchor="middle"
+              font-size="22" font-weight="800" fill="#ffffff">⏱</text>
+        <text x="74" y="26" font-size="22" font-weight="700" fill="#1a1d20">Built-in timestamp</text>
+        <text x="74" y="50" font-size="16" font-weight="500" fill="#6c757d">TTL checks for free — drop stale tokens</text>
+      </g>
+
+      <!-- Key rotation -->
+      <g transform="translate(440, 100)">
+        <rect x="0" y="0" width="56" height="56" rx="12" fill="url(#g17-grad)"/>
+        <text x="28" y="38" text-anchor="middle"
+              font-size="22" font-weight="800" fill="#ffffff">⟳</text>
+        <text x="74" y="26" font-size="22" font-weight="700" fill="#1a1d20">MultiFernet key rotation</text>
+        <text x="74" y="50" font-size="16" font-weight="500" fill="#6c757d">Rotate keys without downtime or migrations</text>
+      </g>
+
+      <!-- Simple API -->
+      <g transform="translate(0, 200)">
+        <rect x="0" y="0" width="56" height="56" rx="12" fill="url(#g17-grad)"/>
+        <text x="28" y="38" text-anchor="middle"
+              font-size="22" font-weight="800" fill="#ffffff">{ }</text>
+        <text x="74" y="26" font-size="22" font-weight="700" fill="#1a1d20">2 methods, 0 footguns</text>
+        <text x="74" y="50" font-size="16" font-weight="500" fill="#6c757d">f.encrypt(b"…") · f.decrypt(token, ttl=300)</text>
+      </g>
+
+      <!-- Audited -->
+      <g transform="translate(440, 200)">
+        <rect x="0" y="0" width="56" height="56" rx="12" fill="url(#g17-grad)"/>
+        <text x="28" y="38" text-anchor="middle"
+              font-size="22" font-weight="800" fill="#ffffff">✓</text>
+        <text x="74" y="26" font-size="22" font-weight="700" fill="#1a1d20">Battle-tested, audited</text>
+        <text x="74" y="50" font-size="16" font-weight="500" fill="#6c757d">cryptography.io — the boring default</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Code snippet -->
+  <g transform="translate(120, 1010)">
+    <rect x="0" y="0" width="960" height="100" rx="18" fill="#0d1117"/>
+    <text x="28" y="38"
+          font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
+          font-size="18" font-weight="600" fill="#7d8590"># settings.py · key from env, never the DB</text>
+    <text x="28" y="74"
+          font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
+          font-size="18" font-weight="700" fill="#7dd3fc">password_cipher = Fernet(os.environ["FERNET_KEY"]).encrypt(pw)</text>
+  </g>
+
+  <!-- Footer -->
+  <g transform="translate(120, 1140)">
+    <rect x="0" y="0" width="40" height="40" rx="8" fill="url(#g17-grad)"/>
+    <text x="20" y="30" text-anchor="middle"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="24" font-weight="700" fill="#ffffff">@</text>
+    <text x="52" y="28"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="18" font-weight="700" fill="#1a1d20">Mails Manager App · m-m.up.railway.app</text>
+  </g>
+</svg>

@@ -1,0 +1,160 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" preserveAspectRatio="xMidYMid meet"
+     role="img" aria-label="Threat model — what the attacker sees">
+  <title>Threat model — what the attacker sees</title>
+
+  <defs>
+    <linearGradient id="g16-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#005FF9"/>
+      <stop offset="100%" stop-color="#0099FF"/>
+    </linearGradient>
+    <linearGradient id="g16-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbfcfd"/>
+      <stop offset="100%" stop-color="#eef2f7"/>
+    </linearGradient>
+    <pattern id="g16-dots" x="0" y="0" width="28" height="28" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#005FF9" fill-opacity="0.06"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="1200" fill="url(#g16-bg)"/>
+  <rect width="1200" height="1200" fill="url(#g16-dots)"/>
+
+  <!-- Eyebrow -->
+  <g transform="translate(120, 100)">
+    <rect x="0" y="0" width="230" height="44" rx="22" fill="#ffffff" stroke="#dee2e6"/>
+    <circle cx="22" cy="22" r="6" fill="#dc3545"/>
+    <text x="42" y="29"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="15" font-weight="600" fill="#1a1d20" letter-spacing="0.18em">T H R E A T &#160;M O D E L</text>
+  </g>
+
+  <text x="120" y="220"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="74" font-weight="800" fill="#1a1d20" letter-spacing="-0.02em">If your DB</text>
+  <text x="120" y="298"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="74" font-weight="800" letter-spacing="-0.02em" fill="url(#g16-grad)">leaks tomorrow…</text>
+
+  <!-- Two side-by-side panels: WITHOUT vs WITH -->
+  <g transform="translate(120, 370)">
+    <!-- WITHOUT (left) -->
+    <g>
+      <rect x="0" y="0" width="450" height="600" rx="24" fill="#ffffff" stroke="#dee2e6" stroke-width="2"/>
+      <rect x="0" y="0" width="450" height="80" rx="24" fill="#fde2e2"/>
+      <rect x="0" y="56" width="450" height="24" fill="#fde2e2"/>
+      <text x="24" y="50"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="14" font-weight="700" fill="#dc3545" letter-spacing="0.18em">W I T H O U T &#160;E N C R Y P T I O N</text>
+      <text x="24" y="74"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="22" font-weight="800" fill="#1a1d20">Plain text</text>
+
+      <text x="24" y="130"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="14" font-weight="600" fill="#6c757d" letter-spacing="0.16em">D B &#160;D U M P</text>
+      <rect x="24" y="144" width="400" height="50" rx="10" fill="#f1f3f5" stroke="#dee2e6"/>
+      <text x="40" y="178"
+            font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
+            font-size="20" font-weight="600" fill="#1a1d20">alex@gmail.com</text>
+      <rect x="24" y="206" width="400" height="50" rx="10" fill="#f1f3f5" stroke="#dee2e6"/>
+      <text x="40" y="240"
+            font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
+            font-size="20" font-weight="600" fill="#dc3545">hunter2-imap-pass</text>
+      <rect x="24" y="268" width="400" height="50" rx="10" fill="#f1f3f5" stroke="#dee2e6"/>
+      <text x="40" y="302"
+            font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
+            font-size="20" font-weight="600" fill="#dc3545">imap.gmail.com:993</text>
+
+      <!-- Attacker outcome -->
+      <g transform="translate(24, 360)">
+        <rect x="0" y="0" width="400" height="200" rx="14" fill="#fef0f0" stroke="#f5c2c7"/>
+        <text x="20" y="36"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="14" font-weight="700" fill="#6c757d" letter-spacing="0.16em">A T T A C K E R &#160;C A N</text>
+        <text x="20" y="76"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="20" font-weight="700" fill="#a02834">✕ log in as you</text>
+        <text x="20" y="110"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="20" font-weight="700" fill="#a02834">✕ read every message</text>
+        <text x="20" y="144"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="20" font-weight="700" fill="#a02834">✕ send mail from you</text>
+        <text x="20" y="178"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="20" font-weight="700" fill="#a02834">✕ pivot to other accounts</text>
+      </g>
+    </g>
+
+    <!-- WITH Fernet (right) -->
+    <g transform="translate(490, 0)">
+      <rect x="0" y="0" width="450" height="600" rx="24" fill="#ffffff" stroke="#dee2e6" stroke-width="2"/>
+      <rect x="0" y="0" width="450" height="80" rx="24" fill="url(#g16-grad)"/>
+      <rect x="0" y="56" width="450" height="24" fill="#0099FF"/>
+      <text x="24" y="50"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="14" font-weight="700" fill="#ffffff" letter-spacing="0.18em">W I T H &#160;F E R N E T &#160;A T &#160;R E S T</text>
+      <text x="24" y="74"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="22" font-weight="800" fill="#ffffff">This app</text>
+
+      <text x="24" y="130"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="14" font-weight="600" fill="#6c757d" letter-spacing="0.16em">D B &#160;D U M P</text>
+      <rect x="24" y="144" width="400" height="50" rx="10" fill="#f1f3f5" stroke="#dee2e6"/>
+      <text x="40" y="178"
+            font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
+            font-size="20" font-weight="600" fill="#1a1d20">alex@gmail.com</text>
+      <rect x="24" y="206" width="400" height="50" rx="10" fill="#0f1726"/>
+      <text x="40" y="240"
+            font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
+            font-size="16" font-weight="600" fill="#7dd3fc">gAAAAABl9z...QcKx2pTH4_w==</text>
+      <rect x="24" y="268" width="400" height="50" rx="10" fill="#0f1726"/>
+      <text x="40" y="302"
+            font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
+            font-size="16" font-weight="600" fill="#7dd3fc">gAAAAABl9z...nXRf9Pa==</text>
+
+      <!-- Attacker outcome -->
+      <g transform="translate(24, 360)">
+        <rect x="0" y="0" width="400" height="200" rx="14" fill="#d1e7dd" stroke="#a3cfbb"/>
+        <text x="20" y="36"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="14" font-weight="700" fill="#6c757d" letter-spacing="0.16em">A T T A C K E R &#160;G E T S</text>
+        <text x="20" y="76"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="20" font-weight="700" fill="#0a3622">✓ email addresses (low value)</text>
+        <text x="20" y="110"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="20" font-weight="700" fill="#0a3622">✓ opaque ciphertext blobs</text>
+        <text x="20" y="144"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="20" font-weight="700" fill="#0a3622">✓ a brute-force problem</text>
+        <text x="20" y="178"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="20" font-weight="700" fill="#0a3622">✓ key lives outside the DB</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Verdict bar -->
+  <g transform="translate(120, 1010)">
+    <rect x="0" y="0" width="960" height="90" rx="20" fill="#1a1d20"/>
+    <text x="40" y="42"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="24" font-weight="800" fill="#ffffff">A DB dump should leak metadata, not mailboxes.</text>
+    <text x="40" y="72"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="16" font-weight="500" fill="#9ba9bb">Design for the bad day. Encrypt at rest. Keep the key elsewhere.</text>
+  </g>
+
+  <!-- Footer -->
+  <g transform="translate(120, 1140)">
+    <rect x="0" y="0" width="40" height="40" rx="8" fill="url(#g16-grad)"/>
+    <text x="20" y="30" text-anchor="middle"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="24" font-weight="700" fill="#ffffff">@</text>
+    <text x="52" y="28"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="18" font-weight="700" fill="#1a1d20">Mails Manager App · m-m.up.railway.app</text>
+  </g>
+</svg>

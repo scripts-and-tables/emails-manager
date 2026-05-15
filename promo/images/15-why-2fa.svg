@@ -1,0 +1,116 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" preserveAspectRatio="xMidYMid meet"
+     role="img" aria-label="Why 2FA matters">
+  <title>Why 2FA matters — the numbers</title>
+
+  <defs>
+    <linearGradient id="g15-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#005FF9"/>
+      <stop offset="100%" stop-color="#0099FF"/>
+    </linearGradient>
+    <linearGradient id="g15-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0d1117"/>
+      <stop offset="100%" stop-color="#161b22"/>
+    </linearGradient>
+    <pattern id="g15-dots" x="0" y="0" width="28" height="28" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#0099FF" fill-opacity="0.12"/>
+    </pattern>
+    <radialGradient id="g15-glow" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#005FF9" stop-opacity="0.20"/>
+      <stop offset="100%" stop-color="#005FF9" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="1200" fill="url(#g15-bg)"/>
+  <rect width="1200" height="1200" fill="url(#g15-dots)"/>
+  <rect width="1200" height="1200" fill="url(#g15-glow)"/>
+
+  <!-- Eyebrow -->
+  <g transform="translate(120, 140)">
+    <rect x="0" y="0" width="170" height="44" rx="22" fill="#0d1117" stroke="#30363d"/>
+    <circle cx="22" cy="22" r="6" fill="#dc3545"/>
+    <text x="42" y="29"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="15" font-weight="600" fill="#f0f6fc" letter-spacing="0.18em">W H Y &#160;2 F A</text>
+  </g>
+
+  <!-- Big stat -->
+  <text x="120" y="380"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="280" font-weight="800" letter-spacing="-0.05em" fill="url(#g15-grad)">99%</text>
+
+  <text x="120" y="460"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="42" font-weight="800" fill="#f0f6fc" letter-spacing="-0.01em">of automated account-takeover</text>
+  <text x="120" y="510"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="42" font-weight="800" fill="#f0f6fc" letter-spacing="-0.01em">attacks stop at a second factor.</text>
+
+  <text x="120" y="568"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="20" font-weight="500" fill="#7d8590">— Microsoft Security, Identity report, 2019 (still holds up)</text>
+
+  <!-- Three supporting stat cards -->
+  <g transform="translate(120, 660)">
+    <g>
+      <rect x="0" y="0" width="300" height="220" rx="22" fill="#0d1117" stroke="#30363d" stroke-width="2"/>
+      <text x="24" y="60"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="72" font-weight="800" letter-spacing="-0.04em" fill="url(#g15-grad)">81%</text>
+      <text x="24" y="110"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="18" font-weight="700" fill="#f0f6fc">of breaches use</text>
+      <text x="24" y="138"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="18" font-weight="700" fill="#f0f6fc">stolen credentials</text>
+      <text x="24" y="180"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="14" font-weight="500" fill="#7d8590">Verizon DBIR</text>
+    </g>
+
+    <g transform="translate(330, 0)">
+      <rect x="0" y="0" width="300" height="220" rx="22" fill="#0d1117" stroke="#30363d" stroke-width="2"/>
+      <text x="24" y="60"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="72" font-weight="800" letter-spacing="-0.04em" fill="url(#g15-grad)">5 s</text>
+      <text x="24" y="110"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="18" font-weight="700" fill="#f0f6fc">to type a 6-digit</text>
+      <text x="24" y="138"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="18" font-weight="700" fill="#f0f6fc">email OTP code</text>
+      <text x="24" y="180"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="14" font-weight="500" fill="#7d8590">User test, this app</text>
+    </g>
+
+    <g transform="translate(660, 0)">
+      <rect x="0" y="0" width="300" height="220" rx="22" fill="#0d1117" stroke="#30363d" stroke-width="2"/>
+      <text x="24" y="60"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="72" font-weight="800" letter-spacing="-0.04em" fill="url(#g15-grad)">0</text>
+      <text x="24" y="110"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="18" font-weight="700" fill="#f0f6fc">apps to install,</text>
+      <text x="24" y="138"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="18" font-weight="700" fill="#f0f6fc">QR codes to scan</text>
+      <text x="24" y="180"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="14" font-weight="500" fill="#7d8590">Just your inbox</text>
+    </g>
+  </g>
+
+  <!-- Footer -->
+  <g transform="translate(120, 1100)">
+    <rect x="0" y="0" width="48" height="48" rx="10" fill="url(#g15-grad)"/>
+    <text x="24" y="36" text-anchor="middle"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="28" font-weight="700" fill="#ffffff">@</text>
+    <text x="64" y="32"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="22" font-weight="700" fill="#f0f6fc">Mails Manager App</text>
+    <text x="64" y="56"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="16" font-weight="500" fill="#9ba9bb">2FA on by default · m-m.up.railway.app</text>
+  </g>
+</svg>

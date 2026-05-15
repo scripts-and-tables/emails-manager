@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" preserveAspectRatio="xMidYMid meet"
+     role="img" aria-label="Recent commit log — the work in commits">
+  <title>Recent commit log — the work in commits</title>
+
+  <defs>
+    <linearGradient id="g20-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#005FF9"/>
+      <stop offset="100%" stop-color="#0099FF"/>
+    </linearGradient>
+    <linearGradient id="g20-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0d1117"/>
+      <stop offset="100%" stop-color="#161b22"/>
+    </linearGradient>
+    <pattern id="g20-dots" x="0" y="0" width="28" height="28" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#0099FF" fill-opacity="0.12"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="1200" fill="url(#g20-bg)"/>
+  <rect width="1200" height="1200" fill="url(#g20-dots)"/>
+
+  <!-- Eyebrow -->
+  <g transform="translate(120, 140)">
+    <rect x="0" y="0" width="180" height="44" rx="22" fill="#0d1117" stroke="#30363d"/>
+    <circle cx="22" cy="22" r="6" fill="#3fb950"/>
+    <text x="42" y="29"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="15" font-weight="600" fill="#f0f6fc" letter-spacing="0.18em">C H A N G E L O G</text>
+  </g>
+
+  <text x="120" y="280"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="86" font-weight="800" fill="#f0f6fc" letter-spacing="-0.02em">The work,</text>
+  <text x="120" y="376"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="86" font-weight="800" letter-spacing="-0.02em" fill="url(#g20-grad)">in commits.</text>
+
+  <text x="120" y="438"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="24" font-weight="500" fill="#9ba9bb">$ git log --oneline · last 10 on main</text>
+
+  <!-- git log card -->
+  <g transform="translate(120, 510)">
+    <rect x="0" y="0" width="960" height="540" rx="24" fill="#010409" stroke="#30363d" stroke-width="2"/>
+
+    <!-- Window header -->
+    <rect x="0" y="0" width="960" height="44" rx="24" fill="#0d1117"/>
+    <rect x="0" y="24" width="960" height="20" fill="#0d1117"/>
+    <circle cx="26" cy="22" r="7" fill="#f85149"/>
+    <circle cx="50" cy="22" r="7" fill="#d29922"/>
+    <circle cx="74" cy="22" r="7" fill="#3fb950"/>
+    <text x="480" y="28" text-anchor="middle"
+          font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
+          font-size="14" font-weight="600" fill="#7d8590">$ git log --oneline -10</text>
+
+    <!-- Log lines -->
+    <g transform="translate(36, 90)" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="17">
+      <g>
+        <text x="0" y="0" font-weight="700" fill="#f9c513">79d5385</text>
+        <text x="120" y="0" font-weight="500" fill="#c9d1d9">Add demo MP4 recording to promo/</text>
+      </g>
+      <g transform="translate(0, 40)">
+        <text x="0" y="0" font-weight="700" fill="#f9c513">6b7147e</text>
+        <text x="120" y="0" font-weight="500" fill="#c9d1d9">Add promo/ folder with 12 LinkedIn-square SVGs</text>
+      </g>
+      <g transform="translate(0, 80)">
+        <text x="0" y="0" font-weight="700" fill="#f9c513">2da06c5</text>
+        <text x="120" y="0" font-weight="500" fill="#c9d1d9">Fix horizontal scroll on landing page</text>
+      </g>
+      <g transform="translate(0, 120)">
+        <text x="0" y="0" font-weight="700" fill="#f9c513">1cc8a9f</text>
+        <text x="120" y="0" font-weight="500" fill="#c9d1d9">Add 30 tests for encryption, login, OTP, reset</text>
+      </g>
+      <g transform="translate(0, 160)">
+        <text x="0" y="0" font-weight="700" fill="#f9c513">1ff4785</text>
+        <text x="120" y="0" font-weight="500" fill="#c9d1d9">Wire optional Sentry error monitoring</text>
+      </g>
+      <g transform="translate(0, 200)">
+        <text x="0" y="0" font-weight="700" fill="#f9c513">48fadd1</text>
+        <text x="120" y="0" font-weight="500" fill="#c9d1d9">Add AuthEvent audit log for auth events</text>
+      </g>
+      <g transform="translate(0, 240)">
+        <text x="0" y="0" font-weight="700" fill="#f9c513">c2e409b</text>
+        <text x="120" y="0" font-weight="500" fill="#c9d1d9">Add Content-Security-Policy with per-request nonces</text>
+      </g>
+      <g transform="translate(0, 280)">
+        <text x="0" y="0" font-weight="700" fill="#f9c513">6314b40</text>
+        <text x="120" y="0" font-weight="500" fill="#c9d1d9">Audit dependencies for known CVEs in CI</text>
+      </g>
+      <g transform="translate(0, 320)">
+        <text x="0" y="0" font-weight="700" fill="#f9c513">1251f6d</text>
+        <text x="120" y="0" font-weight="500" fill="#c9d1d9">Tighten login page padding to fit above the fold</text>
+      </g>
+      <g transform="translate(0, 360)">
+        <text x="0" y="0" font-weight="700" fill="#f9c513">cb85387</text>
+        <text x="120" y="0" font-weight="500" fill="#c9d1d9">Fit login above the fold: two-column desktop split</text>
+      </g>
+      <g transform="translate(0, 410)">
+        <text x="0" y="0" font-weight="700" fill="#7d8590">───────</text>
+        <text x="120" y="0" font-weight="500" fill="#7d8590">10 commits · auth, security, tests, deploy, polish</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Footer -->
+  <g transform="translate(120, 1100)">
+    <rect x="0" y="0" width="48" height="48" rx="10" fill="url(#g20-grad)"/>
+    <text x="24" y="36" text-anchor="middle"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="28" font-weight="700" fill="#ffffff">@</text>
+    <text x="64" y="32"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="22" font-weight="700" fill="#f0f6fc">Mails Manager App</text>
+    <text x="64" y="56"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="16" font-weight="500" fill="#9ba9bb">github · m-m.up.railway.app</text>
+  </g>
+</svg>

@@ -1,0 +1,156 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" preserveAspectRatio="xMidYMid meet"
+     role="img" aria-label="Railway vs the alternatives for a Django app">
+  <title>Railway vs the alternatives for a Django app</title>
+
+  <defs>
+    <linearGradient id="g18-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#005FF9"/>
+      <stop offset="100%" stop-color="#0099FF"/>
+    </linearGradient>
+    <linearGradient id="g18-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbfcfd"/>
+      <stop offset="100%" stop-color="#eef2f7"/>
+    </linearGradient>
+    <pattern id="g18-dots" x="0" y="0" width="28" height="28" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#005FF9" fill-opacity="0.06"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="1200" fill="url(#g18-bg)"/>
+  <rect width="1200" height="1200" fill="url(#g18-dots)"/>
+
+  <!-- Eyebrow -->
+  <g transform="translate(120, 100)">
+    <rect x="0" y="0" width="240" height="44" rx="22" fill="#ffffff" stroke="#dee2e6"/>
+    <circle cx="22" cy="22" r="6" fill="#fd7e14"/>
+    <text x="42" y="29"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="15" font-weight="600" fill="#1a1d20" letter-spacing="0.18em">D E P L O Y &#160;P L A Y B O O K</text>
+  </g>
+
+  <text x="120" y="220"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="74" font-weight="800" fill="#1a1d20" letter-spacing="-0.02em">Why Railway,</text>
+  <text x="120" y="300"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="74" font-weight="800" letter-spacing="-0.02em" fill="url(#g18-grad)">for a Django app?</text>
+
+  <text x="120" y="362"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="24" font-weight="500" fill="#495057">Heroku-clean ergonomics. Postgres bundled. No yaml priesthood.</text>
+
+  <!-- Comparison table -->
+  <g transform="translate(120, 430)" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+
+    <!-- Header row -->
+    <g transform="translate(0, 0)">
+      <text x="0" y="22" font-size="14" font-weight="700" fill="#6c757d" letter-spacing="0.18em">P R O V I D E R</text>
+      <text x="320" y="22" font-size="14" font-weight="700" fill="#6c757d" letter-spacing="0.18em">D J A N G O</text>
+      <text x="510" y="22" font-size="14" font-weight="700" fill="#6c757d" letter-spacing="0.18em">P O S T G R E S</text>
+      <text x="740" y="22" font-size="14" font-weight="700" fill="#6c757d" letter-spacing="0.18em">B U I L D</text>
+      <text x="880" y="22" font-size="14" font-weight="700" fill="#6c757d" letter-spacing="0.18em">F R E E</text>
+    </g>
+
+    <!-- Railway row (highlighted) -->
+    <g transform="translate(0, 50)">
+      <rect x="-10" y="-10" width="980" height="100" rx="20" fill="none" stroke="url(#g18-grad)" stroke-width="3"/>
+      <rect x="0" y="0" width="960" height="80" rx="14" fill="#ffffff" stroke="#dee2e6"/>
+      <rect x="0" y="0" width="6" height="80" rx="3" fill="url(#g18-grad)"/>
+      <g transform="translate(24, 22)">
+        <rect x="0" y="0" width="36" height="36" rx="8" fill="#0b0d0e"/>
+        <path d="M 8 12 L 28 12 M 8 18 L 28 18 M 8 24 L 28 24" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+      </g>
+      <text x="76" y="50" font-size="24" font-weight="800" fill="#1a1d20">Railway</text>
+      <g transform="translate(190, 32)">
+        <rect x="0" y="0" width="100" height="22" rx="11" fill="url(#g18-grad)"/>
+        <text x="50" y="15" text-anchor="middle" font-size="11" font-weight="700" fill="#ffffff" letter-spacing="0.14em">P I C K E D</text>
+      </g>
+      <text x="320" y="48" font-size="26" font-weight="800" fill="#198754">✓</text>
+      <text x="510" y="48" font-size="20" font-weight="700" fill="#1a1d20">add-on, 1 click</text>
+      <text x="740" y="48" font-size="20" font-weight="700" fill="#1a1d20">git push</text>
+      <text x="880" y="48" font-size="20" font-weight="700" fill="#fd7e14">trial</text>
+    </g>
+
+    <!-- Heroku -->
+    <g transform="translate(0, 160)">
+      <rect x="0" y="0" width="960" height="80" rx="14" fill="#ffffff" stroke="#dee2e6"/>
+      <rect x="0" y="0" width="6" height="80" rx="3" fill="#6f42c1"/>
+      <g transform="translate(24, 22)">
+        <rect x="0" y="0" width="36" height="36" rx="8" fill="#6f42c1"/>
+        <text x="18" y="26" text-anchor="middle" font-size="22" font-weight="800" fill="#ffffff">H</text>
+      </g>
+      <text x="76" y="50" font-size="24" font-weight="800" fill="#1a1d20">Heroku</text>
+      <text x="320" y="48" font-size="26" font-weight="800" fill="#198754">✓</text>
+      <text x="510" y="48" font-size="20" font-weight="700" fill="#1a1d20">add-on, $$</text>
+      <text x="740" y="48" font-size="20" font-weight="700" fill="#1a1d20">git push</text>
+      <text x="880" y="48" font-size="20" font-weight="700" fill="#dc3545">no</text>
+    </g>
+
+    <!-- Vercel -->
+    <g transform="translate(0, 250)">
+      <rect x="0" y="0" width="960" height="80" rx="14" fill="#ffffff" stroke="#dee2e6"/>
+      <rect x="0" y="0" width="6" height="80" rx="3" fill="#1a1d20"/>
+      <g transform="translate(24, 22)">
+        <rect x="0" y="0" width="36" height="36" rx="8" fill="#000000"/>
+        <path d="M 18 8 L 30 28 L 6 28 Z" fill="#ffffff"/>
+      </g>
+      <text x="76" y="50" font-size="24" font-weight="800" fill="#1a1d20">Vercel</text>
+      <text x="320" y="48" font-size="26" font-weight="800" fill="#fd7e14">~</text>
+      <text x="510" y="48" font-size="20" font-weight="700" fill="#1a1d20">none, BYO</text>
+      <text x="740" y="48" font-size="20" font-weight="700" fill="#1a1d20">git push</text>
+      <text x="880" y="48" font-size="20" font-weight="700" fill="#198754">yes</text>
+    </g>
+
+    <!-- Fly.io -->
+    <g transform="translate(0, 340)">
+      <rect x="0" y="0" width="960" height="80" rx="14" fill="#ffffff" stroke="#dee2e6"/>
+      <rect x="0" y="0" width="6" height="80" rx="3" fill="#7B3FE4"/>
+      <g transform="translate(24, 22)">
+        <rect x="0" y="0" width="36" height="36" rx="8" fill="#7B3FE4"/>
+        <text x="18" y="26" text-anchor="middle" font-size="20" font-weight="800" fill="#ffffff">⌁</text>
+      </g>
+      <text x="76" y="50" font-size="24" font-weight="800" fill="#1a1d20">Fly.io</text>
+      <text x="320" y="48" font-size="26" font-weight="800" fill="#198754">✓</text>
+      <text x="510" y="48" font-size="20" font-weight="700" fill="#1a1d20">attach, manual</text>
+      <text x="740" y="48" font-size="20" font-weight="700" fill="#1a1d20">flyctl + toml</text>
+      <text x="880" y="48" font-size="20" font-weight="700" fill="#fd7e14">~</text>
+    </g>
+
+    <!-- Render -->
+    <g transform="translate(0, 430)">
+      <rect x="0" y="0" width="960" height="80" rx="14" fill="#ffffff" stroke="#dee2e6"/>
+      <rect x="0" y="0" width="6" height="80" rx="3" fill="#198754"/>
+      <g transform="translate(24, 22)">
+        <rect x="0" y="0" width="36" height="36" rx="8" fill="#46e3b7"/>
+        <text x="18" y="26" text-anchor="middle" font-size="20" font-weight="800" fill="#ffffff">R</text>
+      </g>
+      <text x="76" y="50" font-size="24" font-weight="800" fill="#1a1d20">Render</text>
+      <text x="320" y="48" font-size="26" font-weight="800" fill="#198754">✓</text>
+      <text x="510" y="48" font-size="20" font-weight="700" fill="#1a1d20">add-on</text>
+      <text x="740" y="48" font-size="20" font-weight="700" fill="#1a1d20">git push</text>
+      <text x="880" y="48" font-size="20" font-weight="700" fill="#fd7e14">~</text>
+    </g>
+  </g>
+
+  <!-- Verdict bar -->
+  <g transform="translate(120, 1010)">
+    <rect x="0" y="0" width="960" height="100" rx="20" fill="url(#g18-grad)"/>
+    <text x="40" y="42"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="24" font-weight="800" fill="#ffffff">For a Django + Postgres side project: Railway wins on ergonomics.</text>
+    <text x="40" y="74"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="16" font-weight="500" fill="#ffffff" opacity="0.9">Postgres in one click · git-push deploys · no Dockerfile required.</text>
+  </g>
+
+  <!-- Footer -->
+  <g transform="translate(120, 1140)">
+    <rect x="0" y="0" width="40" height="40" rx="8" fill="url(#g18-grad)"/>
+    <text x="20" y="30" text-anchor="middle"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="24" font-weight="700" fill="#ffffff">@</text>
+    <text x="52" y="28"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="18" font-weight="700" fill="#1a1d20">Mails Manager App · m-m.up.railway.app</text>
+  </g>
+</svg>

@@ -16,6 +16,14 @@ Twelve hand-authored SVG promos, each `1200×1200` (LinkedIn feed square). All s
 | 10 | `10-built-end-to-end.svg` | Portfolio framing — auth, IMAP, security, deploy scope |
 | 11 | `11-problem-solution.svg` | Problem/solution: 3 mailboxes → one dashboard |
 | 12 | `12-hero-square.svg` | Square recut of the landing hero, generic use |
+| 13 | `13-built-with-claude.svg` | "Shipped with Claude" — paired-coding angle, terminal transcript |
+| 14 | `14-2fa-methods.svg` | 2FA comparison — SMS vs TOTP vs Email-OTP vs Passkeys |
+| 15 | `15-why-2fa.svg` | Stat-driven 2FA post — 99% / 81% / 5s |
+| 16 | `16-threat-model.svg` | "If your DB leaks tomorrow…" plaintext vs Fernet side-by-side |
+| 17 | `17-why-fernet.svg` | Crypto explainer — don't roll your own, what Fernet gives you |
+| 18 | `18-railway-vs.svg` | Railway vs Heroku/Vercel/Fly/Render comparison table |
+| 19 | `19-git-push-pipeline.svg` | git push → live in 50s, six-step timeline |
+| 20 | `20-commit-log.svg` | Real `git log --oneline -10` as portfolio panel |
 
 ## Export to PNG for LinkedIn
 
