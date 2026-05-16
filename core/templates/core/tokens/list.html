@@ -26,8 +26,8 @@
         <div class="input-group">
           <input id="reveal-input" class="form-control font-monospace" value="{{ revealed_value }}" readonly>
           <button class="btn btn-outline-secondary" type="button"
-                  onclick="navigator.clipboard.writeText(document.getElementById('reveal-input').value)">
-            <i class="bi bi-clipboard"></i>
+                  data-copy-target="reveal-input" aria-label="Copy token">
+            <i class="bi bi-clipboard" data-copy-icon></i>
           </button>
         </div>
         <div class="form-text mt-2">Send as <code>Authorization: Bearer &lt;token&gt;</code>.</div>
@@ -85,7 +85,7 @@
                 <td class="text-end pe-3">
                   {% if not t.revoked_at %}
                   <form method="post" action="{% url 'core:tokens_revoke' t.pk %}"
-                        onsubmit="return confirm('Revoke {{ t.name|escapejs }}? Services using it will stop working.');">
+                        data-confirm-message="Revoke {{ t.name|escapejs }}? Services using it will stop working.">
                     {% csrf_token %}
                     <button class="btn btn-sm btn-outline-danger" type="submit">
                       <i class="bi bi-x-octagon me-1"></i>Revoke
@@ -122,4 +122,26 @@
     </div>
   </div>
 </div>
+
+<script nonce="{{ request.csp_nonce }}">
+  document.querySelectorAll('[data-copy-target]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const input = document.getElementById(btn.dataset.copyTarget);
+      if (!input) return;
+      try {
+        navigator.clipboard.writeText(input.value);
+      } catch (_e) {
+        // Older browsers: fall back to a select + execCommand.
+        input.select();
+        try { document.execCommand('copy'); } catch (_) { /* give up silently */ }
+      }
+      const icon = btn.querySelector('[data-copy-icon]');
+      if (icon) {
+        const prev = icon.className;
+        icon.className = 'bi bi-check2';
+        setTimeout(() => { icon.className = prev; }, 1200);
+      }
+    });
+  });
+</script>
 {% endblock %}
