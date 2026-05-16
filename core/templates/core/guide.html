@@ -79,6 +79,7 @@
             <li class="list-group-item"><a href="#limits" class="text-decoration-none">Account limits</a></li>
             <li class="list-group-item"><a href="#two-factor" class="text-decoration-none">Two-factor authentication</a></li>
             <li class="list-group-item"><a href="#inbox" class="text-decoration-none">Inbox & email actions</a></li>
+            <li class="list-group-item"><a href="#api" class="text-decoration-none">API access</a></li>
             <li class="list-group-item"><a href="#security" class="text-decoration-none">Security & privacy</a></li>
           </ul>
         </div>
@@ -388,6 +389,173 @@ alias3@list.ru,app-password,imap.mail.ru,993</code></pre>
           <li><strong>Delete</strong> — move the message to Trash on the server. This
           is real deletion, not a portal-only hide.</li>
         </ul>
+      </div>
+    </section>
+
+    <section id="api" class="card card-soft mb-4 guide-section">
+      <div class="card-body p-4">
+        <h2><i class="bi bi-code-slash text-primary me-2"></i>API access</h2>
+        <p class="text-secondary">
+          A small read-only HTTP API lets external services — automation tools,
+          scripts, AI pipelines — pull recent messages from your connected mailboxes
+          without re-entering IMAP credentials. v1 exposes one endpoint and is
+          pull-only.
+        </p>
+
+        <h3 class="h6 mt-3">1. Issue a token</h3>
+        <p>
+          Open <a href="{% url 'core:tokens_list' %}">API tokens</a> (or use the avatar
+          dropdown → <strong>API tokens</strong>) and click <strong>New token</strong>.
+          Give it a name, optionally restrict it to specific mailboxes, optionally set
+          an expiry. The full token value is shown <strong>exactly once</strong> — copy
+          it to your secret manager before leaving the page. Only the short prefix
+          remains visible afterwards.
+        </p>
+        <div class="guide-callout">
+          Tokens start with <code>mma_live_</code> followed by 32 random characters.
+          The plaintext value is never written to the database — only a SHA-256 hash
+          and the prefix.
+        </div>
+
+        <h3 class="h6 mt-4">2. The endpoint</h3>
+        <pre class="bg-body-tertiary border rounded p-3 small mb-2"><code>GET {{ request.scheme }}://{{ request.get_host }}/api/v1/messages
+Authorization: Bearer mma_live_&lt;your-token&gt;</code></pre>
+
+        <h3 class="h6 mt-4">3. Query parameters</h3>
+        <div class="table-responsive">
+          <table class="table table-sm align-middle small mb-0">
+            <thead>
+              <tr>
+                <th>Param</th><th>Required</th><th>Default</th><th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>mailbox</code></td>
+                <td>Yes</td>
+                <td>—</td>
+                <td>Email address of one of your connected mailboxes (e.g. <code>alex@mail.ru</code>). Must be owned by the token holder.</td>
+              </tr>
+              <tr>
+                <td><code>minutes</code></td>
+                <td>Yes</td>
+                <td>—</td>
+                <td>Integer 1–1440. Window size — server returns messages from <code>now - minutes</code> until now.</td>
+              </tr>
+              <tr>
+                <td><code>folder</code></td>
+                <td>No</td>
+                <td><code>inbox</code></td>
+                <td>One of <code>inbox</code>, <code>sent</code>, <code>drafts</code>, <code>spam</code>, <code>trash</code>.</td>
+              </tr>
+              <tr>
+                <td><code>bodies</code></td>
+                <td>No</td>
+                <td><code>true</code></td>
+                <td>Set to <code>false</code> for headers only — much faster for high-volume polling.</td>
+              </tr>
+              <tr>
+                <td><code>limit</code></td>
+                <td>No</td>
+                <td><code>100</code></td>
+                <td>Maximum messages to return, 1–500. If exceeded, response sets <code>truncated: true</code>.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="h6 mt-4">4. Example call</h3>
+        <pre class="bg-body-tertiary border rounded p-3 small mb-3"><code>curl -H "Authorization: Bearer mma_live_xxxxxxxxxxxxxxxx" \
+  "{{ request.scheme }}://{{ request.get_host }}/api/v1/messages?mailbox=alex@mail.ru&minutes=60"</code></pre>
+
+        <h3 class="h6 mt-4">5. Response shape</h3>
+        <pre class="bg-body-tertiary border rounded p-3 small mb-3"><code>{
+  "mailbox": "alex@mail.ru",
+  "folder": "inbox",
+  "window_minutes": 60,
+  "since": "2026-05-17T14:23:00+00:00",
+  "count": 1,
+  "truncated": false,
+  "messages": [
+    {
+      "uid": "12345",
+      "subject": "Hello",
+      "from": {"name": "Mom", "email": "mom@example.com"},
+      "to":   [{"name": "Alex", "email": "alex@mail.ru"}],
+      "cc":   [],
+      "date": "2026-05-17T15:12:00+00:00",
+      "message_id": "&lt;abc@example.com&gt;",
+      "flags": ["\\Seen"],
+      "size": 4823,
+      "text": "Hi alex, lunch sunday?",
+      "html": "&lt;p&gt;Hi alex, lunch sunday?&lt;/p&gt;",
+      "attachments": [
+        {"filename": "menu.pdf", "size": 31200, "content_type": "application/pdf"}
+      ],
+      "has_attachments": true
+    }
+  ]
+}</code></pre>
+        <p class="small text-secondary mb-0">
+          When <code>bodies=false</code>, each message omits <code>text</code>,
+          <code>html</code>, and <code>attachments</code>; <code>has_attachments</code>
+          still tells you whether any are present.
+        </p>
+
+        <h3 class="h6 mt-4">6. Error codes</h3>
+        <p class="small text-secondary mb-2">
+          Errors share a flat JSON shape: <code>{error, message, status}</code>. Branch
+          on <code>error</code>, not the prose <code>message</code>.
+        </p>
+        <div class="table-responsive">
+          <table class="table table-sm align-middle small mb-0">
+            <thead>
+              <tr><th>Status</th><th>Error code</th><th>Cause</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>400</td><td><code>validation_error</code></td><td>Missing or out-of-range <code>mailbox</code>, <code>minutes</code>, <code>folder</code>, or <code>limit</code>.</td></tr>
+              <tr><td>401</td><td><code>invalid_token</code></td><td>Header missing, malformed, token unknown, revoked, or expired.</td></tr>
+              <tr><td>403</td><td><code>scope_forbidden</code></td><td>Mailbox exists and is yours, but this token isn't scoped to it.</td></tr>
+              <tr><td>404</td><td><code>mailbox_not_found</code></td><td>No enabled mailbox with that address on your account. Returned identically for typos and for other users' addresses — no enumeration oracle.</td></tr>
+              <tr><td>429</td><td><code>rate_limited</code></td><td>Over 60 requests/minute on this token. Response includes <code>Retry-After</code>.</td></tr>
+              <tr><td>503</td><td><code>imap_unavailable</code></td><td>Upstream IMAP server timed out or refused. Retry shortly.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="h6 mt-4">7. Rate limit</h3>
+        <p class="mb-0">
+          <strong>60 requests per minute per token</strong>, rolling window. The 61st
+          call returns <code>429</code> with <code>Retry-After: 60</code>. Multiple
+          tokens have independent buckets, but be a good citizen — Mail.ru also rate-
+          limits IMAP connections and the API does no caching, so each call is a real
+          IMAP fetch.
+        </p>
+
+        <h3 class="h6 mt-4">8. Revoking a token</h3>
+        <p class="mb-0">
+          On <a href="{% url 'core:tokens_list' %}">API tokens</a>, click
+          <strong>Revoke</strong> next to the token. From that moment every call with
+          it returns <code>401 invalid_token</code>. Revocation is irreversible —
+          create a new token if you need one again. The audit log of past calls is
+          preserved.
+        </p>
+
+        <h3 class="h6 mt-4">9. What never appears in the response</h3>
+        <ul class="mb-0">
+          <li>Your IMAP password (encrypted or otherwise).</li>
+          <li>IMAP host / port — server-internal.</li>
+          <li>The Fernet encryption key.</li>
+          <li>Other users' mailboxes or data.</li>
+          <li>Raw IMAP error strings — all upstream failures collapse to a generic <code>503 imap_unavailable</code>.</li>
+        </ul>
+
+        <div class="guide-callout guide-callout-warn mt-3">
+          <p class="mb-1"><strong>Heads-up:</strong> the <code>mailbox</code> query
+          parameter contains your email address, so it appears in HTTP access logs
+          (yours and Railway's). It's information about you, not third parties — but
+          treat the log surface accordingly.</p>
+        </div>
       </div>
     </section>
 
