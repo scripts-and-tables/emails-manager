@@ -1,7 +1,7 @@
 from django.urls import path
 from django.views.generic import TemplateView
 
-from . import views
+from . import token_views, views
 
 app_name = "core"
 
@@ -36,6 +36,9 @@ urlpatterns = [
     path("accounts/<int:pk>/test/", views.account_test, name="account_test"),
     path("accounts/<int:pk>/toggle/", views.account_toggle, name="account_toggle"),
     path("accounts/<int:pk>/password/", views.account_update_password, name="account_update_password"),
+    path("account/tokens/", token_views.tokens_list, name="tokens_list"),
+    path("account/tokens/new/", token_views.tokens_create, name="tokens_create"),
+    path("account/tokens/<int:pk>/revoke/", token_views.tokens_revoke, name="tokens_revoke"),
     path("inbox/", views.inbox, name="inbox"),
     path("inbox/data/", views.inbox_data, name="inbox_data"),
     path("inbox/<int:account_id>/<str:uid>/", views.email_detail, name="email_detail"),

@@ -1,4 +1,5 @@
 import hashlib
+import uuid
 from datetime import timedelta
 
 from django.conf import settings
@@ -60,6 +61,9 @@ class UserPreferences(models.Model):
         on_delete=models.CASCADE,
         related_name="preferences",
     )
+    # Opaque per-user identifier for any surface that needs to refer to a
+    # user without leaking username/email (admin URLs, future API surfaces).
+    public_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False, db_index=True)
     two_factor_enabled = models.BooleanField(default=True)
     # null = use the free-tier default from core.limits.FREE_TIER_ACCOUNT_LIMIT.
     # A set value overrides the default upward (paid-tier grants).
@@ -142,3 +146,89 @@ class AuthEvent(models.Model):
     def __str__(self) -> str:
         who = self.user.get_username() if self.user else (self.username or "anon")
         return f"{self.created_at:%Y-%m-%d %H:%M} {self.event_type} {who}"
+
+
+class APIToken(models.Model):
+    """Long-lived bearer token for the external read API.
+
+    The plaintext token value is shown to the user exactly once at creation.
+    Only the SHA-256 hash and a short prefix are stored; lookup is by prefix,
+    then constant-time hash compare. Tokens can be revoked (soft delete) and
+    optionally scoped to specific mailboxes; empty scope = all owner's
+    mailboxes.
+    """
+
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="api_tokens",
+    )
+    name = models.CharField(max_length=120)
+    key_prefix = models.CharField(max_length=12, db_index=True)
+    key_hash = models.CharField(max_length=64)
+    accounts = models.ManyToManyField(EmailAccount, blank=True, related_name="api_tokens")
+    expires_at = models.DateTimeField(null=True, blank=True)
+    last_used_at = models.DateTimeField(null=True, blank=True)
+    last_used_ip = models.GenericIPAddressField(null=True, blank=True)
+    revoked_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("-created_at",)
+
+    def __str__(self) -> str:
+        return f"{self.name} ({self.key_prefix}…)"
+
+    def is_active(self) -> bool:
+        if self.revoked_at is not None:
+            return False
+        if self.expires_at is not None and self.expires_at <= timezone.now():
+            return False
+        return True
+
+    def can_access(self, account: EmailAccount) -> bool:
+        """True if this token may read messages from `account`."""
+        if account.owner_id != self.owner_id:
+            return False
+        scoped = self.accounts.all()
+        if scoped.exists():
+            return scoped.filter(pk=account.pk).exists()
+        return True
+
+
+class APIRequestLog(models.Model):
+    """One row per API call. Append-only forensic trail."""
+
+    token = models.ForeignKey(
+        APIToken,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="requests",
+    )
+    endpoint = models.CharField(max_length=120)
+    status_code = models.IntegerField()
+    mailbox = models.ForeignKey(
+        EmailAccount,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="api_requests",
+    )
+    minutes = models.IntegerField(null=True, blank=True)
+    count = models.IntegerField(null=True, blank=True)
+    ip = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.CharField(max_length=255, blank=True)
+    latency_ms = models.IntegerField()
+    error_code = models.CharField(max_length=40, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ("-created_at",)
+        indexes = [
+            models.Index(fields=["token", "-created_at"]),
+            models.Index(fields=["endpoint", "-created_at"]),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.created_at:%Y-%m-%d %H:%M} {self.endpoint} {self.status_code}"

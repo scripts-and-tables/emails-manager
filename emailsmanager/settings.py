@@ -29,6 +29,12 @@ CSRF_TRUSTED_ORIGINS = config(
 # Fernet key for encrypting IMAP passwords at rest.
 FIELD_ENCRYPTION_KEY = config("FIELD_ENCRYPTION_KEY", default="")
 
+# External read-only API for fetching recent messages.
+MMA_API_TOKEN_PREFIX = config("MMA_API_TOKEN_PREFIX", default="mma_live_")
+MMA_API_RATE_PER_MINUTE = config("MMA_API_RATE_PER_MINUTE", default=60, cast=int)
+MMA_API_MAX_WINDOW_MINUTES = config("MMA_API_MAX_WINDOW_MINUTES", default=1440, cast=int)
+MMA_API_MAX_LIMIT = config("MMA_API_MAX_LIMIT", default=500, cast=int)
+
 # Outbound transactional email via Resend (signup verify, password reset, login OTP)
 RESEND_API_KEY = config("RESEND_API_KEY", default="")
 RESEND_FROM_EMAIL = config("RESEND_FROM_EMAIL", default="onboarding@resend.dev")

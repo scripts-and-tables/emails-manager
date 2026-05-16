@@ -4,6 +4,7 @@ from collections.abc import Iterable
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
+from typing import Any
 
 from imap_tools import AND, MailBox, MailBoxUnencrypted
 
@@ -206,6 +207,53 @@ def fetch_body(account: EmailAccount, uid: str, folder: str = "inbox") -> EmailF
                 text=msg.text or "",
             )
     return None
+
+
+def fetch_window(
+    account: EmailAccount,
+    *,
+    since: datetime,
+    folder: str = "inbox",
+    with_bodies: bool = True,
+    limit: int = 100,
+) -> tuple[list[Any], bool, str | None]:
+    """API-shaped fetcher: messages with date >= `since`, newest first.
+
+    Returns (messages, truncated, error). `messages` are raw
+    `imap_tools.MailMessage` objects so the serializer can read all fields
+    (`to_values`, `headers`, `attachments`, `text`, `html`, `flags`).
+
+    IMAP's date filter is date-granular only — we additionally filter in
+    Python by `since` to get minute-level precision, so a `minutes=15`
+    request doesn't return everything from earlier today.
+    """
+    messages: list[Any] = []
+    truncated = False
+    try:
+        with _open_with_semantic_folder(account, folder)[0] as mailbox:
+            criteria = AND(date_gte=since.date())
+            count = 0
+            for msg in mailbox.fetch(
+                criteria,
+                bulk=True,
+                mark_seen=False,
+                headers_only=not with_bodies,
+                reverse=True,
+            ):
+                msg_date = _coerce_aware(msg.date)
+                if msg_date is not None and msg_date < since:
+                    # IMAP gave us today's older messages; skip the ones outside our window.
+                    continue
+                messages.append(msg)
+                count += 1
+                if count >= limit:
+                    # Peek one more to set truncated flag. Without doing this
+                    # we don't know whether the server had more to give.
+                    truncated = True
+                    break
+    except Exception as exc:  # noqa: BLE001
+        return [], False, str(exc) or exc.__class__.__name__
+    return messages, truncated, None
 
 
 _TRASH_NAMES = ("Trash", "trash", "Корзина", "INBOX/Trash", "[Gmail]/Trash", "[Gmail]/Корзина")
