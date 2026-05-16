@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" preserveAspectRatio="xMidYMid meet"
+     role="img" aria-label="Plaintext passwords are a when-not-if problem">
+  <title>Plaintext passwords are a when-not-if problem</title>
+
+  <defs>
+    <linearGradient id="g24-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#005FF9"/>
+      <stop offset="100%" stop-color="#0099FF"/>
+    </linearGradient>
+    <linearGradient id="g24-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0d1117"/>
+      <stop offset="100%" stop-color="#161b22"/>
+    </linearGradient>
+    <pattern id="g24-dots" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#0099FF" fill-opacity="0.12"/>
+    </pattern>
+    <radialGradient id="g24-glow" cx="100%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#dc3545" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#dc3545" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#g24-bg)"/>
+  <rect width="1200" height="630" fill="url(#g24-dots)"/>
+  <rect width="1200" height="630" fill="url(#g24-glow)"/>
+
+  <!-- Eyebrow -->
+  <g transform="translate(72, 72)">
+    <rect x="0" y="0" width="170" height="38" rx="19" fill="#0d1117" stroke="#30363d"/>
+    <circle cx="20" cy="19" r="5" fill="#dc3545"/>
+    <text x="36" y="25"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="13" font-weight="600" fill="#f0f6fc" letter-spacing="0.18em">S E C U R I T Y</text>
+  </g>
+
+  <!-- Headline -->
+  <text x="72" y="220"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="60" font-weight="800" fill="#f0f6fc" letter-spacing="-0.02em">Plaintext passwords</text>
+  <text x="72" y="288"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="60" font-weight="800" fill="#f0f6fc" letter-spacing="-0.02em">in your DB are a</text>
+  <text x="72" y="356"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="60" font-weight="800" letter-spacing="-0.02em" fill="#dc3545">"when not if" problem.</text>
+
+  <text x="72" y="412"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="20" font-weight="500" fill="#9ba9bb">Encrypt at rest. Keep the key elsewhere. It's two lines.</text>
+
+  <!-- Footer -->
+  <g transform="translate(72, 540)">
+    <rect x="0" y="0" width="40" height="40" rx="9" fill="url(#g24-grad)"/>
+    <text x="20" y="30" text-anchor="middle"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="24" font-weight="700" fill="#ffffff">@</text>
+    <text x="52" y="20"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="16" font-weight="700" fill="#f0f6fc">Mails Manager App</text>
+    <text x="52" y="38"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="13" font-weight="500" fill="#9ba9bb">m-m.up.railway.app</text>
+  </g>
+
+  <!-- Right column: bad → good DB rows -->
+  <g transform="translate(720, 110)">
+    <!-- Bad row -->
+    <g>
+      <rect x="0" y="0" width="420" height="170" rx="20" fill="#1a0d0f" stroke="#5c171c" stroke-width="2"/>
+      <text x="20" y="36"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="13" font-weight="700" fill="#dc3545" letter-spacing="0.18em">B E F O R E</text>
+      <rect x="20" y="50" width="380" height="46" rx="10" fill="#0d1117"/>
+      <text x="36" y="80"
+            font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
+            font-size="16" font-weight="700" fill="#dc3545">password = "hunter2-imap-pass"</text>
+      <rect x="20" y="106" width="380" height="46" rx="10" fill="#0d1117"/>
+      <text x="36" y="136"
+            font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
+            font-size="14" font-weight="600" fill="#9ba9bb">CharField(max_length=128)</text>
+    </g>
+
+    <!-- Good row -->
+    <g transform="translate(0, 200)">
+      <rect x="0" y="0" width="420" height="210" rx="20" fill="#0d1722" stroke="#005FF9" stroke-width="2"/>
+      <text x="20" y="36"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="13" font-weight="700" letter-spacing="0.18em" fill="url(#g24-grad)">A F T E R</text>
+      <rect x="20" y="50" width="380" height="46" rx="10" fill="#0d1117"/>
+      <text x="36" y="80"
+            font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
+            font-size="14" font-weight="700" fill="#7dd3fc">gAAAAABl9z...nXRf9Pa==</text>
+      <rect x="20" y="106" width="380" height="46" rx="10" fill="#0d1117"/>
+      <text x="36" y="136"
+            font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
+            font-size="14" font-weight="600" fill="#9ba9bb">BinaryField · key from env</text>
+      <text x="20" y="184"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="14" font-weight="600" fill="#3fb950">→ DB dump = useless ciphertext</text>
+    </g>
+  </g>
+</svg>

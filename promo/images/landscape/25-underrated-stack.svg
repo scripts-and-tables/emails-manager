@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" preserveAspectRatio="xMidYMid meet"
+     role="img" aria-label="Django + Postgres + Railway: the most underrated stack of 2026">
+  <title>Django + Postgres + Railway — the most underrated stack of 2026</title>
+
+  <defs>
+    <linearGradient id="g25-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#005FF9"/>
+      <stop offset="100%" stop-color="#0099FF"/>
+    </linearGradient>
+    <linearGradient id="g25-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbfcfd"/>
+      <stop offset="100%" stop-color="#eef2f7"/>
+    </linearGradient>
+    <pattern id="g25-dots" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#005FF9" fill-opacity="0.06"/>
+    </pattern>
+    <radialGradient id="g25-glow" cx="100%" cy="100%" r="60%">
+      <stop offset="0%" stop-color="#005FF9" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#005FF9" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#g25-bg)"/>
+  <rect width="1200" height="630" fill="url(#g25-dots)"/>
+  <rect width="1200" height="630" fill="url(#g25-glow)"/>
+
+  <!-- Eyebrow -->
+  <g transform="translate(72, 72)">
+    <rect x="0" y="0" width="190" height="38" rx="19" fill="#ffffff" stroke="#dee2e6"/>
+    <circle cx="20" cy="19" r="5" fill="#fd7e14"/>
+    <text x="36" y="25"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="13" font-weight="600" fill="#1a1d20" letter-spacing="0.18em">B O R I N G &#160;T E C H</text>
+  </g>
+
+  <!-- Headline -->
+  <text x="72" y="220"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="56" font-weight="800" fill="#1a1d20" letter-spacing="-0.02em">The most underrated</text>
+  <text x="72" y="284"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="56" font-weight="800" fill="#1a1d20" letter-spacing="-0.02em">stack of 2026 is also</text>
+  <text x="72" y="348"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="56" font-weight="800" letter-spacing="-0.02em" fill="url(#g25-grad)">the most boring.</text>
+
+  <text x="72" y="404"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="20" font-weight="500" fill="#495057">Django + Postgres + Railway. No edge. No yaml. No drama.</text>
+
+  <!-- Footer -->
+  <g transform="translate(72, 540)">
+    <rect x="0" y="0" width="40" height="40" rx="9" fill="url(#g25-grad)"/>
+    <text x="20" y="30" text-anchor="middle"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="24" font-weight="700" fill="#ffffff">@</text>
+    <text x="52" y="20"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="16" font-weight="700" fill="#1a1d20">Mails Manager App</text>
+    <text x="52" y="38"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="13" font-weight="500" fill="#6c757d">deployed in 50s · m-m.up.railway.app</text>
+  </g>
+
+  <!-- Right column: stack tower -->
+  <g transform="translate(740, 90)">
+    <!-- Railway top -->
+    <g>
+      <rect x="0" y="0" width="400" height="100" rx="18" fill="#0b0d0e"/>
+      <g transform="translate(24, 26)">
+        <rect x="0" y="0" width="48" height="48" rx="10" fill="#1a1d20"/>
+        <path d="M 12 12 L 36 12 M 12 22 L 36 22 M 12 32 L 36 32" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+      </g>
+      <text x="92" y="48"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="22" font-weight="800" fill="#ffffff">Railway</text>
+      <text x="92" y="76"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="14" font-weight="500" fill="#9ba9bb">git push deploy · ~50s</text>
+    </g>
+
+    <!-- Postgres middle -->
+    <g transform="translate(0, 115)">
+      <rect x="0" y="0" width="400" height="100" rx="18" fill="#336791"/>
+      <g transform="translate(24, 26)">
+        <rect x="0" y="0" width="48" height="48" rx="10" fill="#27516e"/>
+        <text x="24" y="34" text-anchor="middle"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="22" font-weight="800" fill="#ffffff">PG</text>
+      </g>
+      <text x="92" y="48"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="22" font-weight="800" fill="#ffffff">PostgreSQL</text>
+      <text x="92" y="76"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="14" font-weight="500" fill="#cfdce8">since 1996 · still right</text>
+    </g>
+
+    <!-- Django bottom -->
+    <g transform="translate(0, 230)">
+      <rect x="0" y="0" width="400" height="100" rx="18" fill="#092e20"/>
+      <g transform="translate(24, 26)">
+        <rect x="0" y="0" width="48" height="48" rx="10" fill="#0a3a28"/>
+        <text x="24" y="36" text-anchor="middle"
+              font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+              font-size="26" font-weight="800" fill="#44b78b">dj</text>
+      </g>
+      <text x="92" y="48"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="22" font-weight="800" fill="#ffffff">Django 5.1</text>
+      <text x="92" y="76"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="14" font-weight="500" fill="#9ba9bb">batteries included · still</text>
+    </g>
+
+    <!-- Bottom badge -->
+    <g transform="translate(0, 350)">
+      <rect x="0" y="0" width="400" height="60" rx="14" fill="url(#g25-grad)"/>
+      <text x="200" y="38" text-anchor="middle"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="16" font-weight="700" fill="#ffffff" letter-spacing="0.05em">No frameworks-of-the-month.</text>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" preserveAspectRatio="xMidYMid meet"
+     role="img" aria-label="30 tests for a side project">
+  <title>30 tests for a side project — what they bought me</title>
+
+  <defs>
+    <linearGradient id="g22-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#005FF9"/>
+      <stop offset="100%" stop-color="#0099FF"/>
+    </linearGradient>
+    <linearGradient id="g22-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbfcfd"/>
+      <stop offset="100%" stop-color="#eef2f7"/>
+    </linearGradient>
+    <pattern id="g22-dots" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#005FF9" fill-opacity="0.06"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#g22-bg)"/>
+  <rect width="1200" height="630" fill="url(#g22-dots)"/>
+
+  <!-- Eyebrow -->
+  <g transform="translate(72, 72)">
+    <rect x="0" y="0" width="170" height="38" rx="19" fill="#ffffff" stroke="#dee2e6"/>
+    <circle cx="20" cy="19" r="5" fill="#198754"/>
+    <text x="36" y="25"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="13" font-weight="600" fill="#1a1d20" letter-spacing="0.18em">Q U A L I T Y</text>
+  </g>
+
+  <!-- Headline (left) -->
+  <text x="72" y="220"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="60" font-weight="800" fill="#1a1d20" letter-spacing="-0.02em">30 tests for a</text>
+  <text x="72" y="288"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="60" font-weight="800" fill="#1a1d20" letter-spacing="-0.02em">side project sounds</text>
+  <text x="72" y="356"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="60" font-weight="800" letter-spacing="-0.02em" fill="url(#g22-grad)">insane.</text>
+
+  <text x="72" y="412"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="20" font-weight="500" fill="#495057">Here's what they actually bought me. →</text>
+
+  <!-- Footer -->
+  <g transform="translate(72, 540)">
+    <rect x="0" y="0" width="40" height="40" rx="9" fill="url(#g22-grad)"/>
+    <text x="20" y="30" text-anchor="middle"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="24" font-weight="700" fill="#ffffff">@</text>
+    <text x="52" y="20"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="16" font-weight="700" fill="#1a1d20">Mails Manager App</text>
+    <text x="52" y="38"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="13" font-weight="500" fill="#6c757d">m-m.up.railway.app</text>
+  </g>
+
+  <!-- Right column: pytest output -->
+  <g transform="translate(720, 100)">
+    <rect x="0" y="0" width="420" height="430" rx="20" fill="#0d1117" stroke="#30363d" stroke-width="2"/>
+    <rect x="0" y="0" width="420" height="40" rx="20" fill="#161b22"/>
+    <rect x="0" y="22" width="420" height="18" fill="#161b22"/>
+    <circle cx="22" cy="20" r="6" fill="#f85149"/>
+    <circle cx="42" cy="20" r="6" fill="#d29922"/>
+    <circle cx="62" cy="20" r="6" fill="#3fb950"/>
+    <text x="210" y="26" text-anchor="middle"
+          font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
+          font-size="12" font-weight="600" fill="#7d8590">$ python manage.py test</text>
+
+    <g transform="translate(20, 70)" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13">
+      <text y="0" fill="#c9d1d9">Creating test database...</text>
+      <text y="22" fill="#c9d1d9">accounts.tests.AccountAddTests</text>
+      <text x="380" y="22" text-anchor="end" fill="#3fb950">.....</text>
+      <text y="46" fill="#c9d1d9">accounts.tests.IMAPRoundtrip</text>
+      <text x="380" y="46" text-anchor="end" fill="#3fb950">....</text>
+      <text y="70" fill="#c9d1d9">auth.tests.SignupOTPTests</text>
+      <text x="380" y="70" text-anchor="end" fill="#3fb950">.....</text>
+      <text y="94" fill="#c9d1d9">auth.tests.LoginThrottleTests</text>
+      <text x="380" y="94" text-anchor="end" fill="#3fb950">...</text>
+      <text y="118" fill="#c9d1d9">auth.tests.PasswordResetTests</text>
+      <text x="380" y="118" text-anchor="end" fill="#3fb950">....</text>
+      <text y="142" fill="#c9d1d9">crypto.tests.FernetRoundtrip</text>
+      <text x="380" y="142" text-anchor="end" fill="#3fb950">.....</text>
+      <text y="166" fill="#c9d1d9">crypto.tests.KeyRotation</text>
+      <text x="380" y="166" text-anchor="end" fill="#3fb950">...</text>
+      <text y="200" fill="#7d8590">─────────────────────────────</text>
+      <text y="226" font-weight="700" fill="#3fb950">Ran 30 tests in 4.218s</text>
+      <text y="252" font-weight="700" fill="#3fb950">OK</text>
+    </g>
+
+    <!-- Bottom callout -->
+    <g transform="translate(20, 360)">
+      <rect x="0" y="0" width="380" height="50" rx="10" fill="#161b22" stroke="#30363d"/>
+      <text x="20" y="32" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+            font-size="14" font-weight="600" fill="#9ba9bb">Confidence to refactor at midnight.</text>
+    </g>
+  </g>
+</svg>
