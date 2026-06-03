@@ -1,0 +1,8 @@
+# Railway's builder (Railpack) installs Python via mise. mise 2026.5.x began
+# verifying GitHub artifact attestations for python, and python@3.13.0 has none
+# published, so `mise install` fails the build with:
+#   "No GitHub artifact attestations found for python@3.13.0"
+# This is a mise/upstream tooling change, not a project dependency issue.
+# Disable that verification so the documented python build can install.
+[settings]
+python.github_attestations = false
