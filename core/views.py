@@ -26,6 +26,7 @@ from .decorators import OTP_VERIFIED_SESSION_KEY, is_otp_verified, otp_required,
 from .email_otp import OtpDeliveryError, issue_and_send, verify
 from .email_verify import VerifyDeliveryError, send_verification_email
 from .forms import (
+    AliasFormSet,
     BulkAccountForm,
     EmailAccountForm,
     OtpForm,
@@ -235,13 +236,20 @@ def account_edit(request: HttpRequest, pk: int) -> HttpResponse:
     account = get_object_or_404(EmailAccount, pk=pk, owner=request.user)
     if request.method == "POST":
         form = EmailAccountForm(request.POST, instance=account)
-        if form.is_valid():
+        formset = AliasFormSet(request.POST, instance=account)
+        if form.is_valid() and formset.is_valid():
             form.save()
+            formset.save()
             messages.success(request, f"Updated {account.email_address}.")
             return redirect("core:accounts_list")
     else:
         form = EmailAccountForm(instance=account)
-    return render(request, "core/account_form.html", {"form": form, "is_new": False, "account": account})
+        formset = AliasFormSet(instance=account)
+    return render(
+        request,
+        "core/account_form.html",
+        {"form": form, "formset": formset, "is_new": False, "account": account},
+    )
 
 
 @otp_required

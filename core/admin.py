@@ -1,6 +1,13 @@
 from django.contrib import admin
 
-from .models import AuthEvent, EmailAccount
+from .models import AuthEvent, EmailAccount, EmailAlias
+
+
+class EmailAliasInline(admin.TabularInline):
+    model = EmailAlias
+    extra = 0
+    fields = ("email_address", "is_enabled", "created_at")
+    readonly_fields = ("created_at",)
 
 
 @admin.register(EmailAccount)
@@ -12,6 +19,7 @@ class EmailAccountAdmin(admin.ModelAdmin):
     list_display = ("email_address", "owner", "imap_host", "imap_port", "updated_at")
     search_fields = ("email_address", "owner__username")
     readonly_fields = ("encrypted_password", "created_at", "updated_at")
+    inlines = (EmailAliasInline,)
 
 
 @admin.register(AuthEvent)

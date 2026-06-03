@@ -251,10 +251,11 @@
         <h2><i class="bi bi-stars text-primary me-2"></i>Mail.ru aliases trick</h2>
         <p>
           One real Mail.ru registration can give you up to <strong>ten different
-          addresses</strong>. Mail.ru calls these <em>aliases</em>: extra
-          email addresses you create from inside one Mail.ru account, each of which is
-          its own valid IMAP login. That's how you turn a single Mail.ru signup into
-          ten connectable mailboxes in this portal.
+          addresses</strong>. Mail.ru calls these <em>aliases</em>: extra email
+          addresses you create from inside one Mail.ru account. They all deliver into
+          the <strong>same inbox</strong> and use the <strong>same app password</strong>,
+          so in this portal you attach them to a single account rather than connecting
+          each one separately.
         </p>
 
         <h3 class="h6 mt-3">Create the aliases on Mail.ru</h3>
@@ -290,28 +291,39 @@
           </div>
         </div>
 
-        <h3 class="h6 mt-3">Connect them here, in bulk</h3>
+        <h3 class="h6 mt-3">Attach them to your account here</h3>
         <p class="text-secondary">
-          Instead of adding each alias one by one, use
-          <a href="{% url 'core:account_bulk_add' %}">Accounts → Bulk add</a> and paste
-          a small CSV. One line per alias, four columns:
-        </p>
-        <pre class="bg-body-tertiary border rounded p-3 small mb-3"><code>alias1@mail.ru,app-password,imap.mail.ru,993
-alias2@inbox.ru,app-password,imap.mail.ru,993
-alias3@list.ru,app-password,imap.mail.ru,993</code></pre>
-        <p class="small text-secondary mb-3">
-          Columns are <strong>email, password, IMAP host, IMAP port</strong>, in that
-          order. Empty lines are ignored. After submitting, the portal shows which
-          lines were added, skipped as duplicates, or blocked by the account cap.
+          Add the mailbox once as a normal account, then open
+          <a href="{% url 'core:accounts_list' %}">Accounts</a> → that account →
+          <strong>Edit</strong>. At the bottom you'll find an <strong>Aliases</strong>
+          section — paste each alias address there and save. They reuse the account's
+          existing app password, so there's nothing else to enter.
         </p>
 
-        <div class="guide-callout guide-callout-warn">
-          <p class="mb-1"><strong>Heads-up:</strong> each alias counts as one account
-          against your <a href="#limits">portal cap</a>.</p>
+        <div class="guide-callout">
+          <p class="mb-1"><strong>Why attach instead of adding separately?</strong></p>
           <p class="mb-0 small text-secondary">
-            Bulk add is currently a premium feature. If you're on the default tier you
-            can still add aliases — just one at a time from
-            <a href="{% url 'core:account_new' %}">Add account</a>.
+            All aliases share one inbox. Attaching them means one IMAP connection
+            instead of one per alias, no duplicated messages, and — through the
+            <a href="{% url 'core:tokens_list' %}">API</a> — you can fetch each alias on
+            its own and get back <em>only</em> the mail addressed to it.
+          </p>
+        </div>
+
+        <h3 class="h6 mt-3">Fetching an alias through the API</h3>
+        <p class="small text-secondary mb-2">
+          Pass the alias address as the <code>mailbox</code> parameter, exactly like a
+          primary address. The response echoes the queried alias under
+          <code>mailbox</code>, names the parent under <code>account</code>, and sets
+          <code>"alias": true</code>:
+        </p>
+        <pre class="bg-body-tertiary border rounded p-3 small mb-3"><code>GET /api/v1/messages?mailbox=alias2@inbox.ru&amp;minutes=60</code></pre>
+
+        <div class="guide-callout">
+          <p class="mb-0 small text-secondary">
+            <strong>Good to know:</strong> aliases <em>don't</em> count against your
+            <a href="#limits">account cap</a> — only the parent mailbox does. A single
+            mailbox plus its ten aliases is one account here.
           </p>
         </div>
       </div>

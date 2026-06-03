@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from collections.abc import Iterable
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
@@ -12,6 +13,13 @@ from .models import EmailAccount
 
 IMAP_TIMEOUT_SECONDS = 15
 MAX_PARALLEL = 8
+
+# Headers that record the *envelope* recipient — i.e. the address mail was
+# actually delivered to. For a mail.ru alias the visible To/Cc usually already
+# holds the alias, but mail addressed via Bcc or a mailing list only shows up
+# here, so we check both when filtering an alias's mail out of the shared inbox.
+_DELIVERY_HEADERS = ("delivered-to", "x-original-to", "envelope-to", "x-envelope-to", "x-rcpt-to")
+_EMAIL_RE = re.compile(r"[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}")
 
 
 @dataclass
@@ -138,6 +146,28 @@ def _coerce_aware(value: datetime | None) -> datetime | None:
     return value
 
 
+def _recipient_addresses(msg: Any) -> set[str]:
+    """All addresses a message was delivered to, lower-cased.
+
+    Combines the parsed To/Cc addresses with the envelope-recipient delivery
+    headers, so alias mail that doesn't name the alias in a visible header
+    (Bcc, list traffic) is still matched. Exact addresses — not substrings —
+    so `alias1@` and `alias10@` never bleed into each other.
+    """
+    addrs: set[str] = set()
+    for vals in (getattr(msg, "to_values", None) or (), getattr(msg, "cc_values", None) or ()):
+        for a in vals:
+            email = (getattr(a, "email", "") or "").strip().lower()
+            if email:
+                addrs.add(email)
+    headers = getattr(msg, "headers", None) or {}
+    for hname in _DELIVERY_HEADERS:
+        for raw in headers.get(hname, ()) or ():
+            for found in _EMAIL_RE.findall(raw or ""):
+                addrs.add(found.lower())
+    return addrs
+
+
 def fetch_recent(
     account: EmailAccount,
     since: datetime,
@@ -216,6 +246,7 @@ def fetch_window(
     folder: str = "inbox",
     with_bodies: bool = True,
     limit: int = 100,
+    recipient: str | None = None,
 ) -> tuple[list[Any], bool, str | None]:
     """API-shaped fetcher: messages with date >= `since`, newest first.
 
@@ -226,7 +257,15 @@ def fetch_window(
     IMAP's date filter is date-granular only — we additionally filter in
     Python by `since` to get minute-level precision, so a `minutes=15`
     request doesn't return everything from earlier today.
+
+    `recipient`, when given, is an alias address sharing this account's mailbox.
+    Only messages actually delivered to that address are returned, so an alias
+    behaves like its own logical inbox. The match is done in Python (exact, over
+    To/Cc + delivery headers) rather than via IMAP SEARCH so it stays correct
+    for Bcc/list mail and immune to substring collisions; `limit` then counts
+    matching messages, so a busy shared mailbox can't starve a quiet alias.
     """
+    recipient_lc = recipient.strip().lower() if recipient else None
     messages: list[Any] = []
     truncated = False
     try:
@@ -243,6 +282,8 @@ def fetch_window(
                 msg_date = _coerce_aware(msg.date)
                 if msg_date is not None and msg_date < since:
                     # IMAP gave us today's older messages; skip the ones outside our window.
+                    continue
+                if recipient_lc is not None and recipient_lc not in _recipient_addresses(msg):
                     continue
                 messages.append(msg)
                 count += 1

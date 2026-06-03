@@ -3,7 +3,9 @@ import uuid
 from datetime import timedelta
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models.functions import Lower
 from django.utils import timezone
 
 from .encryption import decrypt, encrypt
@@ -102,6 +104,74 @@ class EmailAccount(models.Model):
 
     def get_password(self) -> str:
         return decrypt(self.encrypted_password)
+
+
+class EmailAlias(models.Model):
+    """An alternate delivery address for an EmailAccount.
+
+    On mail.ru (and similar providers) one mailbox can receive mail on several
+    addresses — mail.ru calls these *aliases*. They all land in the same INBOX
+    and are reached with the same IMAP host and the same app password, so an
+    alias carries no credentials or connection details of its own: it just
+    points at its parent EmailAccount.
+
+    The external API resolves a request for an alias address to the parent
+    account, opens one IMAP connection, and filters the shared inbox down to
+    messages actually addressed to the alias (see imap_client.fetch_window).
+    Aliases therefore do NOT count against the per-user account cap and do not
+    open their own IMAP connections.
+    """
+
+    account = models.ForeignKey(
+        EmailAccount,
+        on_delete=models.CASCADE,
+        related_name="aliases",
+    )
+    email_address = models.EmailField()
+    is_enabled = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("email_address",)
+        verbose_name_plural = "email aliases"
+        constraints = [
+            # No duplicate alias address within a single account (case-insensitive).
+            models.UniqueConstraint(
+                Lower("email_address"),
+                "account",
+                name="unique_alias_address_per_account_ci",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return self.email_address
+
+    def clean(self) -> None:
+        """Enforce that an alias address is unique across everything the owner
+        already has — their primary account addresses and their other aliases.
+
+        This spans two tables, so it can't be a single DB constraint; we check
+        it here (covers the admin and the edit form) scoped to the owner so it
+        never leaks the existence of another user's address.
+        """
+        super().clean()
+        addr = (self.email_address or "").strip().lower()
+        if not addr or self.account_id is None:
+            return
+        owner_id = self.account.owner_id
+        if EmailAccount.objects.filter(
+            owner_id=owner_id, email_address__iexact=addr
+        ).exists():
+            raise ValidationError(
+                {"email_address": "This address is already one of your connected accounts."}
+            )
+        clash = EmailAlias.objects.filter(account__owner_id=owner_id, email_address__iexact=addr)
+        if self.pk is not None:
+            clash = clash.exclude(pk=self.pk)
+        if clash.exists():
+            raise ValidationError(
+                {"email_address": "This alias is already attached to one of your accounts."}
+            )
 
 
 class AuthEvent(models.Model):

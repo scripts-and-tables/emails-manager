@@ -79,6 +79,47 @@
             {% for err in form.password.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
           </div>
 
+          {% if formset is not None %}
+          <hr class="my-4">
+          <div class="mb-2">
+            <label class="form-label mb-1">
+              <i class="bi bi-stars text-primary me-1"></i>Aliases <span class="text-secondary small">(optional)</span>
+            </label>
+            <div class="form-text mt-0 mb-3">
+              Extra mail.ru addresses that land in this same mailbox. They share this
+              account's password — no separate login. The API can fetch each alias on
+              its own and returns only the mail addressed to it.
+            </div>
+          </div>
+          {{ formset.management_form }}
+          {% if formset.non_form_errors %}<div class="alert alert-danger">{{ formset.non_form_errors }}</div>{% endif %}
+          <div class="d-flex flex-column gap-2 mb-4">
+            {% for aform in formset %}
+              <div class="border rounded p-2 {% if aform.instance.pk and not aform.instance.is_enabled %}bg-body-tertiary{% endif %}">
+                {% for hidden in aform.hidden_fields %}{{ hidden }}{% endfor %}
+                <div class="d-flex align-items-center gap-2">
+                  <span class="input-group-text border-0 bg-transparent px-1"><i class="bi bi-at"></i></span>
+                  <div class="flex-grow-1 min-w-0">{{ aform.email_address }}</div>
+                  <div class="form-check form-switch m-0" title="Enabled">
+                    {{ aform.is_enabled }}
+                  </div>
+                  {% if aform.instance.pk %}
+                  <div class="form-check m-0 text-danger small" title="Delete this alias">
+                    <label class="form-check-label d-flex align-items-center gap-1">
+                      {{ aform.DELETE }}<i class="bi bi-trash"></i>
+                    </label>
+                  </div>
+                  {% endif %}
+                </div>
+                {% for err in aform.email_address.errors %}<div class="text-danger small mt-1">{{ err }}</div>{% endfor %}
+              </div>
+            {% endfor %}
+          </div>
+          <p class="form-text mt-0 mb-4">
+            Fill the blank row to add an alias. Save, then re-open this page to add another.
+          </p>
+          {% endif %}
+
           <div class="d-flex flex-column flex-sm-row gap-2">
             <button type="submit" class="btn btn-primary">
               <i class="bi bi-check2 me-1"></i>{% if is_new %}Add account{% else %}Save changes{% endif %}

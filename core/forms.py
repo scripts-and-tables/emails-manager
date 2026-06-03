@@ -1,8 +1,9 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
+from django.forms import inlineformset_factory
 
-from .models import EmailAccount
+from .models import EmailAccount, EmailAlias
 
 
 class OtpForm(forms.Form):
@@ -145,3 +146,27 @@ class EmailAccountForm(forms.ModelForm):
         if commit:
             account.save()
         return account
+
+
+class EmailAliasForm(forms.ModelForm):
+    class Meta:
+        model = EmailAlias
+        fields = ["email_address", "is_enabled"]
+        widgets = {
+            "email_address": forms.EmailInput(
+                attrs={"class": "form-control", "placeholder": "alias@inbox.ru"}
+            ),
+            "is_enabled": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        }
+
+
+# Inline aliases on the account edit page. One blank row each load; saving and
+# re-opening the page surfaces another. Cross-owner uniqueness is enforced by
+# EmailAlias.clean(), which the formset runs via the model's full_clean().
+AliasFormSet = inlineformset_factory(
+    EmailAccount,
+    EmailAlias,
+    form=EmailAliasForm,
+    extra=1,
+    can_delete=True,
+)

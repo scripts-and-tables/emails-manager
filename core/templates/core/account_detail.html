@@ -99,6 +99,32 @@
           <dt class="col-sm-4 col-md-3 text-secondary fw-normal">Last updated</dt>
           <dd class="col-sm-8 col-md-9 mb-0">{{ account.updated_at|date:"M j, Y H:i" }}</dd>
         </dl>
+
+        {% with aliases=account.aliases.all %}
+        {% if aliases %}
+        <h2 class="h6 text-secondary text-uppercase mb-3 mt-4" style="letter-spacing:.05em;">
+          <i class="bi bi-stars me-1"></i>Aliases
+        </h2>
+        <ul class="list-group list-group-flush small">
+          {% for alias in aliases %}
+          <li class="list-group-item d-flex align-items-center justify-content-between px-0">
+            <span class="text-break {% if not alias.is_enabled %}text-secondary text-decoration-line-through{% endif %}">
+              <i class="bi bi-at me-1 text-secondary"></i>{{ alias.email_address }}
+            </span>
+            {% if alias.is_enabled %}
+              <span class="badge rounded-pill bg-success-subtle text-success-emphasis border border-success-subtle">Enabled</span>
+            {% else %}
+              <span class="badge rounded-pill bg-secondary-subtle text-secondary-emphasis border">Disabled</span>
+            {% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+        <p class="form-text mt-2 mb-0">
+          Each alias shares this mailbox. Fetching an alias via the API returns only the
+          mail addressed to it.
+        </p>
+        {% endif %}
+        {% endwith %}
       </div>
     </div>
 

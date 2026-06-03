@@ -14,7 +14,7 @@ from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 
 from .. import imap_client
-from ..models import EmailAccount
+from ..models import EmailAccount, EmailAlias
 from .auth import require_api_token
 from .errors import json_error
 from .serializers import message_to_dict
@@ -85,11 +85,31 @@ def messages_recent(request: HttpRequest) -> JsonResponse:
 
     # Resolve mailbox scoped to *this token's owner* — a probe with someone
     # else's email returns the same 404 as a typo (no cross-tenant oracle).
+    #
+    # The requested address may be either a primary account address or one of
+    # its aliases. Aliases share the parent account's IMAP connection, so an
+    # alias hit resolves to the parent `mailbox` plus an `alias_address` we use
+    # to filter the shared inbox down to mail actually delivered to the alias.
     mailbox = EmailAccount.objects.filter(
         owner=token.owner,
         email_address__iexact=mailbox_param,
         is_enabled=True,
     ).first()
+    alias_address: str | None = None
+    if mailbox is None:
+        alias = (
+            EmailAlias.objects.select_related("account")
+            .filter(
+                account__owner=token.owner,
+                account__is_enabled=True,
+                email_address__iexact=mailbox_param,
+                is_enabled=True,
+            )
+            .first()
+        )
+        if alias is not None:
+            mailbox = alias.account
+            alias_address = alias.email_address
     if mailbox is None:
         resp = json_error(
             "mailbox_not_found",
@@ -116,6 +136,7 @@ def messages_recent(request: HttpRequest) -> JsonResponse:
         folder=folder,
         with_bodies=with_bodies,
         limit=limit,
+        recipient=alias_address,
     )
 
     if error is not None:
@@ -133,7 +154,11 @@ def messages_recent(request: HttpRequest) -> JsonResponse:
 
     response = JsonResponse(
         {
-            "mailbox": mailbox.email_address,
+            # `mailbox` echoes the address that was queried (the alias, if one
+            # was used); `account` is always the parent mailbox it resolves to.
+            "mailbox": alias_address or mailbox.email_address,
+            "account": mailbox.email_address,
+            "alias": alias_address is not None,
             "folder": folder,
             "window_minutes": minutes,
             "since": since.isoformat(),
