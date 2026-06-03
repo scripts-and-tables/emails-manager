@@ -15,6 +15,7 @@ from django.core.signing import dumps as sign_dumps
 from django.core.signing import loads as sign_loads
 from django.core.validators import validate_email
 from django.db.models import Count
+from django.db.models.functions import Lower
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -188,6 +189,7 @@ def accounts_list(request: HttpRequest) -> HttpResponse:
         EmailAccount.objects.filter(owner=request.user)
         .annotate(alias_count=Count("aliases"))
         .prefetch_related("aliases")
+        .order_by(Lower("email_address"))
     )
     used, limit = get_account_usage(request.user)
     at_limit = used >= limit

@@ -166,6 +166,26 @@ class AccountsListAliasDisplayTests(TestCase):
         self.assertNotIn(">Display name<", body)
 
 
+class AccountsListOrderingTests(TestCase):
+    """Accounts are listed in case-insensitive alphabetical order by email."""
+
+    def setUp(self):
+        self.user = User.objects.create_user(username="ord", email="ord@x.com", password="x")
+        for em in ("Beta@mail.ru", "alpha@mail.ru", "Charlie@mail.ru"):
+            EmailAccount.objects.create(owner=self.user, email_address=em, encrypted_password=b"")
+        self.client.force_login(self.user)
+        session = self.client.session
+        session[OTP_VERIFIED_SESSION_KEY] = True
+        session.save()
+
+    def test_accounts_sorted_case_insensitively(self):
+        body = self.client.get(reverse("core:accounts_list")).content.decode()
+        positions = [body.index(e) for e in ("alpha@mail.ru", "Beta@mail.ru", "Charlie@mail.ru")]
+        # Case-insensitive order is alpha < Beta < Charlie; a case-sensitive
+        # sort would put the capitalised ones first and fail this.
+        self.assertEqual(positions, sorted(positions))
+
+
 class APIAliasResolutionTests(TestCase):
     def setUp(self):
         self.alice = User.objects.create_user(username="alice", password="pw")
