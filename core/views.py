@@ -184,8 +184,10 @@ def verify_otp(request: HttpRequest) -> HttpResponse:
 
 @otp_required
 def accounts_list(request: HttpRequest) -> HttpResponse:
-    accounts = EmailAccount.objects.filter(owner=request.user).annotate(
-        alias_count=Count("aliases")
+    accounts = (
+        EmailAccount.objects.filter(owner=request.user)
+        .annotate(alias_count=Count("aliases"))
+        .prefetch_related("aliases")
     )
     used, limit = get_account_usage(request.user)
     at_limit = used >= limit

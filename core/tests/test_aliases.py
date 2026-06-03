@@ -16,6 +16,7 @@ from django.utils import timezone
 
 from core import imap_client
 from core.api.auth import issue_token
+from core.decorators import OTP_VERIFIED_SESSION_KEY
 from core.models import APIToken, EmailAccount, EmailAlias
 
 User = get_user_model()
@@ -132,6 +133,37 @@ class RecipientFilterTests(TestCase):
         b = _msg(to=["y@mail.ru"], uid="b")
         msgs, _, _ = self._run([a, b], None)
         self.assertEqual({m.uid for m in msgs}, {"a", "b"})
+
+
+class AccountsListAliasDisplayTests(TestCase):
+    """The accounts page lists aliases under their parent and links to it."""
+
+    def setUp(self):
+        self.user = User.objects.create_user(username="u", email="u@x.com", password="x")
+        self.account = EmailAccount.objects.create(
+            owner=self.user, email_address="primary@mail.ru", encrypted_password=b""
+        )
+        EmailAlias.objects.create(account=self.account, email_address="alias@inbox.ru")
+        self.client.force_login(self.user)
+        session = self.client.session
+        session[OTP_VERIFIED_SESSION_KEY] = True
+        session.save()
+
+    def test_alias_row_links_to_parent_and_controls_present(self):
+        resp = self.client.get(reverse("core:accounts_list"))
+        self.assertEqual(resp.status_code, 200)
+        body = resp.content.decode()
+        # Alias is rendered as its own (alias) row.
+        self.assertIn("alias@inbox.ru", body)
+        self.assertIn("data-alias-row", body)
+        # Clicking the alias opens the parent account page, not an alias page.
+        self.assertIn(reverse("core:account_detail", args=[self.account.pk]), body)
+        # Search box + show-aliases toggle are present.
+        self.assertIn('id="account-search"', body)
+        self.assertIn('id="show-aliases-toggle"', body)
+        # Link-count badge + the unused display-name column are gone/added.
+        self.assertIn("bi-link-45deg", body)
+        self.assertNotIn(">Display name<", body)
 
 
 class APIAliasResolutionTests(TestCase):
