@@ -2,30 +2,36 @@
 
 Aliases share their parent account's IMAP connection and password, so this
 command only links addresses — it never touches credentials. It's idempotent:
-re-running skips aliases that are already attached, so it's safe to run again
-after adding more.
+re-running skips aliases that are already attached, so it's safe to run again.
 
 Input is one or more `alias  parent` pairs, supplied either inline:
 
     python manage.py attach_aliases --account riveracazanova@mail.ru \\
         cyril.lukin@mail.ru gennady.lukin11@mail.ru
 
-or as a whitespace/CSV-separated file (use - for stdin), one pair per line:
+or as a whitespace/CSV-separated file (use - for stdin), one pair per line —
+the first token is the alias, the last is the parent:
 
-    python manage.py attach_aliases --file aliases.tsv
+    python manage.py attach_aliases --file aliases.tsv --skip-missing
 
     # aliases.tsv
     cyril.lukin@mail.ru     riveracazanova@mail.ru
     gennady.lukin11@mail.ru riveracazanova@mail.ru
 
-Pass --dry-run to validate and preview without writing anything.
+Pass --dry-run to preview without writing. Pass --skip-missing for a best-effort
+bulk load: rows whose parent account isn't in the database (or that would
+collide with an existing address) are skipped and reported instead of aborting.
+Lines containing a bare DELETED marker are ignored.
+
+All existing state is read in a handful of queries up front and new rows are
+written with a single bulk_create, so even large files load in one round-trip
+rather than several per row.
 """
 
 from __future__ import annotations
 
 import sys
 
-from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
@@ -33,83 +39,119 @@ from core.models import EmailAccount, EmailAlias
 
 
 class Command(BaseCommand):
-    help = "Attach aliases to existing email accounts (idempotent)."
+    help = "Attach aliases to existing email accounts (idempotent, batched)."
 
     def add_arguments(self, parser):
+        parser.add_argument("aliases", nargs="*", help="Aliases to attach to --account.")
+        parser.add_argument("--account", dest="account", help="Parent account for inline aliases.")
+        parser.add_argument("--file", dest="file", help="File of 'alias parent' pairs (- for stdin).")
+        parser.add_argument("--owner", dest="owner", help="Username to disambiguate shared addresses.")
         parser.add_argument(
-            "aliases",
-            nargs="*",
-            help="Alias addresses to attach to --account (inline mode).",
-        )
-        parser.add_argument(
-            "--account",
-            dest="account",
-            help="Parent account address for the inline alias list.",
-        )
-        parser.add_argument(
-            "--file",
-            dest="file",
-            help="Path to a file of 'alias parent' pairs (use - for stdin).",
-        )
-        parser.add_argument(
-            "--owner",
-            dest="owner",
-            help="Username to disambiguate when several users own the same address.",
-        )
-        parser.add_argument(
-            "--dry-run",
+            "--skip-missing",
             action="store_true",
-            help="Validate and preview without writing.",
+            help="Best-effort: skip rows with no parent account / that would collide.",
         )
+        parser.add_argument("--dry-run", action="store_true", help="Preview without writing.")
 
     def handle(self, *args, **opts):
         pairs = self._collect_pairs(opts)
         if not pairs:
-            raise CommandError(
-                "No alias pairs given. Use --account EMAIL alias... or --file PATH."
-            )
+            raise CommandError("No alias pairs given. Use --account EMAIL alias... or --file PATH.")
 
         dry_run = opts["dry_run"]
+        skip_missing = opts["skip_missing"]
         owner = opts.get("owner")
-        added = skipped = failed = 0
 
-        # One transaction for the whole run so a mid-list failure doesn't leave
-        # a half-attached account. --dry-run rolls back unconditionally.
-        try:
+        # --- Preload existing state (a few queries, not one-per-row). ---
+        acc_qs = EmailAccount.objects.all()
+        if owner:
+            acc_qs = acc_qs.filter(owner__username=owner)
+        accounts = list(acc_qs)
+
+        by_email: dict[str, list[EmailAccount]] = {}
+        owner_primaries: dict[int, set[str]] = {}
+        for acc in accounts:
+            em = acc.email_address.lower()
+            by_email.setdefault(em, []).append(acc)
+            owner_primaries.setdefault(acc.owner_id, set()).add(em)
+
+        present: set[tuple[int, str]] = set()  # (account_id, lower(alias))
+        owner_aliases: dict[int, set[str]] = {}
+        for al in EmailAlias.objects.values("account_id", "email_address", "account__owner_id"):
+            em = al["email_address"].lower()
+            present.add((al["account_id"], em))
+            owner_aliases.setdefault(al["account__owner_id"], set()).add(em)
+
+        # --- Classify every pair in memory. ---
+        to_create: list[EmailAlias] = []
+        added: list[tuple[str, str]] = []
+        already_present = 0
+        skipped_missing: list[tuple[str, str]] = []
+        skipped_invalid: list[tuple[str, str, str]] = []
+
+        for alias_addr, parent_addr in pairs:
+            accs = by_email.get(parent_addr.lower())
+            if not accs:
+                if skip_missing:
+                    skipped_missing.append((alias_addr, parent_addr))
+                    continue
+                raise CommandError(f"No account {parent_addr!r} found (use --skip-missing to skip).")
+            if len(accs) > 1:
+                raise CommandError(
+                    f"{parent_addr!r} is owned by several users; pass --owner to choose."
+                )
+            acc = accs[0]
+            oid = acc.owner_id
+            em = alias_addr.lower()
+
+            if (acc.id, em) in present:
+                already_present += 1
+                continue
+            reason = None
+            if em in owner_primaries.get(oid, ()):
+                reason = "already one of your connected accounts"
+            elif em in owner_aliases.get(oid, ()):
+                reason = "already attached to one of your accounts"
+            if reason is not None:
+                if skip_missing:
+                    skipped_invalid.append((alias_addr, parent_addr, reason))
+                    continue
+                raise CommandError(f"{alias_addr} -> {parent_addr}: {reason}")
+
+            to_create.append(EmailAlias(account=acc, email_address=alias_addr))
+            present.add((acc.id, em))
+            owner_aliases.setdefault(oid, set()).add(em)
+            added.append((alias_addr, parent_addr))
+
+        # --- Write (one bulk insert) unless dry-run. ---
+        if to_create and not dry_run:
             with transaction.atomic():
-                for alias_addr, parent_addr in pairs:
-                    account = self._resolve_account(parent_addr, owner)
-                    result = self._attach_one(account, alias_addr, dry_run)
-                    if result == "added":
-                        added += 1
-                        self.stdout.write(self.style.SUCCESS(f"  + {alias_addr}  ->  {parent_addr}"))
-                    elif result == "skipped":
-                        skipped += 1
-                        self.stdout.write(f"  = {alias_addr}  (already attached)")
-                if dry_run:
-                    transaction.set_rollback(True)
-        except _AliasError as exc:
-            # Surface validation failures as a clean command error (whole run
-            # already rolled back by the atomic block).
-            raise CommandError(str(exc)) from exc
+                EmailAlias.objects.bulk_create(to_create, batch_size=500)
+
+        # --- Report. ---
+        for alias_addr, parent_addr in added:
+            self.stdout.write(self.style.SUCCESS(f"  + {alias_addr}  ->  {parent_addr}"))
+        for alias_addr, parent_addr in skipped_missing:
+            self.stdout.write(self.style.WARNING(f"  ? {alias_addr}  (no account for {parent_addr})"))
+        for alias_addr, parent_addr, reason in skipped_invalid:
+            self.stdout.write(self.style.WARNING(f"  ! {alias_addr} -> {parent_addr}: {reason}"))
 
         verb = "Would attach" if dry_run else "Attached"
         self.stdout.write(
             self.style.MIGRATE_HEADING(
-                f"\n{verb} {added} alias(es); {skipped} already present; {failed} failed."
+                f"\n{verb} {len(added)} alias(es); {already_present} already present; "
+                f"{len(skipped_missing)} missing parent; {len(skipped_invalid)} invalid."
             )
         )
         if dry_run:
             self.stdout.write("Dry run - no changes were saved.")
 
-    # --- helpers -----------------------------------------------------------
+    # --- input parsing -----------------------------------------------------
 
     def _collect_pairs(self, opts) -> list[tuple[str, str]]:
         pairs: list[tuple[str, str]] = []
-
         if opts.get("file"):
             pairs.extend(self._read_file(opts["file"]))
-
         if opts.get("aliases"):
             if not opts.get("account"):
                 raise CommandError("Inline aliases require --account EMAIL.")
@@ -118,7 +160,6 @@ class Command(BaseCommand):
         elif opts.get("account") and not opts.get("file"):
             raise CommandError("--account given but no alias addresses listed.")
 
-        # De-dupe identical pairs while preserving order.
         seen: set[tuple[str, str]] = set()
         unique: list[tuple[str, str]] = []
         for alias_addr, parent in pairs:
@@ -137,44 +178,15 @@ class Command(BaseCommand):
                 if not line or line.startswith("#"):
                     continue
                 parts = line.replace(",", " ").split()
-                if len(parts) != 2:
+                if any(p.upper() == "DELETED" for p in parts):
+                    continue  # source-flagged as deleted
+                if len(parts) < 2:
                     raise CommandError(
                         f"{path}:{line_num}: expected 'alias parent', got: {raw.rstrip()!r}"
                     )
-                out.append((parts[0], parts[1]))
+                # First token is the alias, last is the parent account.
+                out.append((parts[0], parts[-1]))
             return out
         finally:
             if stream is not sys.stdin:
                 stream.close()
-
-    def _resolve_account(self, parent_addr: str, owner: str | None) -> EmailAccount:
-        qs = EmailAccount.objects.filter(email_address__iexact=parent_addr)
-        if owner:
-            qs = qs.filter(owner__username=owner)
-        matches = list(qs)
-        if not matches:
-            who = f" for owner {owner!r}" if owner else ""
-            raise CommandError(f"No account {parent_addr!r}{who} found.")
-        if len(matches) > 1:
-            raise CommandError(
-                f"{parent_addr!r} is owned by several users; pass --owner to choose."
-            )
-        return matches[0]
-
-    def _attach_one(self, account: EmailAccount, alias_addr: str, dry_run: bool) -> str:
-        # Idempotency: an alias already on this account is a skip, not an error.
-        if account.aliases.filter(email_address__iexact=alias_addr).exists():
-            return "skipped"
-        alias = EmailAlias(account=account, email_address=alias_addr)
-        try:
-            alias.full_clean()
-        except ValidationError as exc:
-            msgs = "; ".join(m for errs in exc.message_dict.values() for m in errs)
-            raise _AliasError(f"{alias_addr} -> {account.email_address}: {msgs}") from exc
-        if not dry_run:
-            alias.save()
-        return "added"
-
-
-class _AliasError(Exception):
-    """Internal: a validation failure that should abort the whole run."""

@@ -21,9 +21,6 @@
           </span>
           <div class="flex-grow-1 min-w-0">
             <h1 class="h5 mb-0 text-break">{{ account.email_address }}</h1>
-            {% if account.display_name %}
-              <div class="text-secondary small">{{ account.display_name }}</div>
-            {% endif %}
           </div>
         </div>
 
@@ -72,9 +69,6 @@
         <dl class="row mb-0 small">
           <dt class="col-sm-4 col-md-3 text-secondary fw-normal">Email address</dt>
           <dd class="col-sm-8 col-md-9 mb-2 text-truncate">{{ account.email_address }}</dd>
-
-          <dt class="col-sm-4 col-md-3 text-secondary fw-normal">Display name</dt>
-          <dd class="col-sm-8 col-md-9 mb-2">{{ account.display_name|default:"—" }}</dd>
 
           <dt class="col-sm-4 col-md-3 text-secondary fw-normal">Group</dt>
           <dd class="col-sm-8 col-md-9 mb-2">

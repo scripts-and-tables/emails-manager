@@ -51,7 +51,6 @@
           <tr>
             <th style="width:1%" class="text-center" title="Enabled">On</th>
             <th>Email</th>
-            <th>Display name</th>
             <th>IMAP host</th>
             <th>Port</th>
             <th style="min-width: 240px;">Status</th>
@@ -73,6 +72,12 @@
               <td>
                 <a href="{% url 'core:account_detail' account.pk %}"
                    class="text-decoration-none text-reset account-link">{{ account.email_address }}</a>
+                {% if account.alias_count %}
+                  <span class="badge rounded-pill bg-secondary-subtle text-secondary-emphasis border ms-1"
+                        title="{{ account.alias_count }} linked alias{{ account.alias_count|pluralize:'es' }}">
+                    <i class="bi bi-link-45deg"></i> {{ account.alias_count }}
+                  </span>
+                {% endif %}
                 {% if account.group %}
                   <a href="{% url 'core:inbox' %}?group={{ account.group|urlencode }}"
                      class="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle ms-1 text-decoration-none"
@@ -81,7 +86,6 @@
                   </a>
                 {% endif %}
               </td>
-              <td class="text-secondary">{{ account.display_name|default:"—" }}</td>
               <td><code class="small">{{ account.imap_host }}</code></td>
               <td>{{ account.imap_port }}</td>
               <td>
@@ -131,14 +135,19 @@
           <a href="{% url 'core:account_detail' account.pk %}"
              class="flex-grow-1 min-w-0 text-decoration-none text-reset account-link">
             <div class="fw-semibold text-truncate">{{ account.email_address }}</div>
-            {% if account.display_name %}
-              <div class="text-secondary small text-truncate">{{ account.display_name }}</div>
-            {% endif %}
-            {% if account.group %}
-              <div class="mt-1">
-                <span class="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle">
-                  <i class="bi bi-tag"></i> {{ account.group }}
-                </span>
+            {% if account.alias_count or account.group %}
+              <div class="mt-1 d-flex flex-wrap gap-1">
+                {% if account.alias_count %}
+                  <span class="badge rounded-pill bg-secondary-subtle text-secondary-emphasis border"
+                        title="{{ account.alias_count }} linked alias{{ account.alias_count|pluralize:'es' }}">
+                    <i class="bi bi-link-45deg"></i> {{ account.alias_count }}
+                  </span>
+                {% endif %}
+                {% if account.group %}
+                  <span class="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle">
+                    <i class="bi bi-tag"></i> {{ account.group }}
+                  </span>
+                {% endif %}
               </div>
             {% endif %}
           </a>
