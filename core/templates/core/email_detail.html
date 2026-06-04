@@ -62,6 +62,31 @@
   </div>
 </div>
 
+{% if message.html %}
+  {% if show_images %}
+    <div class="d-flex align-items-center gap-2 mb-2 small text-secondary">
+      <i class="bi bi-image"></i>
+      <span>Remote images are shown for this email.</span>
+      <a class="ms-auto text-decoration-none"
+         href="?window={{ back_window }}&amp;folder={{ back_folder }}{% if back_account %}&amp;account={{ back_account }}{% endif %}">
+        Hide images
+      </a>
+    </div>
+  {% else %}
+    <div class="alert alert-warning d-flex flex-wrap align-items-center gap-2 py-2 px-3 mb-2 small">
+      <i class="bi bi-shield-exclamation"></i>
+      <span>
+        Remote images are hidden. Loading them can tell the sender you opened this
+        email (and reveal your rough location).
+      </span>
+      <a class="btn btn-sm btn-warning ms-sm-auto"
+         href="?window={{ back_window }}&amp;folder={{ back_folder }}{% if back_account %}&amp;account={{ back_account }}{% endif %}&amp;images=1">
+        <i class="bi bi-image me-1"></i>Show images
+      </a>
+    </div>
+  {% endif %}
+{% endif %}
+
 <div class="card card-soft">
   <div class="card-body p-2 p-md-3">
     {% if message.html %}

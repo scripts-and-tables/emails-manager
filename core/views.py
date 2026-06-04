@@ -538,7 +538,12 @@ def email_detail(request: HttpRequest, account_id: int, uid: str) -> HttpRespons
         messages.error(request, "Email not found.")
         return redirect("core:inbox")
 
-    return render(
+    # Remote images are blocked by the site CSP (img-src 'self' data:) by
+    # default — loading them lets a sender confirm the email was opened. The
+    # user opts in per-message via ?images=1, which relaxes img-src to allow
+    # https: for *this response only* (the sandboxed srcdoc iframe inherits it).
+    show_images = request.GET.get("images") == "1"
+    response = render(
         request,
         "core/email_detail.html",
         {
@@ -548,8 +553,12 @@ def email_detail(request: HttpRequest, account_id: int, uid: str) -> HttpRespons
             "back_window": request.GET.get("window", "1d"),
             "back_account": request.GET.get("account") or "",
             "back_folder": folder,
+            "show_images": show_images,
         },
     )
+    if show_images:
+        response._csp_update = {"img-src": ["https:"]}
+    return response
 
 
 def _back_to_inbox_url(request: HttpRequest) -> str:
