@@ -120,22 +120,29 @@ class AccountLimitTests(TestCase):
         session[OTP_VERIFIED_SESSION_KEY] = True
         session.save()
 
-    def test_premium_capped_at_100(self):
+    def test_superuser_is_unlimited(self):
+        from core.limits import get_account_limit, is_at_account_limit
+
         admin = User.objects.create_superuser(username="root", email="r@x.com", password="x")
-        # Below the cap: add succeeds.
+        # No cap at all for superusers.
+        self.assertIsNone(get_account_limit(admin))
+        # Even past the old premium ceiling, they're never "at limit".
         for i in range(PREMIUM_TIER_ACCOUNT_LIMIT):
             _make_account(admin, f"acct{i}@example.com")
+        self.assertFalse(is_at_account_limit(admin))
+        # And a single-add beyond the old cap succeeds.
         self._login(admin)
-        # At PREMIUM_TIER_ACCOUNT_LIMIT/PREMIUM_TIER_ACCOUNT_LIMIT — next single-add is blocked.
         response = self.client.post(
             reverse("core:account_new"),
             _new_account_post_data("over@example.com"),
         )
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("core:accounts_list"))
+        self.assertTrue(
+            EmailAccount.objects.filter(owner=admin, email_address="over@example.com").exists()
+        )
         self.assertEqual(
             EmailAccount.objects.filter(owner=admin).count(),
-            PREMIUM_TIER_ACCOUNT_LIMIT,
+            PREMIUM_TIER_ACCOUNT_LIMIT + 1,
         )
 
     def test_single_add_blocks_at_cap(self):

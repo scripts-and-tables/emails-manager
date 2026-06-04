@@ -5,8 +5,8 @@
   <h1 class="h5 mb-0">
     Email accounts
     <span class="badge text-bg-secondary ms-1 align-middle"
-          aria-label="{{ account_count }} of {{ account_limit }} accounts used">
-      {{ account_count }} / {{ account_limit }}
+          aria-label="{{ account_count }} accounts{% if account_limit %} of {{ account_limit }}{% endif %}">
+      {{ account_count }}{% if account_limit %} / {{ account_limit }}{% endif %}
     </span>
   </h1>
   <div class="d-flex gap-2 flex-wrap">
@@ -21,16 +21,6 @@
         <i class="bi bi-lock-fill me-1"></i>Account limit reached
       </a>
     {% else %}
-      {% if can_bulk_add %}
-        <a href="{% url 'core:account_bulk_add' %}" class="btn btn-outline-secondary btn-sm">
-          <i class="bi bi-cloud-upload me-1"></i>Bulk add
-        </a>
-      {% else %}
-        <a href="{% url 'core:limits' %}" class="btn btn-outline-secondary btn-sm"
-           title="Bulk add isn't available on this account.">
-          <i class="bi bi-lock-fill me-1"></i>Bulk add
-        </a>
-      {% endif %}
       <a href="{% url 'core:account_new' %}" class="btn btn-primary btn-sm">
         <i class="bi bi-plus-lg me-1"></i>Add account
       </a>

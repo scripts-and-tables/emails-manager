@@ -46,8 +46,8 @@
           <span class="home-tile-icon home-tile-icon-green"><i class="bi bi-person-rolodex"></i></span>
           <h2 class="h5 mb-0">Accounts</h2>
           <span class="badge text-bg-secondary ms-auto"
-                aria-label="{{ account_count }} of {{ account_limit }} accounts used">
-            {{ account_count }} / {{ account_limit }}
+                aria-label="{{ account_count }} accounts{% if account_limit %} of {{ account_limit }}{% endif %}">
+            {{ account_count }}{% if account_limit %} / {{ account_limit }}{% endif %}
           </span>
         </div>
         <p class="text-secondary small mb-0">

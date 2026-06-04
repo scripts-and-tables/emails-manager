@@ -13,10 +13,14 @@
       <div class="card-body p-4 p-md-5">
         <div class="empty-state-icon mb-3"><i class="bi bi-info-circle text-primary"></i></div>
         <h1 class="h4 mb-2">
-          {% if is_premium %}You have a raised cap{% else %}Account limit on this instance{% endif %}
+          {% if not account_limit %}No account limit{% elif is_premium %}You have a raised cap{% else %}Account limit on this instance{% endif %}
         </h1>
         <p class="text-secondary mb-4">
-          You're using <strong>{{ account_count }} / {{ account_limit }}</strong> accounts.
+          {% if account_limit %}
+            You're using <strong>{{ account_count }} / {{ account_limit }}</strong> accounts.
+          {% else %}
+            You're using <strong>{{ account_count }}</strong> accounts, with no cap on this account.
+          {% endif %}
         </p>
         {% if is_premium %}
           <p class="text-secondary small mb-4">

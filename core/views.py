@@ -192,7 +192,7 @@ def accounts_list(request: HttpRequest) -> HttpResponse:
         .order_by(Lower("email_address"))
     )
     used, limit = get_account_usage(request.user)
-    at_limit = used >= limit
+    at_limit = limit is not None and used >= limit
     return render(
         request,
         "core/accounts_list.html",
@@ -201,7 +201,6 @@ def accounts_list(request: HttpRequest) -> HttpResponse:
             "account_count": used,
             "account_limit": limit,
             "at_limit": at_limit,
-            "can_bulk_add": can_bulk_add(request.user),
         },
     )
 
@@ -308,7 +307,7 @@ def account_bulk_add(request: HttpRequest) -> HttpResponse:
         messages.error(request, "Bulk add isn't available on this account.")
         return redirect("core:limits")
     used, limit = get_account_usage(request.user)
-    at_limit = used >= limit
+    at_limit = limit is not None and used >= limit
     ctx = {"account_count": used, "account_limit": limit, "at_limit": at_limit}
     if request.method == "POST":
         form = BulkAccountForm(request.POST)
@@ -359,7 +358,7 @@ def account_bulk_add(request: HttpRequest) -> HttpResponse:
 
             # Recompute usage after the bulk run for accurate context.
             used_after, _ = get_account_usage(request.user)
-            at_limit_after = used_after >= limit
+            at_limit_after = limit is not None and used_after >= limit
             return render(
                 request,
                 "core/account_bulk.html",
