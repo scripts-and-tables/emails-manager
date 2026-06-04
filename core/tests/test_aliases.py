@@ -164,6 +164,9 @@ class AccountsListAliasDisplayTests(TestCase):
         # Link-count badge + the unused display-name column are gone/added.
         self.assertIn("bi-link-45deg", body)
         self.assertNotIn(">Display name<", body)
+        # Template comments must not leak into the rendered page.
+        self.assertNotIn("{#", body)
+        self.assertNotIn("Quiet metadata", body)
 
 
 class AccountsListOrderingTests(TestCase):
