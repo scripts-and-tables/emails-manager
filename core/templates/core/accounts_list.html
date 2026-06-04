@@ -157,33 +157,40 @@
            data-account-row data-account-id="{{ account.pk }}"
            data-email="{{ account.email_address|lower }}"
            data-test-url="{% url 'core:account_test' account.pk %}">
-        <div class="d-flex align-items-center gap-2">
-          <button type="button" class="status-dot-trigger" data-test-trigger
-                  title="Tap to test connection" aria-label="Test connection">
-            <span class="status-dot-css status-idle-bg" data-status-dot aria-hidden="true"></span>
-          </button>
-          <a href="{% url 'core:account_detail' account.pk %}"
-             class="flex-grow-1 min-w-0 d-flex align-items-center gap-1 text-decoration-none text-reset account-link">
-            <span class="fw-semibold text-truncate">{{ account.email_address }}</span>
-            {% if account.alias_count %}
-              <span class="badge rounded-pill bg-secondary-subtle text-secondary-emphasis border flex-shrink-0"
-                    title="{{ account.alias_count }} linked alias{{ account.alias_count|pluralize:'es' }}">
-                <i class="bi bi-link-45deg"></i> {{ account.alias_count }}
-              </span>
-            {% endif %}
-            {% if account.group %}
-              <span class="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle flex-shrink-0">
-                <i class="bi bi-tag"></i> {{ account.group }}
-              </span>
-            {% endif %}
-          </a>
+        {# Line 1: the email address gets the full width. #}
+        <a href="{% url 'core:account_detail' account.pk %}"
+           class="d-block text-truncate fw-semibold text-decoration-none text-reset account-link">
+          {{ account.email_address }}
+        </a>
+        {# Line 2: check status · alias count · group · enable toggle. #}
+        <div class="d-flex align-items-center gap-2 mt-1">
           <button type="button"
-                  class="btn btn-sm btn-outline-warning border-0 d-none update-password-btn"
+                  class="btn btn-sm btn-outline-secondary py-0 px-2 test-btn d-inline-flex align-items-center gap-1 flex-shrink-0"
+                  title="Test connection" aria-label="Test connection">
+            <span class="status-dot-css status-idle-bg" data-status-dot aria-hidden="true"></span>
+            <i class="bi bi-arrow-repeat"></i>
+          </button>
+          <span class="status-message text-secondary small flex-grow-1 text-truncate"></span>
+          {% if account.alias_count %}
+            <span class="badge rounded-pill bg-secondary-subtle text-secondary-emphasis border flex-shrink-0"
+                  title="{{ account.alias_count }} linked alias{{ account.alias_count|pluralize:'es' }}">
+              <i class="bi bi-link-45deg"></i> {{ account.alias_count }}
+            </span>
+          {% endif %}
+          {% if account.group %}
+            <a href="{% url 'core:inbox' %}?group={{ account.group|urlencode }}"
+               class="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle text-decoration-none flex-shrink-0"
+               title="View emails from group {{ account.group }}">
+              <i class="bi bi-tag"></i> {{ account.group }}
+            </a>
+          {% endif %}
+          <button type="button"
+                  class="btn btn-sm btn-outline-warning border-0 d-none update-password-btn flex-shrink-0"
                   data-password-url="{% url 'core:account_update_password' account.pk %}"
                   title="Update app password" aria-label="Update app password">
             <i class="bi bi-key"></i>
           </button>
-          <div class="form-check form-switch m-0 ps-0">
+          <div class="form-check form-switch m-0 ps-0 flex-shrink-0">
             <input class="form-check-input toggle-switch m-0" type="checkbox" role="switch"
                    data-toggle-url="{% url 'core:account_toggle' account.pk %}"
                    aria-label="Enable {{ account.email_address }}"
