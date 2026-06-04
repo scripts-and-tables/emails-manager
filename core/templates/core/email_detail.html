@@ -65,24 +65,21 @@
 {% if message.html %}
   {% if show_images %}
     <div class="d-flex align-items-center gap-2 mb-2 small text-secondary">
-      <i class="bi bi-image"></i>
-      <span>Remote images are shown for this email.</span>
+      <i class="bi bi-image"></i><span>Images shown</span>
       <a class="ms-auto text-decoration-none"
          href="?window={{ back_window }}&amp;folder={{ back_folder }}{% if back_account %}&amp;account={{ back_account }}{% endif %}">
-        Hide images
+        Hide
       </a>
     </div>
   {% else %}
-    <div class="alert alert-warning d-flex flex-wrap align-items-center gap-2 py-2 px-3 mb-2 small">
-      <i class="bi bi-shield-exclamation"></i>
-      <span>
-        Remote images are hidden. Loading them can tell the sender you opened this
-        email (and reveal your rough location).
-      </span>
-      <a class="btn btn-sm btn-warning ms-sm-auto"
+    <div class="d-flex align-items-center gap-2 mb-2">
+      <a class="btn btn-sm btn-outline-secondary"
          href="?window={{ back_window }}&amp;folder={{ back_folder }}{% if back_account %}&amp;account={{ back_account }}{% endif %}&amp;images=1">
         <i class="bi bi-image me-1"></i>Show images
       </a>
+      <i class="bi bi-info-circle text-secondary" tabindex="0" role="img"
+         aria-label="Loading remote images may let the sender know you opened this email"
+         title="Loading remote images may let the sender know you opened this email."></i>
     </div>
   {% endif %}
 {% endif %}

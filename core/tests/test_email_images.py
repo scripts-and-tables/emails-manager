@@ -63,7 +63,7 @@ class EmailImageGatingTests(TestCase):
         self.assertEqual(resp.status_code, 200)
         img_src = _img_src(resp.headers.get("Content-Security-Policy", ""))
         self.assertIn("https:", img_src)  # remote images now allowed
-        self.assertContains(resp, "Remote images are shown")
+        self.assertContains(resp, "Images shown")
 
     @patch("core.views.fetch_body")
     def test_other_pages_keep_strict_img_src(self, mock_fetch):
