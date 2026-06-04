@@ -177,13 +177,23 @@ And the controls inside must have these classes / data attrs as needed:
           seen.set(row.dataset.accountId, row.dataset.testUrl);
         }
       });
+      const total = seen.size;
+      if (!total) return;
+      const original = testAllBtn.innerHTML;
+      let done = 0;
+      const render = () => {
+        testAllBtn.innerHTML =
+          '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>' +
+          'Testing ' + done + '/' + total + '…';
+      };
       testAllBtn.disabled = true;
-      testAllBtn.classList.add('is-testing');
-      Promise.all(Array.from(seen.entries()).map(([id, url]) => testAccount(id, url)))
-        .finally(() => {
-          testAllBtn.disabled = false;
-          testAllBtn.classList.remove('is-testing');
-        });
+      render();
+      Promise.all(Array.from(seen.entries()).map(([id, url]) =>
+        testAccount(id, url).finally(() => { done++; render(); })
+      )).finally(() => {
+        testAllBtn.disabled = false;
+        testAllBtn.innerHTML = original;
+      });
     });
   }
 
