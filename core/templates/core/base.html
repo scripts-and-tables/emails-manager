@@ -106,6 +106,10 @@
 
     .empty-state-icon { font-size: 3rem; color: var(--bs-secondary-color); line-height: 1; }
 
+    /* Allow flex children to shrink below their content width so text-truncate
+       works inside flex rows (Bootstrap 5 ships no min-width utility). */
+    .min-w-0 { min-width: 0; }
+
     .user-avatar {
       display: inline-flex; align-items: center; justify-content: center;
       width: 36px; height: 36px; border-radius: 50%;

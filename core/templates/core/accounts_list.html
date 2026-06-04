@@ -157,33 +157,36 @@
            data-account-row data-account-id="{{ account.pk }}"
            data-email="{{ account.email_address|lower }}"
            data-test-url="{% url 'core:account_test' account.pk %}">
-        {# Line 1: the email address gets the full width. #}
-        <a href="{% url 'core:account_detail' account.pk %}"
-           class="d-block text-truncate fw-semibold text-decoration-none text-reset account-link">
-          {{ account.email_address }}
-        </a>
-        {# Line 2: check status · alias count · group · enable toggle. #}
-        <div class="d-flex align-items-center gap-2 mt-1">
-          <button type="button"
-                  class="btn btn-sm btn-outline-secondary py-0 px-2 test-btn d-inline-flex align-items-center gap-1 flex-shrink-0"
-                  title="Test connection" aria-label="Test connection">
+        <div class="d-flex align-items-center gap-2">
+          {# Leading status dot — tap to test; pulses while testing. #}
+          <button type="button" class="status-dot-trigger test-btn flex-shrink-0"
+                  title="Tap to test connection" aria-label="Test {{ account.email_address }}">
             <span class="status-dot-css status-idle-bg" data-status-dot aria-hidden="true"></span>
-            <i class="bi bi-arrow-repeat"></i>
           </button>
-          <span class="status-message text-secondary small flex-grow-1 text-truncate"></span>
-          {% if account.alias_count %}
-            <span class="badge rounded-pill bg-secondary-subtle text-secondary-emphasis border flex-shrink-0"
-                  title="{{ account.alias_count }} linked alias{{ account.alias_count|pluralize:'es' }}">
-              <i class="bi bi-link-45deg"></i> {{ account.alias_count }}
-            </span>
-          {% endif %}
-          {% if account.group %}
-            <a href="{% url 'core:inbox' %}?group={{ account.group|urlencode }}"
-               class="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle text-decoration-none flex-shrink-0"
-               title="View emails from group {{ account.group }}">
-              <i class="bi bi-tag"></i> {{ account.group }}
+          <div class="flex-grow-1 min-w-0">
+            <a href="{% url 'core:account_detail' account.pk %}"
+               class="d-block text-truncate fw-semibold text-decoration-none text-reset account-link">
+              {{ account.email_address }}
             </a>
-          {% endif %}
+            {# Quiet metadata line: only takes height when it has content
+               (status text appears here after a test). #}
+            <div class="d-flex align-items-center gap-2 small text-secondary lh-sm">
+              <span class="status-message text-truncate"></span>
+              {% if account.alias_count %}
+                <span class="flex-shrink-0"
+                      title="{{ account.alias_count }} linked alias{{ account.alias_count|pluralize:'es' }}">
+                  <i class="bi bi-link-45deg"></i>{{ account.alias_count }}
+                </span>
+              {% endif %}
+              {% if account.group %}
+                <a href="{% url 'core:inbox' %}?group={{ account.group|urlencode }}"
+                   class="text-secondary text-decoration-none flex-shrink-0"
+                   title="View emails from group {{ account.group }}">
+                  <i class="bi bi-tag"></i> {{ account.group }}
+                </a>
+              {% endif %}
+            </div>
+          </div>
           <button type="button"
                   class="btn btn-sm btn-outline-warning border-0 d-none update-password-btn flex-shrink-0"
                   data-password-url="{% url 'core:account_update_password' account.pk %}"
