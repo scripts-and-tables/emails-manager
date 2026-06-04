@@ -381,6 +381,12 @@
         if (!confirm(form.dataset.confirmMessage)) e.preventDefault();
       });
     });
+    // Links tagged data-confirm-message confirm() before navigating.
+    document.querySelectorAll('a[data-confirm-message]').forEach((link) => {
+      link.addEventListener('click', (e) => {
+        if (!confirm(link.dataset.confirmMessage)) e.preventDefault();
+      });
+    });
     document.querySelectorAll('[data-auto-submit]').forEach((el) => {
       el.addEventListener('change', () => { if (el.form) el.form.submit(); });
     });

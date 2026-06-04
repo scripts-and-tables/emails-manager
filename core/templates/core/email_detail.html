@@ -72,14 +72,12 @@
       </a>
     </div>
   {% else %}
-    <div class="d-flex align-items-center gap-2 mb-2">
+    <div class="mb-2">
       <a class="btn btn-sm btn-outline-secondary"
+         data-confirm-message="Showing remote images can reveal your rough location and let the sender know you opened this email. Show images?"
          href="?window={{ back_window }}&amp;folder={{ back_folder }}{% if back_account %}&amp;account={{ back_account }}{% endif %}&amp;images=1">
         <i class="bi bi-image me-1"></i>Show images
       </a>
-      <i class="bi bi-info-circle text-secondary" tabindex="0" role="img"
-         aria-label="Loading remote images may let the sender know you opened this email"
-         title="Loading remote images may let the sender know you opened this email."></i>
     </div>
   {% endif %}
 {% endif %}

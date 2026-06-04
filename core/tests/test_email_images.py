@@ -55,6 +55,8 @@ class EmailImageGatingTests(TestCase):
         self.assertIn("img-src", img_src)
         self.assertNotIn("https:", img_src)  # remote images not allowed
         self.assertContains(resp, "Show images")
+        # The button confirms before navigating (guards against accidental taps).
+        self.assertContains(resp, "data-confirm-message")
 
     @patch("core.views.fetch_body")
     def test_images_allowed_with_param(self, mock_fetch):
